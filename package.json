@@ -26,8 +26,8 @@
     "babel-register": "^6.16.3",
     "chai": "^3.5.0",
     "jsdom": "^9.9.1",
+    "jsdom-global": "^2.1.1",
     "mocha": "^3.1.2",
-    "mocha-jsdom": "^1.1.0",
     "path": "^0.12.0",
     "sinon": "^1.17.6",
     "webpack": "^1.13.0",
@@ -35,7 +35,7 @@
   },
   "scripts": {
     "build": "NODE_ENV=production webpack --config webpack.config.js",
-    "test": "mocha --reporter list --require babel-register tests"
+    "test": "mocha --require babel-register --require jsdom-global/register tests"
   },
   "repository": {
     "type": "git",
