@@ -1,0 +1,20 @@
+before_script:
+  - npm install -g yarn
+  - yarn install
+
+cache:
+  paths:
+    - $HOME/.cache/yarn
+
+
+# targets
+
+test:6:
+  image: node:6
+  script:
+    - npm test
+
+test:7:
+  image: node:7
+  script:
+    - npm test

@@ -1,0 +1,44 @@
+{
+  "name": "naja",
+  "version": "0.1.0",
+  "description": "Modern AJAX library for Nette Framework",
+  "keywords": [
+    "nette",
+    "ajax",
+    "history"
+  ],
+  "author": "Jiří Pudil",
+  "license": "MIT",
+  "main": "src/index.js",
+  "dependencies": {
+    "event-target-shim": "^2.0.0",
+    "object-assign": "^4.1.0",
+    "qwest": "^4.4.5"
+  },
+  "devDependencies": {
+    "babel": "^6.5.0",
+    "babel-core": "^6.14.0",
+    "babel-loader": "^6.2.0",
+    "babel-plugin-syntax-class-properties": "^6.13.0",
+    "babel-plugin-transform-class-properties": "^6.14.0",
+    "babel-polyfill": "^6.16.0",
+    "babel-preset-es2015": "^6.16.0",
+    "babel-register": "^6.16.3",
+    "chai": "^3.5.0",
+    "jsdom": "^9.9.1",
+    "mocha": "^3.1.2",
+    "mocha-jsdom": "^1.1.0",
+    "path": "^0.12.0",
+    "sinon": "^1.17.6",
+    "webpack": "^1.13.0",
+    "webpack-dev-server": "^1.15.0"
+  },
+  "scripts": {
+    "build": "NODE_ENV=production webpack --config webpack.config.js",
+    "test": "mocha --reporter list --require babel-register tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jiripudil/Naja.git"
+  }
+}

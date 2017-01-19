@@ -1,0 +1,7 @@
+/*!
+ * Naja.ja
+ * v0.1.0-dev
+ * 
+ * by Jiří Pudil <https://jiripudil.cz>
+ */
+!function(e){function t(i){if(n[i])return n[i].exports;var r=n[i]={exports:{},id:i,loaded:!1};return e[i].call(r.exports,r,r.exports,t),r.loaded=!0,r.exports}var n={};return t.m=e,t.c=n,t.p="",t(0)}([function(e,t,n){e.exports=n(2)},function(e,t){"use strict";function n(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}Object.defineProperty(t,"__esModule",{value:!0});var i=function(){function e(e,t){for(var n=0;n<t.length;n++){var i=t[n];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(e,i.key,i)}}return function(t,n,i){return n&&e(t.prototype,n),i&&e(t,i),t}}(),r=function(){function e(){n(this,e),this.initialized=!1}return i(e,[{key:"initialize",value:function(){if(this.initialized)throw new Error("Cannot initialize Naja, it is already initialized.");this.initialized=!0}}]),e}();t.default=r},function(e,t,n){"use strict";function i(e){return e&&e.__esModule?e:{default:e}}Object.defineProperty(t,"__esModule",{value:!0});var r=n(1),a=i(r),o=new a.default;document.addEventListener("DOMContentLoaded",o.initialize.bind(o)),window.Naja=o,t.default=o}]);
