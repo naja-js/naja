@@ -35,7 +35,7 @@
   },
   "scripts": {
     "build": "NODE_ENV=production webpack --config webpack.config.js",
-    "test": "mocha --require babel-register --require jsdom-global/register tests"
+    "test": "mocha --require babel-register tests"
   },
   "repository": {
     "type": "git",
