@@ -5,7 +5,7 @@ before_script:
 
 cache:
   paths:
-    - $(yarn cache dir)
+    - $HOME/.yarn-cache
 
 
 # targets
