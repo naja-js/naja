@@ -2,14 +2,19 @@ import qwest from 'qwest';
 import objectAssign from 'object-assign';
 import EventTarget from 'event-target-shim';
 
+import UIHandler from './core/UIHandler';
+
 
 export default class Naja extends EventTarget {
 	initialized = false;
+	components = [];
 
 	initialize() {
 		if (this.initialized) {
 			throw new Error("Cannot initialize Naja, it is already initialized.");
 		}
+
+		this.components.push(new UIHandler(this));
 
 		this.fireEvent('init');
 		this.initialized = true;

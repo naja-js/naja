@@ -55,6 +55,12 @@ describe('UIHandler', function () {
 	});
 
 
+	it('registered in Naja.initialize()', function () {
+		const naja = new Naja();
+		naja.initialize();
+		assert.isDefined(naja.components.find(component => component instanceof UIHandler));
+	});
+
 	it('constructor()', function () {
 		const naja = new Naja();
 		const mock = sinon.mock(naja);
