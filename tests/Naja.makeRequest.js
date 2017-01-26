@@ -1,4 +1,4 @@
-import 'jsdom-global/register';
+import './jsdomRegister';
 import {assert} from 'chai';
 import sinon from 'sinon';
 
@@ -74,7 +74,7 @@ describe('makeRequest()', function () {
 			assert.isTrue(loadCallback.called);
 			assert.isFalse(errorCallback.called);
 			done();
-		})
+		});
 
 		this.requests[0].respond(200, {'Content-Type': 'application/json'}, JSON.stringify({answer: 42}));
 	});
@@ -123,7 +123,7 @@ describe('makeRequest()', function () {
 				.and(sinon.match.has('response'))
 				.and(sinon.match.has('xhr', sinon.match.instanceOf(XMLHttpRequest)))
 			));
-			
+
 			assert.isTrue(completeCallback.called);
 			assert.isTrue(completeCallback.calledBefore(loadCallback));
 			assert.isTrue(completeCallback.calledWith(sinon.match.object
@@ -135,7 +135,7 @@ describe('makeRequest()', function () {
 			assert.isTrue(loadCallback.called);
 			assert.isFalse(successCallback.called);
 			done();
-		})
+		});
 
 		this.requests[0].respond(500, {'Content-Type': 'application/json'}, JSON.stringify({error: 'Internal Server Error'}));
 	});

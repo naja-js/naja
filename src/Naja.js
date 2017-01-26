@@ -3,14 +3,16 @@ import objectAssign from 'object-assign';
 import EventTarget from 'event-target-shim';
 
 import UIHandler from './core/UIHandler';
-import SnippetHandler from './core/SnippetHandler';
+import FormsHandler from './core/FormsHandler';
 import RedirectHandler from './core/RedirectHandler';
+import SnippetHandler from './core/SnippetHandler';
 
 
 export default class Naja extends EventTarget {
 	initialized = false;
 
 	uiHandler = null;
+	formsHandler = null;
 	snippetHandler = null;
 	redirectHandler = null;
 	extensions = [];
@@ -21,8 +23,9 @@ export default class Naja extends EventTarget {
 		}
 
 		this.uiHandler = new UIHandler(this);
-		this.snippetHandler = new SnippetHandler(this);
 		this.redirectHandler = new RedirectHandler(this);
+		this.snippetHandler = new SnippetHandler(this);
+		this.formsHandler = new FormsHandler(this);
 
 		this.fireEvent('init');
 		this.initialized = true;

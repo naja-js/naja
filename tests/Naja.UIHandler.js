@@ -1,4 +1,4 @@
-import 'jsdom-global/register';
+import './jsdomRegister';
 import {assert} from 'chai';
 import sinon from 'sinon';
 
@@ -107,6 +107,45 @@ describe('UIHandler', function () {
 				ctrlKey: true,
 			};
 			handler.handleUI(evt2);
+
+			mock.verify();
+		});
+
+		it('triggers interaction event', function () {
+			const naja = new Naja();
+			const listener = sinon.spy();
+			naja.addEventListener('interaction', listener);
+
+			const handler = new UIHandler(naja);
+
+			const evt = {
+				type: 'click',
+				target: this.a,
+				preventDefault: () => true,
+			};
+			handler.handleUI(evt);
+
+			assert.isTrue(listener.calledWithMatch(sinon.match.object
+				.and(sinon.match.has('element', this.a))
+				.and(sinon.match.has('originalEvent', evt))
+			));
+		});
+
+		it('interaction event listener can abort request', function () {
+			const naja = new Naja();
+			naja.addEventListener('interaction', evt => evt.preventDefault());
+
+			const mock = sinon.mock(naja);
+			mock.expects('makeRequest')
+				.never();
+
+			const handler = new UIHandler(naja);
+
+			const evt = {
+				type: 'click',
+				target: this.a,
+			};
+			handler.handleUI(evt);
 
 			mock.verify();
 		});

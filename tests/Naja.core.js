@@ -1,6 +1,5 @@
-import 'jsdom-global/register';
+import './jsdomRegister';
 import {assert} from 'chai';
-import sinon from 'sinon';
 
 import Naja from '../src/Naja';
 

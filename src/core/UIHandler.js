@@ -40,6 +40,10 @@ export default class UIHandler extends Component {
 		const el = evt.target;
 		let method, url, data;
 
+		if ( ! this.naja.fireEvent('interaction', {element: el, originalEvent: evt})) {
+			return;
+		}
+
 		if (evt.type === 'submit') {
 			method = !!el.method ? el.method.toUpperCase() : 'GET';
 			url = el.action || window.location.pathname + window.location.search;
