@@ -10,10 +10,7 @@ describe('makeRequest()', function () {
 		this.xhr = sinon.useFakeXMLHttpRequest();
 		global.window.XMLHttpRequest = window.XMLHttpRequest = XMLHttpRequest;
 		const requests = this.requests = [];
-
-        this.xhr.onCreate = function (xhr) {
-            requests.push(xhr);
-        };
+		this.xhr.onCreate = requests.push.bind(requests);
 	});
 
 	afterEach(function () {

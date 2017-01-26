@@ -3,14 +3,14 @@ import objectAssign from 'object-assign';
 import EventTarget from 'event-target-shim';
 
 import UIHandler from './core/UIHandler';
-import SnippetManager from './core/SnippetManager';
+import SnippetHandler from './core/SnippetHandler';
 
 
 export default class Naja extends EventTarget {
 	initialized = false;
 
 	uiHandler = null;
-	snippetManager = null;
+	snippetHandler = null;
 	extensions = [];
 
 	initialize() {
@@ -19,7 +19,7 @@ export default class Naja extends EventTarget {
 		}
 
 		this.uiHandler = new UIHandler(this);
-		this.snippetManager = new SnippetManager(this);
+		this.snippetHandler = new SnippetHandler(this);
 
 		this.fireEvent('init');
 		this.initialized = true;

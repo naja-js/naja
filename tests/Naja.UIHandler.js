@@ -17,37 +17,37 @@ describe('UIHandler', function () {
 		};
 
 		// a.ajax
-        this.a = document.createElement('a');
-        this.a.href = '/foo';
-        this.a.classList.add('ajax');
-        document.body.appendChild(this.a);
+		this.a = document.createElement('a');
+		this.a.href = '/foo';
+		this.a.classList.add('ajax');
+		document.body.appendChild(this.a);
 
-        // form.ajax
-        this.form = document.createElement('form');
-        this.form.method = 'POST';
-        this.form.action = '/bar';
-        this.form.classList.add('ajax');
-        document.body.appendChild(this.form);
+		// form.ajax
+		this.form = document.createElement('form');
+		this.form.method = 'POST';
+		this.form.action = '/bar';
+		this.form.classList.add('ajax');
+		document.body.appendChild(this.form);
 
-        // form input[type="submit"].ajax
-        const form2 = document.createElement('form');
-        form2.action = '/baz';
-        this.input = document.createElement('input');
-        this.input.type = 'submit';
-        this.input.name = 'submit';
-        this.input.classList.add('ajax');
-        form2.appendChild(this.input);
-        document.body.appendChild(form2);
+		// form input[type="submit"].ajax
+		const form2 = document.createElement('form');
+		form2.action = '/baz';
+		this.input = document.createElement('input');
+		this.input.type = 'submit';
+		this.input.name = 'submit';
+		this.input.classList.add('ajax');
+		form2.appendChild(this.input);
+		document.body.appendChild(form2);
 
-        // form input[type="image"].ajax
-        const form3 = document.createElement('form');
-        form3.action = '/qux';
-        this.image = document.createElement('input');
-        this.image.type = 'image';
-        this.image.name = 'image';
-        this.image.classList.add('ajax');
-        form3.appendChild(this.image);
-        document.body.appendChild(form3);
+		// form input[type="image"].ajax
+		const form3 = document.createElement('form');
+		form3.action = '/qux';
+		this.image = document.createElement('input');
+		this.image.type = 'image';
+		this.image.name = 'image';
+		this.image.classList.add('ajax');
+		form3.appendChild(this.image);
+		document.body.appendChild(form3);
 	});
 
 	afterEach(function () {
@@ -75,14 +75,14 @@ describe('UIHandler', function () {
 	it('bindUI()', function () {
 		const spy = sinon.spy();
 
-        const handler = new UIHandler(new Naja());
-        handler.bindUI(spy);
+		const handler = new UIHandler(new Naja());
+		handler.bindUI(spy);
 
-        this.a.dispatchEvent(new Event('click'));
-        this.form.dispatchEvent(new Event('submit'));
-        this.input.dispatchEvent(new Event('click'));
+		this.a.dispatchEvent(new Event('click'));
+		this.form.dispatchEvent(new Event('submit'));
+		this.input.dispatchEvent(new Event('click'));
 
-        assert.isTrue(spy.calledThrice);
+		assert.isTrue(spy.calledThrice);
 	});
 
 	describe('handleUI()', function () {

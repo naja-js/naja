@@ -3,14 +3,14 @@ import {assert} from 'chai';
 import sinon from 'sinon';
 
 import Naja from '../src/Naja';
-import SnippetManager from '../src/core/SnippetManager';
+import SnippetHandler from '../src/core/SnippetHandler';
 
 
-describe('SnippetManager', function () {
+describe('SnippetHandler', function () {
 	it('registered in Naja.initialize()', function () {
 		const naja = new Naja();
 		naja.initialize();
-		assert.instanceOf(naja.snippetManager, SnippetManager);
+		assert.instanceOf(naja.snippetHandler, SnippetHandler);
 	});
 
 	it('constructor()', function () {
@@ -20,13 +20,36 @@ describe('SnippetManager', function () {
 			.withExactArgs('success', sinon.match.instanceOf(Function))
 			.once();
 
-		new SnippetManager(naja);
+		new SnippetHandler(naja);
 		mock.verify();
+	});
+
+	it('reads snippets from response', function (done) {
+		const xhr = sinon.useFakeXMLHttpRequest();
+		global.window.XMLHttpRequest = window.XMLHttpRequest = XMLHttpRequest;
+		const requests = [];
+		xhr.onCreate = requests.push.bind(requests);
+
+		const naja = new Naja();
+		const snippetHandler = new SnippetHandler(naja);
+
+		const mock = sinon.mock(snippetHandler);
+		mock.expects('updateSnippets')
+			.withExactArgs({'snippet--foo': 'foo'})
+			.once();
+
+		naja.makeRequest('GET', '/foo').then(() => {
+			mock.verify();
+			xhr.restore();
+			done();
+		});
+
+		requests[0].respond(200, {'Content-Type': 'application/json'}, JSON.stringify({snippets: {'snippet--foo': 'foo'}}));
 	});
 
 	it('updateSnippets()', function () {
 		const naja = new Naja();
-		const snippetManager = new SnippetManager(naja);
+		const snippetHandler = new SnippetHandler(naja);
 
 		const snippet1 = document.createElement('div');
 		snippet1.id = 'snippet--foo';
@@ -36,7 +59,7 @@ describe('SnippetManager', function () {
 		snippet2.id = 'snippet-bar-baz';
 		document.body.appendChild(snippet2);
 
-		const mock = sinon.mock(snippetManager);
+		const mock = sinon.mock(snippetHandler);
 		mock.expects('updateSnippet')
 			.withExactArgs(sinon.match.instanceOf(HTMLElement).and(sinon.match(value => value.id === 'snippet--foo')), 'foo')
 			.once();
@@ -45,7 +68,7 @@ describe('SnippetManager', function () {
 			.withExactArgs(sinon.match.instanceOf(HTMLElement).and(sinon.match(value => value.id === 'snippet-bar-baz')), 'bar.baz')
 			.once();
 
-		snippetManager.updateSnippets({
+		snippetHandler.updateSnippets({
 			'snippet--foo': 'foo',
 			'snippet-bar-baz': 'bar.baz',
 			'snippet--qux': 'is not there',
@@ -58,7 +81,7 @@ describe('SnippetManager', function () {
 
 	it('updateSnippet() title', function () {
 		const naja = new Naja();
-		const snippetManager = new SnippetManager(naja);
+		const snippetHandler = new SnippetHandler(naja);
 
 		const titleEl = document.createElement('title');
 		titleEl.id = 'snippet--title';
@@ -68,7 +91,7 @@ describe('SnippetManager', function () {
 		assert.equal(titleEl.innerHTML, 'Foo');
 		assert.equal(document.title, 'Foo');
 
-		snippetManager.updateSnippet(titleEl, 'Bar');
+		snippetHandler.updateSnippet(titleEl, 'Bar');
 
 		assert.equal(titleEl.innerHTML, 'Bar');
 		assert.equal(document.title, 'Bar');
@@ -76,7 +99,7 @@ describe('SnippetManager', function () {
 
 	it('updateSnippet() [data-ajax-prepend]', function () {
 		const naja = new Naja();
-		const snippetManager = new SnippetManager(naja);
+		const snippetHandler = new SnippetHandler(naja);
 
 		const el = document.createElement('div');
 		el.id = 'snippet--prepend';
@@ -85,13 +108,13 @@ describe('SnippetManager', function () {
 		document.body.appendChild(el);
 
 		assert.equal(el.innerHTML, 'Foo');
-		snippetManager.updateSnippet(el, 'prefix-');
+		snippetHandler.updateSnippet(el, 'prefix-');
 		assert.equal(el.innerHTML, 'prefix-Foo');
 	});
 
 	it('updateSnippet() [data-ajax-append]', function () {
 		const naja = new Naja();
-		const snippetManager = new SnippetManager(naja);
+		const snippetHandler = new SnippetHandler(naja);
 
 		const el = document.createElement('div');
 		el.id = 'snippet--append';
@@ -100,7 +123,7 @@ describe('SnippetManager', function () {
 		document.body.appendChild(el);
 
 		assert.equal(el.innerHTML, 'Foo');
-		snippetManager.updateSnippet(el, '-suffix');
+		snippetHandler.updateSnippet(el, '-suffix');
 		assert.equal(el.innerHTML, 'Foo-suffix');
 	});
 });
