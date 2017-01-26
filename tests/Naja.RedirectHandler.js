@@ -44,7 +44,7 @@ describe('RedirectHandler', function () {
 			done();
 		});
 
-		requests[0].respond(200, {'Content-Type': 'application/json'}, JSON.stringify({redirect: '/foo', forward: true}));
+		requests[0].respond(200, {'Content-Type': 'application/json'}, JSON.stringify({redirect: '/foo', forceRedirect: true}));
 	});
 
 	it('stops event propagation', function (done) {
@@ -65,23 +65,23 @@ describe('RedirectHandler', function () {
 			done();
 		});
 
-		requests[0].respond(200, {'Content-Type': 'application/json'}, JSON.stringify({redirect: '/foo', forward: true}));
+		requests[0].respond(200, {'Content-Type': 'application/json'}, JSON.stringify({redirect: '/foo', forceRedirect: true}));
 	});
 
-	it('makes request if forward is true', function () {
+	it('makes request if forceRedirect is false', function () {
 		const naja = new Naja();
 		const redirectHandler = new RedirectHandler(naja);
 
 		const mock = sinon.mock(naja);
 		mock.expects('makeRequest')
-			.withExactArgs('GET', 'http://example.com')
+			.withExactArgs('GET', '/foo')
 			.once();
 
-		redirectHandler.makeRedirect('http://example.com', true);
+		redirectHandler.makeRedirect('/foo', false);
 		mock.verify();
 	});
 
-	it('redirects if forward is false', function () {
+	it('redirects if forceRedirect is true', function () {
 		const naja = new Naja();
 		const redirectHandler = new RedirectHandler(naja);
 
@@ -91,7 +91,44 @@ describe('RedirectHandler', function () {
 		});
 
 		assert.equal(window.location.href, 'about:blank');
-		redirectHandler.makeRedirect('http://example.com', false);
-		assert.equal(window.location.href, 'http://example.com');
+		redirectHandler.makeRedirect('/foo', true);
+		assert.equal(window.location.href, '/foo');
+	});
+
+	it('makes request if url is local', function () {
+		const naja = new Naja();
+		const redirectHandler = new RedirectHandler(naja);
+
+		Object.defineProperty(window.location, 'origin', {
+			writable: false,
+			value: 'http://example.com'
+		});
+
+		const mock = sinon.mock(naja);
+		mock.expects('makeRequest')
+			.withExactArgs('GET', 'http://example.com/bar')
+			.once();
+
+		redirectHandler.makeRedirect('http://example.com/bar', false);
+		mock.verify();
+	});
+
+	it('redirects if url is external', function () {
+		const naja = new Naja();
+		const redirectHandler = new RedirectHandler(naja);
+
+		Object.defineProperty(window.location, 'href', {
+			writable: true,
+			value: 'http://example.com/foo'
+		});
+
+		Object.defineProperty(window.location, 'origin', {
+			writable: false,
+			value: 'http://example.com'
+		});
+
+		assert.equal(window.location.href, 'http://example.com/foo');
+		redirectHandler.makeRedirect('http://another-site.com/bar', false);
+		assert.equal(window.location.href, 'http://another-site.com/bar');
 	});
 });

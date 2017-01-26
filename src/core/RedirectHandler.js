@@ -7,18 +7,19 @@ export default class RedirectHandler extends Component {
 		naja.addEventListener('success', evt => {
 			const {response} = evt;
 			if (response.redirect) {
-				this.makeRedirect(response.redirect, response.forward);
+				this.makeRedirect(response.redirect, response.forceRedirect);
 				evt.stopImmediatePropagation();
 			}
 		});
 	}
 
-	makeRedirect(url, forward) {
-		if (forward) {
-			this.naja.makeRequest('GET', url);
+	makeRedirect(url, force) {
+		const externalRedirect = /^https?/i.test(url) && ! new RegExp('^' + window.location.origin, 'i').test(url);
+		if (force || externalRedirect) {
+			window.location.href = url;
 
 		} else {
-			window.location.href = url;
+			this.naja.makeRequest('GET', url);
 		}
 	}
 }

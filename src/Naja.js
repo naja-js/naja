@@ -6,6 +6,7 @@ import UIHandler from './core/UIHandler';
 import FormsHandler from './core/FormsHandler';
 import RedirectHandler from './core/RedirectHandler';
 import SnippetHandler from './core/SnippetHandler';
+import HistoryHandler from './core/HistoryHandler';
 
 
 export default class Naja extends EventTarget {
@@ -26,6 +27,7 @@ export default class Naja extends EventTarget {
 		this.redirectHandler = new RedirectHandler(this);
 		this.snippetHandler = new SnippetHandler(this);
 		this.formsHandler = new FormsHandler(this);
+		this.historyHandler = new HistoryHandler(this);
 
 		this.fireEvent('init');
 		this.initialized = true;
