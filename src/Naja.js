@@ -3,18 +3,23 @@ import objectAssign from 'object-assign';
 import EventTarget from 'event-target-shim';
 
 import UIHandler from './core/UIHandler';
+import SnippetManager from './core/SnippetManager';
 
 
 export default class Naja extends EventTarget {
 	initialized = false;
-	components = [];
+
+	uiHandler = null;
+	snippetManager = null;
+	extensions = [];
 
 	initialize() {
 		if (this.initialized) {
 			throw new Error("Cannot initialize Naja, it is already initialized.");
 		}
 
-		this.components.push(new UIHandler(this));
+		this.uiHandler = new UIHandler(this);
+		this.snippetManager = new SnippetManager(this);
 
 		this.fireEvent('init');
 		this.initialized = true;

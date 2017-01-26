@@ -58,7 +58,7 @@ describe('UIHandler', function () {
 	it('registered in Naja.initialize()', function () {
 		const naja = new Naja();
 		naja.initialize();
-		assert.isDefined(naja.components.find(component => component instanceof UIHandler));
+		assert.instanceOf(naja.uiHandler, UIHandler);
 	});
 
 	it('constructor()', function () {
