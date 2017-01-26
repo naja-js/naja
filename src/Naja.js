@@ -4,6 +4,7 @@ import EventTarget from 'event-target-shim';
 
 import UIHandler from './core/UIHandler';
 import SnippetHandler from './core/SnippetHandler';
+import RedirectHandler from './core/RedirectHandler';
 
 
 export default class Naja extends EventTarget {
@@ -11,6 +12,7 @@ export default class Naja extends EventTarget {
 
 	uiHandler = null;
 	snippetHandler = null;
+	redirectHandler = null;
 	extensions = [];
 
 	initialize() {
@@ -20,6 +22,7 @@ export default class Naja extends EventTarget {
 
 		this.uiHandler = new UIHandler(this);
 		this.snippetHandler = new SnippetHandler(this);
+		this.redirectHandler = new RedirectHandler(this);
 
 		this.fireEvent('init');
 		this.initialized = true;
