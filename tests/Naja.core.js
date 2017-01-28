@@ -1,12 +1,17 @@
-import './jsdomRegister';
+import jsdom from './jsdomRegister';
 import {assert} from 'chai';
-
-import Naja from '../src/Naja';
 
 
 describe('Naja.js', () => {
+	jsdom();
+
+	beforeEach(function (done) {
+		this.Naja = require('../src/Naja').default;
+		done();
+	});
+
 	it('should initialize once', function () {
-		const naja = new Naja();
+		const naja = new this.Naja();
 		let thrown = false;
 		assert.isFalse(naja.initialized);
 
@@ -27,7 +32,7 @@ describe('Naja.js', () => {
 
 	describe('event system', function () {
 		it('should call event listener', function () {
-			const naja = new Naja();
+			const naja = new this.Naja();
 			let initCalled = false;
 
 			naja.addEventListener('init', evt => initCalled = true);
@@ -37,7 +42,7 @@ describe('Naja.js', () => {
 		});
 
 		it('should not call listener after evt.stopImmediatePropagation() call', function () {
-			const naja = new Naja();
+			const naja = new this.Naja();
 			let loadCalled = false;
 			let loadCalled2 = false;
 
@@ -50,7 +55,7 @@ describe('Naja.js', () => {
 		});
 
 		it('should return false after evt.preventDefault() call', function () {
-			const naja = new Naja();
+			const naja = new this.Naja();
 			assert.isTrue(naja.fireEvent('foo'));
 
 			naja.addEventListener('foo', evt => evt.preventDefault());

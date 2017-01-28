@@ -1,24 +1,18 @@
-import './jsdomRegister';
+import jsdom from './jsdomRegister';
 import {assert} from 'chai';
 import sinon from 'sinon';
 
-import Naja from '../src/Naja';
-
 
 describe('makeRequest()', function () {
-	beforeEach(function () {
-		this.xhr = sinon.useFakeXMLHttpRequest();
-		global.window.XMLHttpRequest = window.XMLHttpRequest = XMLHttpRequest;
-		const requests = this.requests = [];
-		this.xhr.onCreate = requests.push.bind(requests);
-	});
+	jsdom();
 
-	afterEach(function () {
-		this.xhr.restore();
+	beforeEach(function (done) {
+		this.Naja = require('../src/Naja').default;
+		done();
 	});
 
 	it('should call success event if the request succeeds', function (done) {
-		const naja = new Naja();
+		const naja = new this.Naja();
 		naja.initialize();
 
 		const loadCallback = sinon.spy();
@@ -42,7 +36,7 @@ describe('makeRequest()', function () {
 			assert.isTrue(beforeCallback.called);
 			assert.isTrue(beforeCallback.calledBefore(startCallback));
 			assert.isTrue(beforeCallback.calledWith(sinon.match.object
-				.and(sinon.match.has('xhr', sinon.match.instanceOf(XMLHttpRequest)))
+				.and(sinon.match.has('xhr', sinon.match.instanceOf(window.XMLHttpRequest)))
 				.and(sinon.match.has('method', sinon.match.string))
 				.and(sinon.match.has('url', sinon.match.string))
 				.and(sinon.match.has('data'))
@@ -53,14 +47,14 @@ describe('makeRequest()', function () {
 			assert.isTrue(startCallback.calledBefore(successCallback));
 			assert.isTrue(startCallback.calledWith(sinon.match.object
 				.and(sinon.match.has('request'))
-				.and(sinon.match.has('xhr', sinon.match.instanceOf(XMLHttpRequest)))
+				.and(sinon.match.has('xhr', sinon.match.instanceOf(window.XMLHttpRequest)))
 			));
 
 			assert.isTrue(successCallback.called);
 			assert.isTrue(successCallback.calledBefore(completeCallback));
 			assert.isTrue(successCallback.calledWith(sinon.match.object
 				.and(sinon.match.has('response'))
-				.and(sinon.match.has('xhr', sinon.match.instanceOf(XMLHttpRequest)))
+				.and(sinon.match.has('xhr', sinon.match.instanceOf(window.XMLHttpRequest)))
 			));
 
 			assert.isTrue(completeCallback.called);
@@ -68,7 +62,7 @@ describe('makeRequest()', function () {
 			assert.isTrue(completeCallback.calledWith(sinon.match.object
 				.and(sinon.match.has('error', null))
 				.and(sinon.match.has('response'))
-				.and(sinon.match.has('xhr', sinon.match.instanceOf(XMLHttpRequest)))
+				.and(sinon.match.has('xhr', sinon.match.instanceOf(window.XMLHttpRequest)))
 			));
 
 			assert.isTrue(loadCallback.called);
@@ -80,7 +74,7 @@ describe('makeRequest()', function () {
 	});
 
 	it('should call error event if the request fails', function (done) {
-		const naja = new Naja();
+		const naja = new this.Naja();
 		naja.initialize();
 
 		const loadCallback = sinon.spy();
@@ -102,7 +96,7 @@ describe('makeRequest()', function () {
 
 		request.then(() => {
 			assert.isTrue(beforeCallback.calledWith(sinon.match.object
-				.and(sinon.match.has('xhr', sinon.match.instanceOf(XMLHttpRequest)))
+				.and(sinon.match.has('xhr', sinon.match.instanceOf(window.XMLHttpRequest)))
 				.and(sinon.match.has('method', sinon.match.string))
 				.and(sinon.match.has('url', sinon.match.string))
 				.and(sinon.match.has('data'))
@@ -113,7 +107,7 @@ describe('makeRequest()', function () {
 			assert.isTrue(startCallback.calledBefore(successCallback));
 			assert.isTrue(startCallback.calledWith(sinon.match.object
 				.and(sinon.match.has('request'))
-				.and(sinon.match.has('xhr', sinon.match.instanceOf(XMLHttpRequest)))
+				.and(sinon.match.has('xhr', sinon.match.instanceOf(window.XMLHttpRequest)))
 			));
 
 			assert.isTrue(errorCallback.called);
@@ -121,7 +115,7 @@ describe('makeRequest()', function () {
 			assert.isTrue(errorCallback.calledWith(sinon.match.object
 				.and(sinon.match.has('error', sinon.match.truthy))
 				.and(sinon.match.has('response'))
-				.and(sinon.match.has('xhr', sinon.match.instanceOf(XMLHttpRequest)))
+				.and(sinon.match.has('xhr', sinon.match.instanceOf(window.XMLHttpRequest)))
 			));
 
 			assert.isTrue(completeCallback.called);
@@ -129,7 +123,7 @@ describe('makeRequest()', function () {
 			assert.isTrue(completeCallback.calledWith(sinon.match.object
 				.and(sinon.match.has('error', sinon.match.truthy))
 				.and(sinon.match.has('response'))
-				.and(sinon.match.has('xhr', sinon.match.instanceOf(XMLHttpRequest)))
+				.and(sinon.match.has('xhr', sinon.match.instanceOf(window.XMLHttpRequest)))
 			));
 
 			assert.isTrue(loadCallback.called);

@@ -1,20 +1,25 @@
-import './jsdomRegister';
+import jsdom from './jsdomRegister';
 import {assert} from 'chai';
 import sinon from 'sinon';
 
-import Naja from '../src/Naja';
-import FormsHandler from '../src/core/FormsHandler';
-
 
 describe('FormsHandler', function () {
+	jsdom();
+
+	beforeEach(function (done) {
+		this.Naja = require('../src/Naja').default;
+		this.FormsHandler = require('../src/core/FormsHandler').default;
+		done();
+	});
+
 	it('registered in Naja.initialize()', function () {
-		const naja = new Naja();
+		const naja = new this.Naja();
 		naja.initialize();
-		assert.instanceOf(naja.formsHandler, FormsHandler);
+		assert.instanceOf(naja.formsHandler, this.FormsHandler);
 	});
 
 	it('constructor()', function () {
-		const naja = new Naja();
+		const naja = new this.Naja();
 		const mock = sinon.mock(naja);
 
 		mock.expects('addEventListener')
@@ -25,7 +30,7 @@ describe('FormsHandler', function () {
 			.withExactArgs('interaction', sinon.match.instanceOf(Function))
 			.once();
 
-		new FormsHandler(naja);
+		new this.FormsHandler(naja);
 		mock.verify();
 	});
 
@@ -38,16 +43,11 @@ describe('FormsHandler', function () {
 		document.body.appendChild(form1);
 		document.body.appendChild(form2);
 
-		const naja = new Naja();
-		new FormsHandler(naja);
+		const naja = new this.Naja();
+		new this.FormsHandler(naja);
 		naja.load();
 
 		assert.equal(initForm.callCount, 2);
-
-		document.body.removeChild(form1);
-		document.body.removeChild(form2);
-
-		window.Nette = undefined;
 	});
 
 	it('processes form', function () {
@@ -68,13 +68,11 @@ describe('FormsHandler', function () {
 			preventDefault: sinon.spy(),
 		};
 
-		FormsHandler.processForm(evt);
+		this.FormsHandler.processForm(evt);
 
 		assert.equal(element, element.form['nette-submittedBy']);
 		assert.isTrue(originalEvent.stopImmediatePropagation.called);
 		assert.isTrue(originalEvent.preventDefault.called);
 		assert.isTrue(evt.preventDefault.called);
-
-		window.Nette = undefined;
 	});
 });

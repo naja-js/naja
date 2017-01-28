@@ -1,37 +1,37 @@
-import './jsdomRegister';
+import jsdom from './jsdomRegister';
 import {assert} from 'chai';
 import sinon from 'sinon';
 
-import Naja from '../src/Naja';
-import SnippetHandler from '../src/core/SnippetHandler';
-
 
 describe('SnippetHandler', function () {
+	jsdom();
+
+	beforeEach(function (done) {
+		this.Naja = require('../src/Naja').default;
+		this.SnippetHandler = require('../src/core/SnippetHandler').default;
+		done();
+	});
+
 	it('registered in Naja.initialize()', function () {
-		const naja = new Naja();
+		const naja = new this.Naja();
 		naja.initialize();
-		assert.instanceOf(naja.snippetHandler, SnippetHandler);
+		assert.instanceOf(naja.snippetHandler, this.SnippetHandler);
 	});
 
 	it('constructor()', function () {
-		const naja = new Naja();
+		const naja = new this.Naja();
 		const mock = sinon.mock(naja);
 		mock.expects('addEventListener')
 			.withExactArgs('success', sinon.match.instanceOf(Function))
 			.once();
 
-		new SnippetHandler(naja);
+		new this.SnippetHandler(naja);
 		mock.verify();
 	});
 
 	it('reads snippets from response', function (done) {
-		const xhr = sinon.useFakeXMLHttpRequest();
-		global.window.XMLHttpRequest = window.XMLHttpRequest = XMLHttpRequest;
-		const requests = [];
-		xhr.onCreate = requests.push.bind(requests);
-
-		const naja = new Naja();
-		const snippetHandler = new SnippetHandler(naja);
+		const naja = new this.Naja();
+		const snippetHandler = new this.SnippetHandler(naja);
 
 		const mock = sinon.mock(snippetHandler);
 		mock.expects('updateSnippets')
@@ -40,16 +40,15 @@ describe('SnippetHandler', function () {
 
 		naja.makeRequest('GET', '/foo').then(() => {
 			mock.verify();
-			xhr.restore();
 			done();
 		});
 
-		requests[0].respond(200, {'Content-Type': 'application/json'}, JSON.stringify({snippets: {'snippet--foo': 'foo'}}));
+		this.requests[0].respond(200, {'Content-Type': 'application/json'}, JSON.stringify({snippets: {'snippet--foo': 'foo'}}));
 	});
 
 	it('updateSnippets()', function () {
-		const naja = new Naja();
-		const snippetHandler = new SnippetHandler(naja);
+		const naja = new this.Naja();
+		const snippetHandler = new this.SnippetHandler(naja);
 
 		const snippet1 = document.createElement('div');
 		snippet1.id = 'snippet--foo';
@@ -74,19 +73,35 @@ describe('SnippetHandler', function () {
 			'snippet--qux': 'is not there',
 		});
 
-		document.body.removeChild(snippet1);
-		document.body.removeChild(snippet2);
 		mock.verify();
 	});
 
-	it('updateSnippet() title', function () {
-		const naja = new Naja();
-		const snippetHandler = new SnippetHandler(naja);
+	it('updateSnippet', function () {
+		const naja = new this.Naja();
+		const snippetHandler = new this.SnippetHandler(naja);
 
-		const titleEl = document.createElement('title');
+		const el = document.createElement('div');
+		el.id = 'snippet--qux';
+		el.innerHTML = 'Foo';
+		document.body.appendChild(el);
+
+		assert.equal(el.innerHTML, 'Foo');
+		snippetHandler.updateSnippet(el, 'Bar');
+		assert.equal(el.innerHTML, 'Bar');
+	});
+
+	it('updateSnippet() title', function () {
+		const naja = new this.Naja();
+		const snippetHandler = new this.SnippetHandler(naja);
+
+		let titleEl = document.querySelector('title');
+		if ( ! titleEl) {
+			titleEl = document.createElement('title');
+			document.head.appendChild(titleEl);
+		}
+
 		titleEl.id = 'snippet--title';
 		titleEl.innerHTML = 'Foo';
-		document.head.appendChild(titleEl);
 
 		assert.equal(titleEl.innerHTML, 'Foo');
 		assert.equal(document.title, 'Foo');
@@ -98,8 +113,8 @@ describe('SnippetHandler', function () {
 	});
 
 	it('updateSnippet() [data-ajax-prepend]', function () {
-		const naja = new Naja();
-		const snippetHandler = new SnippetHandler(naja);
+		const naja = new this.Naja();
+		const snippetHandler = new this.SnippetHandler(naja);
 
 		const el = document.createElement('div');
 		el.id = 'snippet--prepend';
@@ -113,8 +128,8 @@ describe('SnippetHandler', function () {
 	});
 
 	it('updateSnippet() [data-ajax-append]', function () {
-		const naja = new Naja();
-		const snippetHandler = new SnippetHandler(naja);
+		const naja = new this.Naja();
+		const snippetHandler = new this.SnippetHandler(naja);
 
 		const el = document.createElement('div');
 		el.id = 'snippet--append';
