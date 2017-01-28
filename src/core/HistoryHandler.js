@@ -71,6 +71,7 @@ export default class HistoryHandler extends Component {
 
 	handleSnippets(snippets) {
 		this.naja.snippetHandler.updateSnippets(snippets);
+		this.naja.scriptLoader.loadScripts(snippets);
 		this.naja.load();
 	}
 
