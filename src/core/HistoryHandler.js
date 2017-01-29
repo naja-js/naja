@@ -48,7 +48,8 @@ export default class HistoryHandler extends Component {
 			this.href = response.url;
 		}
 
-		history.pushState({
+		const method = response.replaceHistory ? 'replaceState' : 'pushState';
+		history[method]({
 			href: this.href,
 			title: window.document.title,
 			ui: this.findSnippets(),

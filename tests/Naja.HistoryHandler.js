@@ -74,6 +74,30 @@ describe('HistoryHandler', function () {
 		this.requests[0].respond(200, {'Content-Type': 'application/json'}, JSON.stringify({snippets: {'snippet-history-foo': 'foo'}}));
 	});
 
+	it('replaces the state after successful request if payload.history.replace', function () {
+		const naja = new this.Naja();
+		naja.initialize();
+
+		const el = document.createElement('div');
+		el.id = 'snippet-history-foo';
+		document.body.appendChild(el);
+
+		naja.makeRequest('GET', '/foo').then(() => {
+			assert.equal(1, window.history.length);
+			assert.deepEqual({
+				href: '/foo',
+				title: '',
+				ui: {
+					'snippet-history-foo': 'foo'
+				},
+			}, window.history.state);
+
+			done();
+		});
+
+		this.requests[0].respond(200, {'Content-Type': 'application/json'}, JSON.stringify({snippets: {'snippet-history-foo': 'foo'}, history: {replace: true}}));
+	});
+
 	it('uses the url from payload if postGet is present', function (done) {
 		const naja = new this.Naja();
 		naja.initialize();
