@@ -2,7 +2,7 @@ import jsdom from './jsdomRegister';
 import {assert} from 'chai';
 
 
-describe('Naja.js', () => {
+describe('Naja.js', function () {
 	jsdom();
 
 	beforeEach(function (done) {
@@ -60,6 +60,28 @@ describe('Naja.js', () => {
 
 			naja.addEventListener('foo', evt => evt.preventDefault());
 			assert.isFalse(naja.fireEvent('foo'));
+		});
+	});
+
+	describe('extensions system', function () {
+		beforeEach(function (done) {
+			this.Naja = require('../src/Naja').default;
+			done();
+		});
+
+		it('registers extensions', function () {
+			const Naja = this.Naja;
+			const naja = new Naja();
+
+			let registered = false;
+			naja.registerExtension(class {
+				constructor(naja) {
+					registered = true;
+					assert.instanceOf(naja, Naja);
+				}
+			});
+			assert.isTrue(registered);
+			assert.equal(1, naja.extensions.length);
 		});
 	});
 });

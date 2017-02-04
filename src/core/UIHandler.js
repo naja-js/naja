@@ -38,9 +38,9 @@ export default class UIHandler extends Component {
 		}
 
 		const el = evt.target;
-		let method, url, data;
+		let method, url, data, options = {};
 
-		if ( ! this.naja.fireEvent('interaction', {element: el, originalEvent: evt})) {
+		if ( ! this.naja.fireEvent('interaction', {element: el, originalEvent: evt, options})) {
 			return;
 		}
 
@@ -73,6 +73,6 @@ export default class UIHandler extends Component {
 		}
 
 		evt.preventDefault();
-		this.naja.makeRequest(method, url, data);
+		this.naja.makeRequest(method, url, data, options);
 	}
 }

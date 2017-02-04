@@ -141,11 +141,34 @@ describe('UIHandler', function () {
 			mock.verify();
 		});
 
+		it('interaction event listener can alter options', function () {
+			const naja = new this.Naja();
+			naja.addEventListener('interaction', ({options}) => {
+				options.foo = 42;
+			});
+
+			const mock = sinon.mock(naja);
+			mock.expects('makeRequest')
+				.withExactArgs('GET', 'http://example.com/foo', null, {foo: 42})
+				.once();
+
+			const handler = new this.UIHandler(naja);
+
+			const evt = {
+				type: 'click',
+				target: this.a,
+				preventDefault: () => true,
+			};
+			handler.handleUI(evt);
+
+			mock.verify();
+		});
+
 		it('a.ajax', function () {
 			const naja = new this.Naja();
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
-				.withExactArgs('GET', 'http://example.com/foo', null)
+				.withExactArgs('GET', 'http://example.com/foo', null, {})
 				.once();
 
 			const handler = new this.UIHandler(naja);
@@ -166,7 +189,7 @@ describe('UIHandler', function () {
 			const naja = new this.Naja();
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
-				.withExactArgs('POST', 'http://example.com/bar', sinon.match.instanceOf(FormData))
+				.withExactArgs('POST', 'http://example.com/bar', sinon.match.instanceOf(FormData), {})
 				.once();
 
 			const handler = new this.UIHandler(naja);
@@ -188,7 +211,7 @@ describe('UIHandler', function () {
 			const mock = sinon.mock(naja);
 			const containsSubmit = sinon.match(value => value.has('submit'), 'contains submit');
 			mock.expects('makeRequest')
-				.withExactArgs('GET', 'http://example.com/baz', sinon.match.instanceOf(FormData).and(containsSubmit))
+				.withExactArgs('GET', 'http://example.com/baz', sinon.match.instanceOf(FormData).and(containsSubmit), {})
 				.once();
 
 			const handler = new this.UIHandler(naja);
@@ -210,7 +233,7 @@ describe('UIHandler', function () {
 			const mock = sinon.mock(naja);
 			const containsImage = sinon.match(value => value.has('image.x') && value.has('image.y'), 'contains image');
 			mock.expects('makeRequest')
-				.withExactArgs('GET', 'http://example.com/qux', sinon.match.instanceOf(FormData).and(containsImage))
+				.withExactArgs('GET', 'http://example.com/qux', sinon.match.instanceOf(FormData).and(containsImage), {})
 				.once();
 
 			const handler = new this.UIHandler(naja);

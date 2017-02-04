@@ -14,10 +14,19 @@ export default class Naja extends EventTarget {
 	initialized = false;
 
 	uiHandler = null;
-	formsHandler = null;
-	snippetHandler = null;
 	redirectHandler = null;
+	snippetHandler = null;
+	formsHandler = null;
+	historyHandler = null;
+	scriptLoader = null;
 	extensions = [];
+
+
+	registerExtension(extensionClass) {
+		const extension = new extensionClass(this);
+		this.extensions.push(extension);
+	}
+
 
 	initialize() {
 		if (this.initialized) {
