@@ -73,15 +73,19 @@ describe('Naja.js', function () {
 			const Naja = this.Naja;
 			const naja = new Naja();
 
-			let registered = false;
-			naja.registerExtension(class {
+			let initialized = false;
+			const extension = class {
 				constructor(naja) {
-					registered = true;
+					initialized = true;
 					assert.instanceOf(naja, Naja);
 				}
-			});
-			assert.isTrue(registered);
+			};
+
+			naja.registerExtension(extension);
 			assert.equal(1, naja.extensions.length);
+
+			naja.initialize();
+			assert.isTrue(initialized);
 		});
 	});
 });
