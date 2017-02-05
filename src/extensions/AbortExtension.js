@@ -19,9 +19,9 @@ export default class AbortExtension {
 		});
 	}
 
-	checkAbortable({el, options}) {
-		this.abortable = el
-			? el.getAttribute('data-naja-abort') !== 'off'
+	checkAbortable({element, options}) {
+		this.abortable = element
+			? element.getAttribute('data-naja-abort') !== 'off'
 			: options.abort !== false;
 	}
 

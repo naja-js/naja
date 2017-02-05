@@ -8,8 +8,8 @@ export default class UniqueExtension {
 
 	xhr = null;
 
-	checkUniqueness({el, options}) {
-		options.unique = el.getAttribute('data-naja-unique') !== 'off';
+	checkUniqueness({element, options}) {
+		options.unique = element.getAttribute('data-naja-unique') !== 'off';
 	}
 
 	abortPreviousRequest({xhr, options}) {
