@@ -11,7 +11,7 @@ export default class AbortExtension {
 	abortable = true;
 	xhr = null;
 	initialize() {
-		document.body.addEventListener('keydown', evt => {
+		document.addEventListener('keydown', (evt) => {
 			if (!!this.xhr && evt.key === 'Escape' && !(evt.ctrlKey || evt.shiftKey || evt.altKey || evt.metaKey) && this.abortable) {
 				this.xhr.abort();
 				this.xhr = null;

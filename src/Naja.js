@@ -30,7 +30,7 @@ export default class Naja extends EventTarget {
 
 	initialize() {
 		if (this.initialized) {
-			throw new Error("Cannot initialize Naja, it is already initialized.");
+			throw new Error('Cannot initialize Naja, it is already initialized.');
 		}
 
 		this.uiHandler = new UIHandler(this);
@@ -66,7 +66,7 @@ export default class Naja extends EventTarget {
 		options = objectAssign({}, defaultOptions, options || {});
 
 		let currentXhr;
-		const beforeCallback = xhr => {
+		const beforeCallback = (xhr) => {
 			currentXhr = xhr;
 			this.fireEvent('before', {xhr, method, url, data, options});
 		};

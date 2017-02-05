@@ -4,7 +4,7 @@ import Component from '../Component';
 export default class RedirectHandler extends Component {
 	constructor(naja) {
 		super(naja);
-		naja.addEventListener('success', evt => {
+		naja.addEventListener('success', (evt) => {
 			const {response} = evt;
 			if (response.redirect) {
 				this.makeRedirect(response.redirect, response.forceRedirect);
@@ -14,7 +14,7 @@ export default class RedirectHandler extends Component {
 	}
 
 	makeRedirect(url, force) {
-		const externalRedirect = /^https?/i.test(url) && ! new RegExp('^' + window.location.origin, 'i').test(url);
+		const externalRedirect = /^https?/i.test(url) && ! new RegExp(`^${window.location.origin}`, 'i').test(url);
 		if (force || externalRedirect) {
 			window.location.href = url;
 

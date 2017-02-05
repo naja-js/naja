@@ -16,17 +16,15 @@ export default class UIHandler extends Component {
 			'button[type="submit"].ajax',
 			'form.ajax input[type="submit"]',
 			'form.ajax input[type="image"]',
-			'form.ajax button[type="submit"]'
+			'form.ajax button[type="submit"]',
 		].join(', ');
 
-		const nodes = document.querySelectorAll(selectors);
-		Array.prototype.forEach.call(nodes, node => {
+		document.querySelectorAll(selectors).forEach((node) => {
 			node.removeEventListener('click', handler);
 			node.addEventListener('click', handler);
 		});
 
-		const forms = document.querySelectorAll('form.ajax');
-		Array.prototype.forEach.call(forms, form => {
+		document.querySelectorAll('form.ajax').forEach((form) => {
 			form.removeEventListener('submit', handler);
 			form.addEventListener('submit', handler);
 		});
@@ -37,15 +35,15 @@ export default class UIHandler extends Component {
 			return;
 		}
 
-		const el = evt.target;
-		let method, url, data, options = {};
+		const el = evt.target, options = {};
+		let method, url, data;
 
 		if ( ! this.naja.fireEvent('interaction', {element: el, originalEvent: evt, options})) {
 			return;
 		}
 
 		if (evt.type === 'submit') {
-			method = !!el.method ? el.method.toUpperCase() : 'GET';
+			method = el.method ? el.method.toUpperCase() : 'GET';
 			url = el.action || window.location.pathname + window.location.search;
 			data = new FormData(el);
 
@@ -56,8 +54,8 @@ export default class UIHandler extends Component {
 				data = null;
 
 			} else if (el.tagName.toLowerCase() === 'input' || el.tagName.toLowerCase() === 'button') {
-				const form = el.form;
-				method = !!form.method ? form.method.toUpperCase() : 'GET';
+				const {form} = el;
+				method = form.method ? form.method.toUpperCase() : 'GET';
 				url = form.action || window.location.pathname + window.location.search;
 				data = new FormData(form);
 
@@ -66,8 +64,8 @@ export default class UIHandler extends Component {
 
 				} else if (el.type === 'image') {
 					const coords = el.getBoundingClientRect();
-					data.set(el.name + '.x', Math.max(0, Math.floor(evt.pageX - coords.left)));
-					data.set(el.name + '.y', Math.max(0, Math.floor(evt.pageY - coords.top)));
+					data.set(`${el.name}.x`, Math.max(0, Math.floor(evt.pageX - coords.left)));
+					data.set(`${el.name}.y`, Math.max(0, Math.floor(evt.pageY - coords.top)));
 				}
 			}
 		}

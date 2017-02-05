@@ -55,7 +55,7 @@ describe('AbortExtension', function () {
 			done();
 		});
 
-		document.body.dispatchEvent(new KeyboardEvent('keydown', {
+		document.dispatchEvent(new KeyboardEvent('keydown', {
 			bubbles: true,
 			cancelable: true,
 			ctrlKey: false,

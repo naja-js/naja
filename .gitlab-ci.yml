@@ -13,9 +13,11 @@ cache:
 test:6:
   image: node:6
   script:
-    - npm test
+    - yarn run lint
+    - yarn run test
 
 test:7:
   image: node:7
   script:
-    - npm test
+    - yarn run lint
+    - yarn run test

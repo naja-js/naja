@@ -17,7 +17,7 @@ export default class HistoryHandler extends Component {
 		this.popped = !!window.history.state;
 		const initialUrl = window.location.href;
 
-		window.addEventListener('popstate', e => {
+		window.addEventListener('popstate', (e) => {
 			const state = e.state || this.initialState;
 			const initialPop = !this.popped && initialUrl === state.href;
 			this.popped = true;
@@ -26,7 +26,7 @@ export default class HistoryHandler extends Component {
 				return;
 			}
 
-			if (!!state.ui) {
+			if (state.ui) {
 				this.handleSnippets(state.ui);
 				this.handleTitle(state.title);
 			}
@@ -61,7 +61,7 @@ export default class HistoryHandler extends Component {
 
 	findSnippets() {
 		const result = {};
-		window.document.querySelectorAll('[id^="snippet-"]').forEach(snippet => {
+		window.document.querySelectorAll('[id^="snippet-"]').forEach((snippet) => {
 			if (!snippet.getAttribute('data-history-nocache')) {
 				result[snippet.id] = snippet.innerHTML;
 			}

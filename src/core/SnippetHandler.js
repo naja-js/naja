@@ -12,10 +12,10 @@ export default class SnippetHandler extends Component {
 	}
 
 	updateSnippets(snippets) {
-		for (let id in snippets) {
+		for (const id in snippets) {
 			if (snippets.hasOwnProperty(id)) {
 				const el = document.getElementById(id);
-				if (!!el) {
+				if (el) {
 					this.updateSnippet(el, snippets[id]);
 				}
 			}

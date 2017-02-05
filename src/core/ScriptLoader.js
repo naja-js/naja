@@ -12,7 +12,7 @@ export default class ScriptLoader extends Component {
 	}
 
 	loadScripts(snippets) {
-		for (let id in snippets) {
+		for (const id in snippets) {
 			if (snippets.hasOwnProperty(id) && /<[^>]*script/i.test(snippets[id])) {
 				if ( ! document.getElementById(id)) {
 					continue;
@@ -21,7 +21,7 @@ export default class ScriptLoader extends Component {
 				const el = window.document.createElement('div');
 				el.innerHTML = snippets[id];
 
-				el.querySelectorAll('script').forEach(script => {
+				el.querySelectorAll('script').forEach((script) => {
 					window.document.head.appendChild(script)
 						.parentNode.removeChild(script);
 				});
