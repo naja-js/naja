@@ -35,7 +35,7 @@ export default class UIHandler extends Component {
 			return;
 		}
 
-		const el = evt.target, options = {};
+		const el = evt.currentTarget, options = {};
 		let method, url, data;
 
 		if ( ! this.naja.fireEvent('interaction', {element: el, originalEvent: evt, options})) {

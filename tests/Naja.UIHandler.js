@@ -111,7 +111,7 @@ describe('UIHandler', function () {
 
 			const evt = {
 				type: 'click',
-				target: this.a,
+				currentTarget: this.a,
 				preventDefault: () => true,
 			};
 			handler.handleUI(evt);
@@ -156,7 +156,7 @@ describe('UIHandler', function () {
 
 			const evt = {
 				type: 'click',
-				target: this.a,
+				currentTarget: this.a,
 				preventDefault: () => true,
 			};
 			handler.handleUI(evt);
@@ -176,7 +176,7 @@ describe('UIHandler', function () {
 			const preventDefault = sinon.spy();
 			const evt = {
 				type: 'click',
-				target: this.a,
+				currentTarget: this.a,
 				preventDefault,
 			};
 			handler.handleUI(evt);
@@ -197,7 +197,7 @@ describe('UIHandler', function () {
 			const preventDefault = sinon.spy();
 			const evt = {
 				type: 'submit',
-				target: this.form,
+				currentTarget: this.form,
 				preventDefault,
 			};
 			handler.handleUI(evt);
@@ -219,7 +219,7 @@ describe('UIHandler', function () {
 			const preventDefault = sinon.spy();
 			const evt = {
 				type: 'click',
-				target: this.input,
+				currentTarget: this.input,
 				preventDefault,
 			};
 			handler.handleUI(evt);
@@ -241,7 +241,7 @@ describe('UIHandler', function () {
 			const preventDefault = sinon.spy();
 			const evt = {
 				type: 'click',
-				target: this.image,
+				currentTarget: this.image,
 				preventDefault,
 			};
 			handler.handleUI(evt);
