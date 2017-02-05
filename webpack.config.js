@@ -8,7 +8,9 @@ module.exports = {
 	],
 	output: {
 		path: path.join(__dirname, 'dist'),
-		filename: 'Naja.js'
+		filename: 'Naja.js',
+		library: 'naja',
+		libraryTarget: 'umd'
 	},
 	module: {
 		rules: [
@@ -24,6 +26,6 @@ module.exports = {
 			},
 			comments: /$./
 		}),
-		new webpack.BannerPlugin({banner: 'Naja.ja\nv0.2.0\n\nby Jiří Pudil <https://jiripudil.cz>'})
+		new webpack.BannerPlugin({banner: 'Naja.ja\nv0.2.1\n\nby Jiří Pudil <https://jiripudil.cz>'})
 	]
 };
