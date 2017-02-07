@@ -133,4 +133,31 @@ describe('makeRequest()', function () {
 
 		this.requests[0].respond(500, {'Content-Type': 'application/json'}, JSON.stringify({error: 'Internal Server Error'}));
 	});
+
+	it('should call error event if the request is aborted', function () {
+		const naja = new this.Naja();
+		naja.initialize();
+
+		const errorCallback = sinon.spy();
+		const completeCallback = sinon.spy();
+		naja.addEventListener('start', ({xhr}) => xhr.abort());
+		naja.addEventListener('error', errorCallback);
+		naja.addEventListener('complete', completeCallback);
+
+		naja.makeRequest('GET', '/foo');
+
+		assert.isTrue(errorCallback.called);
+		assert.isTrue(errorCallback.calledWith(sinon.match.object
+			.and(sinon.match.has('error', sinon.match.truthy))
+			.and(sinon.match.has('response', sinon.match.typeOf('null')))
+			.and(sinon.match.has('xhr', sinon.match.instanceOf(window.XMLHttpRequest)))
+		));
+
+		assert.isTrue(completeCallback.called);
+		assert.isTrue(completeCallback.calledWith(sinon.match.object
+			.and(sinon.match.has('error', sinon.match.truthy))
+			.and(sinon.match.has('response', sinon.match.typeOf('null')))
+			.and(sinon.match.has('xhr', sinon.match.instanceOf(window.XMLHttpRequest)))
+		));
+	});
 });
