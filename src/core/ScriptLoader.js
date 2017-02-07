@@ -12,20 +12,19 @@ export default class ScriptLoader extends Component {
 	}
 
 	loadScripts(snippets) {
-		for (const id in snippets) {
-			if (snippets.hasOwnProperty(id) && /<[^>]*script/i.test(snippets[id])) {
-				if ( ! document.getElementById(id)) {
-					continue;
-				}
-
-				const el = window.document.createElement('div');
-				el.innerHTML = snippets[id];
-
-				el.querySelectorAll('script').forEach((script) => {
-					window.document.head.appendChild(script)
-						.parentNode.removeChild(script);
-				});
+		Object.keys(snippets).forEach((id) => {
+			const content = snippets[id];
+			if ( ! /<[^>]*script/i.test(content)) {
+				return;
 			}
-		}
+
+			const el = window.document.createElement('div');
+			el.innerHTML = content;
+
+			el.querySelectorAll('script').forEach((script) => {
+				window.document.head.appendChild(script)
+					.parentNode.removeChild(script);
+			});
+		});
 	}
 }
