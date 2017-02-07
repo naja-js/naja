@@ -27,10 +27,10 @@ export default class SnippetHandler extends Component {
 			document.title = content;
 
 		} else {
-			if (el.getAttribute('data-ajax-prepend')) {
+			if (el.getAttribute('data-naja-snippet-prepend') || el.getAttribute('data-ajax-prepend')) {
 				el.innerHTML = content + el.innerHTML;
 
-			} else if (el.getAttribute('data-ajax-append')) {
+			} else if (el.getAttribute('data-naja-snippet-append') || el.getAttribute('data-ajax-append')) {
 				el.innerHTML = el.innerHTML + content;
 
 			} else {
