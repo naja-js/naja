@@ -75,13 +75,15 @@ describe('Naja.js', function () {
 
 			let initialized = false;
 			const extension = class {
-				constructor(naja) {
+				constructor(naja, foo, bar) {
 					initialized = true;
 					assert.instanceOf(naja, Naja);
+					assert.equal(42, foo);
+					assert.equal('42', bar);
 				}
 			};
 
-			naja.registerExtension(extension);
+			naja.registerExtension(extension, 42, '42');
 			assert.equal(1, naja.extensions.length);
 
 			naja.initialize();

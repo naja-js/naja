@@ -22,8 +22,8 @@ export default class Naja extends EventTarget {
 	extensions = [];
 
 
-	registerExtension(extensionClass) {
-		this.extensions.push(extensionClass);
+	registerExtension(extensionClass, ...args) {
+		this.extensions.push([extensionClass, args]);
 	}
 
 
@@ -38,7 +38,7 @@ export default class Naja extends EventTarget {
 		this.formsHandler = new FormsHandler(this);
 		this.historyHandler = new HistoryHandler(this);
 		this.scriptLoader = new ScriptLoader(this);
-		this.extensions = this.extensions.map((extensionClass) => new extensionClass(this));
+		this.extensions = this.extensions.map(([extensionClass, args]) => new extensionClass(this, ...args));
 
 		this.fireEvent('init');
 		this.initialized = true;
