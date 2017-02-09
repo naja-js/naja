@@ -60,11 +60,11 @@ describe('SnippetHandler', function () {
 
 		const mock = sinon.mock(snippetHandler);
 		mock.expects('updateSnippet')
-			.withExactArgs(sinon.match.instanceOf(HTMLElement).and(sinon.match(value => value.id === 'snippet--foo')), 'foo')
+			.withExactArgs(sinon.match.instanceOf(HTMLElement).and(sinon.match(value => value.id === 'snippet--foo')), 'foo', false)
 			.once();
 
 		mock.expects('updateSnippet')
-			.withExactArgs(sinon.match.instanceOf(HTMLElement).and(sinon.match(value => value.id === 'snippet-bar-baz')), 'bar.baz')
+			.withExactArgs(sinon.match.instanceOf(HTMLElement).and(sinon.match(value => value.id === 'snippet-bar-baz')), 'bar.baz', false)
 			.once();
 
 		snippetHandler.updateSnippets({
@@ -140,5 +140,20 @@ describe('SnippetHandler', function () {
 		assert.equal(el.innerHTML, 'Foo');
 		snippetHandler.updateSnippet(el, '-suffix');
 		assert.equal(el.innerHTML, 'Foo-suffix');
+	});
+
+	it('updateSnippet() forceReplace', function () {
+		const naja = new this.Naja();
+		const snippetHandler = new this.SnippetHandler(naja);
+
+		const el = document.createElement('div');
+		el.id = 'snippet--append';
+		el.innerHTML = 'Foo';
+		el.setAttribute('data-ajax-append', true);
+		document.body.appendChild(el);
+
+		assert.equal(el.innerHTML, 'Foo');
+		snippetHandler.updateSnippet(el, 'new content', true);
+		assert.equal(el.innerHTML, 'new content');
 	});
 });
