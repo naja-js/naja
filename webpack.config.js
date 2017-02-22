@@ -1,6 +1,11 @@
-var path = require('path');
-var webpack = require('webpack');
+const fs = require('fs');
+const path = require('path');
+const webpack = require('webpack');
 
+
+const packageJsonPath = path.join(__dirname, 'package.json');
+const packageJsonContent = fs.readFileSync(packageJsonPath, 'utf8');
+const {version} = JSON.parse(packageJsonContent);
 
 module.exports = {
 	entry: [
@@ -10,22 +15,22 @@ module.exports = {
 		path: path.join(__dirname, 'dist'),
 		filename: 'Naja.js',
 		library: 'naja',
-		libraryTarget: 'umd'
+		libraryTarget: 'umd',
 	},
 	module: {
 		rules: [
-			{test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader'}
-		]
+			{test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader'},
+		],
 	},
 	plugins: [
 		new webpack.optimize.UglifyJsPlugin({
 			compress: {
 				unused: true,
 				dead_code: true,
-				warnings: false
+				warnings: false,
 			},
-			comments: /$./
+			comments: /$./,
 		}),
-		new webpack.BannerPlugin({banner: 'Naja.ja\nv0.2.1\n\nby Jiří Pudil <https://jiripudil.cz>'})
+		new webpack.BannerPlugin({banner: `Naja.ja\nv${version}\n\nby Jiří Pudil <https://jiripudil.cz>`}),
 	]
 };
