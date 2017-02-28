@@ -19,15 +19,19 @@ export default class UIHandler extends Component {
 			'form.ajax button[type="submit"]',
 		].join(', ');
 
-		document.querySelectorAll(selectors).forEach((node) => {
+		const elements = document.querySelectorAll(selectors);
+		for (let i = 0; i < elements.length; i++) {
+			const node = elements.item(i);
 			node.removeEventListener('click', handler);
 			node.addEventListener('click', handler);
-		});
+		}
 
-		document.querySelectorAll('form.ajax').forEach((form) => {
+		const forms = document.querySelectorAll('form.ajax');
+		for (let i = 0; i < forms.length; i++) {
+			const form = forms.item(i);
 			form.removeEventListener('submit', handler);
 			form.addEventListener('submit', handler);
-		});
+		}
 	}
 
 	handleUI(evt) {

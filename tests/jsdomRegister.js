@@ -11,10 +11,6 @@ export default () => {
 			value: url,
 		});
 
-		NodeList.prototype.forEach = function (callback) {
-			Array.prototype.forEach.call(this, callback);
-		};
-
 		this.requests = [];
 		this.xhr = sinon.useFakeXMLHttpRequest();
 		this.xhr.onCreate = this.requests.push.bind(this.requests);

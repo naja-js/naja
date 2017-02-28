@@ -10,7 +10,10 @@ export default class FormsHandler extends Component {
 
 	static initForms() {
 		if (window.Nette) {
-			document.querySelectorAll('form').forEach(window.Nette.initForm);
+			const forms = window.document.querySelectorAll('form');
+			for (let i = 0; i < forms.length; i++) {
+				window.Nette.initForm(forms.item(i));
+			}
 		}
 	}
 

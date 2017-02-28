@@ -61,11 +61,13 @@ export default class HistoryHandler extends Component {
 
 	findSnippets() {
 		const result = {};
-		window.document.querySelectorAll('[id^="snippet-"]').forEach((snippet) => {
+		const snippets = window.document.querySelectorAll('[id^="snippet-"]');
+		for (let i = 0; i < snippets.length; i++) {
+			const snippet = snippets.item(i);
 			if (!snippet.getAttribute('data-naja-history-nocache') && !snippet.getAttribute('data-history-nocache')) {
 				result[snippet.id] = snippet.innerHTML;
 			}
-		});
+		}
 
 		return result;
 	}

@@ -21,10 +21,12 @@ export default class ScriptLoader extends Component {
 			const el = window.document.createElement('div');
 			el.innerHTML = content;
 
-			el.querySelectorAll('script').forEach((script) => {
+			const scripts = el.querySelectorAll('script');
+			for (let i = 0; i < scripts.length; i++) {
+				const script = scripts.item(i);
 				window.document.head.appendChild(script)
 					.parentNode.removeChild(script);
-			});
+			}
 		});
 	}
 }
