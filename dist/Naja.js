@@ -1,6 +1,6 @@
 /*!
  * Naja.ja
- * v1.0.0-alpha.2
+ * v1.0.0-alpha.3
  * 
  * by Jiří Pudil <https://jiripudil.cz>
  */
