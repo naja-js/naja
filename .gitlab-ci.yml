@@ -15,9 +15,11 @@ test:6:
   script:
     - yarn run lint
     - yarn run test
+    - yarn run build
 
 test:7:
   image: node:7
   script:
     - yarn run lint
     - yarn run test
+    - yarn run build

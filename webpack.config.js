@@ -8,6 +8,7 @@ const packageJsonContent = fs.readFileSync(packageJsonPath, 'utf8');
 const {version} = JSON.parse(packageJsonContent);
 
 module.exports = {
+	devtool: 'source-map',
 	entry: [
 		'./src/index',
 	],
@@ -30,6 +31,7 @@ module.exports = {
 				warnings: false,
 			},
 			comments: /$./,
+			sourceMap: true,
 		}),
 		new webpack.BannerPlugin({banner: `Naja.ja\nv${version}\n\nby Jiří Pudil <https://jiripudil.cz>`}),
 	]

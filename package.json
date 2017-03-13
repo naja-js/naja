@@ -1,6 +1,6 @@
 {
   "name": "naja",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0-alpha.4",
   "description": "Modern AJAX library for Nette Framework",
   "keywords": [
     "nette",
@@ -10,7 +10,6 @@
   "author": "Jiří Pudil",
   "license": "MIT",
   "main": "dist/Naja.js",
-  "module": "src/index.js",
   "dependencies": {
     "event-target-shim": "^2.0.0",
     "object-assign": "^4.1.0",
