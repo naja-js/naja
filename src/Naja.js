@@ -52,7 +52,7 @@ export default class Naja extends EventTarget {
 
 
 	fireEvent(type, args = {}) {
-		const evt = Object.assign(args, {type, cancelable: true});
+		const evt = objectAssign(args, {type, cancelable: true});
 		return this.dispatchEvent(evt);
 	}
 
