@@ -4,10 +4,21 @@ node_js:
   - 6
   - 7
 
+env:
+  - COVERAGE=on
+  - COVERAGE=off
+
+matrix:
+  exclude:
+    - node_js: 6
+      env: COVERAGE=on
+    - node_js: 7
+      env: COVERAGE=off
+
 before_script: yarn run lint
 script:
   - yarn run test
   - yarn run build
-after_success: yarn run coverage
+after_success: if [ "$COVERAGE" == "on" ]; then yarn run coverage; fi
 
 cache: yarn
