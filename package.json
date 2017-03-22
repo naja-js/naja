@@ -39,7 +39,7 @@
   },
   "scripts": {
     "build": "NODE_ENV=production webpack --config webpack.config.js",
-    "test": "nyc mocha --require babel-register tests",
+    "test": "nyc mocha --timeout 5000 --require babel-register tests",
     "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "lint": "node_modules/.bin/eslint src"
   },
