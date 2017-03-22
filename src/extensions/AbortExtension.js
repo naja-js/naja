@@ -23,6 +23,9 @@ export default class AbortExtension {
 		this.abortable = element
 			? element.getAttribute('data-naja-abort') !== 'off'
 			: options.abort !== false;
+
+		// propagate to options if called in interaction event
+		options.abort = this.abortable;
 	}
 
 	saveXhr({xhr}) {
