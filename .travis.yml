@@ -8,4 +8,6 @@ before_script: yarn run lint
 script:
   - yarn run test
   - yarn run build
+after_success: yarn run coverage
+
 cache: yarn
