@@ -5,11 +5,7 @@ import sinon from 'sinon';
 export default () => {
 	beforeEach(function (done) {
 		const url = 'http://example.com/';
-		this.jsdomCleanup = jsdomRegister(undefined, {url});
-		Object.defineProperty(window.location, 'href', {
-			writable: true,
-			value: url,
-		});
+		this.jsdomCleanup = jsdomRegister(undefined, {url, runScripts: 'dangerously'});
 
 		this.requests = [];
 		this.xhr = sinon.useFakeXMLHttpRequest();

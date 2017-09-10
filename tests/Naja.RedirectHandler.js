@@ -50,11 +50,18 @@ describe('RedirectHandler', function () {
 		const naja = new this.Naja();
 		new this.RedirectHandler(naja);
 
+		const mock = sinon.mock(window.location);
+		mock.expects('assign')
+			.withExactArgs('/foo')
+			.once();
+
 		const nextListener = sinon.spy();
 		naja.addEventListener('success', nextListener);
 
 		naja.makeRequest('GET', '/foo').then(() => {
 			assert.isFalse(nextListener.called);
+			mock.verify();
+			mock.restore();
 			done();
 		});
 
@@ -79,8 +86,15 @@ describe('RedirectHandler', function () {
 		const redirectHandler = new this.RedirectHandler(naja);
 
 		assert.equal(window.location.href, 'http://example.com/');
+
+		const mock = sinon.mock(window.location);
+		mock.expects('assign')
+			.withExactArgs('/foo')
+			.once();
+
 		redirectHandler.makeRedirect('/foo', true);
-		assert.equal(window.location.href, '/foo');
+		mock.verify();
+		mock.restore();
 	});
 
 	it('makes request if url is local', function () {
@@ -101,7 +115,14 @@ describe('RedirectHandler', function () {
 		const redirectHandler = new this.RedirectHandler(naja);
 
 		assert.equal(window.location.href, 'http://example.com/');
+
+		const mock = sinon.mock(window.location);
+		mock.expects('assign')
+			.withExactArgs('http://another-site.com/bar')
+			.once();
+
 		redirectHandler.makeRedirect('http://another-site.com/bar', false);
-		assert.equal(window.location.href, 'http://another-site.com/bar');
+		mock.verify();
+		mock.restore();
 	});
 });

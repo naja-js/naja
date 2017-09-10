@@ -16,7 +16,7 @@ export default class RedirectHandler extends Component {
 	makeRedirect(url, force) {
 		const externalRedirect = /^https?/i.test(url) && ! new RegExp(`^${window.location.origin}`, 'i').test(url);
 		if (force || externalRedirect) {
-			window.location.href = url;
+			window.location.assign(url);
 
 		} else {
 			this.naja.makeRequest('GET', url);

@@ -17,6 +17,7 @@ module.exports = {
 		filename: 'Naja.js',
 		library: 'naja',
 		libraryTarget: 'umd',
+		libraryExport: 'default',
 	},
 	module: {
 		rules: [

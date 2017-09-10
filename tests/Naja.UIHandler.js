@@ -65,6 +65,7 @@ describe('UIHandler', function () {
 
 	it('bindUI()', function () {
 		const spy = sinon.spy();
+		this.input.form.addEventListener('submit', (evt) => evt.preventDefault());
 
 		const handler = new this.UIHandler(new this.Naja());
 		handler.bindUI(spy);
