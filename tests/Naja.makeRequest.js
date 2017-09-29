@@ -160,4 +160,29 @@ describe('makeRequest()', function () {
 			.and(sinon.match.has('xhr', sinon.match.instanceOf(window.XMLHttpRequest)))
 		));
 	});
+
+	it('should not send the request if before event is aborted', function () {
+		const Naja = require('../src/Naja').default;
+		const naja = new Naja();
+		naja.initialize();
+
+		const completeCallback = sinon.spy();
+		naja.addEventListener('complete', completeCallback);
+		naja.addEventListener('before', (evt) => evt.preventDefault());
+
+		let thrown = false;
+
+		try {
+			naja.makeRequest('GET', '/foo');
+
+		} catch (e) {
+			// sinon's fake XHR throws error if readyState is not OPENED
+			if (e.message === "INVALID_STATE_ERR") {
+				thrown = true;
+			}
+		}
+
+		assert.isTrue(thrown);
+		assert.isFalse(completeCallback.called);
+	});
 });

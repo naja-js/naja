@@ -69,14 +69,17 @@ export default class Naja extends EventTarget {
 		const beforeCallback = (xhr) => {
 			currentXhr = xhr;
 
+			// abort request if beforeEvent.preventDefault() is called
+			if ( ! this.fireEvent('before', {xhr, method, url, data, options})) {
+				xhr.abort();
+			}
+
 			// qwest does not handle response at all if the request is aborted
 			xhr.addEventListener('abort', () => {
 				const error = new Error('Request aborted.');
 				this.fireEvent('error', {error, xhr, response: null});
 				this.fireEvent('complete', {error, xhr, response: null});
 			});
-
-			this.fireEvent('before', {xhr, method, url, data, options});
 		};
 
 		const request = qwest.map(method, url, data, options, beforeCallback)
