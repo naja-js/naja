@@ -12,7 +12,11 @@ export default class AbortExtension {
 	xhr = null;
 	initialize() {
 		document.addEventListener('keydown', (evt) => {
-			if (!!this.xhr && evt.key === 'Escape' && !(evt.ctrlKey || evt.shiftKey || evt.altKey || evt.metaKey) && this.abortable) {
+			if (!!this.xhr
+				&& ('key' in evt ? evt.key === 'Escape' : evt.keyCode === 27)
+				&& !(evt.ctrlKey || evt.shiftKey || evt.altKey || evt.metaKey)
+				&& this.abortable
+			) {
 				this.xhr.abort();
 				this.xhr = null;
 			}

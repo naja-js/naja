@@ -1,47 +1,45 @@
-import jsdom from './jsdomRegister';
+import mockNaja from './setup/mockNaja';
+import fakeXhr from './setup/fakeXhr';
 import {assert} from 'chai';
 import sinon from 'sinon';
 
+import SnippetHandler from '../src/core/SnippetHandler';
+
 
 describe('SnippetHandler', function () {
-	jsdom();
-
-	beforeEach(function () {
-		this.mockNaja = require('./setup/mockNaja').default;
-		this.SnippetHandler = require('../src/core/SnippetHandler').default;
-	});
+	fakeXhr();
 
 	it('constructor()', function () {
-		const naja = this.mockNaja();
+		const naja = mockNaja();
 		const mock = sinon.mock(naja);
 		mock.expects('addEventListener')
 			.withExactArgs('success', sinon.match.instanceOf(Function))
 			.once();
 
-		new this.SnippetHandler(naja);
+		new SnippetHandler(naja);
 		mock.verify();
 	});
 
 	it('reads snippets from response', function (done) {
-		const naja = this.mockNaja();
-		const snippetHandler = new this.SnippetHandler(naja);
+		const naja = mockNaja();
+		const snippetHandler = new SnippetHandler(naja);
 
 		const mock = sinon.mock(snippetHandler);
 		mock.expects('updateSnippets')
 			.withExactArgs({'snippet--foo': 'foo'})
 			.once();
 
-		naja.makeRequest('GET', '/foo').then(() => {
+		naja.makeRequest('GET', '/SnippetHandler/updateSnippets').then(() => {
 			mock.verify();
 			done();
 		});
 
-		this.requests[0].respond(200, {'Content-Type': 'application/json'}, JSON.stringify({snippets: {'snippet--foo': 'foo'}}));
+		this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({snippets: {'snippet--foo': 'foo'}}));
 	});
 
 	it('updateSnippets()', function () {
-		const naja = this.mockNaja();
-		const snippetHandler = new this.SnippetHandler(naja);
+		const naja = mockNaja();
+		const snippetHandler = new SnippetHandler(naja);
 
 		const snippet1 = document.createElement('div');
 		snippet1.id = 'snippet--foo';
@@ -53,11 +51,11 @@ describe('SnippetHandler', function () {
 
 		const mock = sinon.mock(snippetHandler);
 		mock.expects('updateSnippet')
-			.withExactArgs(sinon.match.instanceOf(HTMLElement).and(sinon.match(value => value.id === 'snippet--foo')), 'foo', false)
+			.withExactArgs(snippet1, 'foo', false)
 			.once();
 
 		mock.expects('updateSnippet')
-			.withExactArgs(sinon.match.instanceOf(HTMLElement).and(sinon.match(value => value.id === 'snippet-bar-baz')), 'bar.baz', false)
+			.withExactArgs(snippet2, 'bar.baz', false)
 			.once();
 
 		snippetHandler.updateSnippets({
@@ -67,11 +65,13 @@ describe('SnippetHandler', function () {
 		});
 
 		mock.verify();
+		document.body.removeChild(snippet1);
+		document.body.removeChild(snippet2);
 	});
 
 	it('updateSnippet', function () {
-		const naja = this.mockNaja();
-		const snippetHandler = new this.SnippetHandler(naja);
+		const naja = mockNaja();
+		const snippetHandler = new SnippetHandler(naja);
 
 		const el = document.createElement('div');
 		el.id = 'snippet--qux';
@@ -81,11 +81,12 @@ describe('SnippetHandler', function () {
 		assert.equal(el.innerHTML, 'Foo');
 		snippetHandler.updateSnippet(el, 'Bar');
 		assert.equal(el.innerHTML, 'Bar');
+		document.body.removeChild(el);
 	});
 
 	it('updateSnippet() title', function () {
-		const naja = this.mockNaja();
-		const snippetHandler = new this.SnippetHandler(naja);
+		const naja = mockNaja();
+		const snippetHandler = new SnippetHandler(naja);
 
 		let titleEl = document.querySelector('title');
 		if ( ! titleEl) {
@@ -106,8 +107,8 @@ describe('SnippetHandler', function () {
 	});
 
 	it('updateSnippet() [data-ajax-prepend]', function () {
-		const naja = this.mockNaja();
-		const snippetHandler = new this.SnippetHandler(naja);
+		const naja = mockNaja();
+		const snippetHandler = new SnippetHandler(naja);
 
 		const el = document.createElement('div');
 		el.id = 'snippet--prepend';
@@ -118,11 +119,12 @@ describe('SnippetHandler', function () {
 		assert.equal(el.innerHTML, 'Foo');
 		snippetHandler.updateSnippet(el, 'prefix-');
 		assert.equal(el.innerHTML, 'prefix-Foo');
+		document.body.removeChild(el);
 	});
 
 	it('updateSnippet() [data-ajax-append]', function () {
-		const naja = this.mockNaja();
-		const snippetHandler = new this.SnippetHandler(naja);
+		const naja = mockNaja();
+		const snippetHandler = new SnippetHandler(naja);
 
 		const el = document.createElement('div');
 		el.id = 'snippet--append';
@@ -133,11 +135,12 @@ describe('SnippetHandler', function () {
 		assert.equal(el.innerHTML, 'Foo');
 		snippetHandler.updateSnippet(el, '-suffix');
 		assert.equal(el.innerHTML, 'Foo-suffix');
+		document.body.removeChild(el);
 	});
 
 	it('updateSnippet() forceReplace', function () {
-		const naja = this.mockNaja();
-		const snippetHandler = new this.SnippetHandler(naja);
+		const naja = mockNaja();
+		const snippetHandler = new SnippetHandler(naja);
 
 		const el = document.createElement('div');
 		el.id = 'snippet--append';
@@ -148,5 +151,6 @@ describe('SnippetHandler', function () {
 		assert.equal(el.innerHTML, 'Foo');
 		snippetHandler.updateSnippet(el, 'new content', true);
 		assert.equal(el.innerHTML, 'new content');
+		document.body.removeChild(el);
 	});
 });

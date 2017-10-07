@@ -1,99 +1,116 @@
-import jsdom from './jsdomRegister';
+import mockNaja from './setup/mockNaja';
 import {assert} from 'chai';
 import sinon from 'sinon';
 
+import UIHandler from '../src/core/UIHandler';
+
 
 describe('UIHandler', function () {
-	jsdom();
-
 	beforeEach(function () {
-		this.mockNaja = require('./setup/mockNaja').default;
-		this.UIHandler = require('../src/core/UIHandler').default;
-
 		// a.ajax
 		this.a = document.createElement('a');
-		this.a.href = '/foo';
+		this.a.href = '/UIHandler/a';
 		this.a.classList.add('ajax');
 		document.body.appendChild(this.a);
 
 		// form.ajax
 		this.form = document.createElement('form');
 		this.form.method = 'POST';
-		this.form.action = '/bar';
+		this.form.action = '/UIHandler/form';
 		this.form.classList.add('ajax');
 		document.body.appendChild(this.form);
 
 		// form input[type="submit"].ajax
-		const form2 = document.createElement('form');
-		form2.action = '/baz';
+		this.form2 = document.createElement('form');
+		this.form2.action = '/UIHandler/submit';
 		this.input = document.createElement('input');
 		this.input.type = 'submit';
 		this.input.name = 'submit';
 		this.input.classList.add('ajax');
-		form2.appendChild(this.input);
-		document.body.appendChild(form2);
+		this.form2.appendChild(this.input);
+		document.body.appendChild(this.form2);
 
 		// form input[type="image"].ajax
-		const form3 = document.createElement('form');
-		form3.action = '/qux';
+		this.form3 = document.createElement('form');
+		this.form3.action = '/UIHandler/image';
 		this.image = document.createElement('input');
 		this.image.type = 'image';
 		this.image.name = 'image';
 		this.image.classList.add('ajax');
-		form3.appendChild(this.image);
-		document.body.appendChild(form3);
+		this.form3.appendChild(this.image);
+		document.body.appendChild(this.form3);
+	});
+
+	afterEach(function () {
+		document.body.removeChild(this.a);
+		document.body.removeChild(this.form);
+		document.body.removeChild(this.form2);
+		document.body.removeChild(this.form3);
 	});
 
 	it('constructor()', function () {
-		const naja = this.mockNaja();
+		const naja = mockNaja();
 		const mock = sinon.mock(naja);
 		mock.expects('addEventListener')
 			.withExactArgs('load', sinon.match.instanceOf(Function))
 			.once();
 
-		new this.UIHandler(naja);
+		new UIHandler(naja);
 		mock.verify();
 	});
 
 	describe('bindUI()', function () {
-		it('binds to .ajax elements by default', function () {
-			const spy = sinon.spy();
-			this.input.form.addEventListener('submit', (evt) => evt.preventDefault());
+		const createEvent = (type) => {
+			if (typeof(Event) === 'function') {
+				return new Event(type, {
+					bubbles: true,
+					cancelable: true,
+				});
 
-			const handler = new this.UIHandler(this.mockNaja());
+			} else {
+				const event = document.createEvent('Event');
+				event.initEvent(type, true, true);
+				return event;
+			}
+		};
+
+		it('binds to .ajax elements by default', function () {
+			const spy = sinon.spy((e) => e.preventDefault());
+
+			const handler = new UIHandler(mockNaja());
 			handler.bindUI(spy);
 
-			this.a.dispatchEvent(new Event('click'));
-			this.form.dispatchEvent(new Event('submit'));
-			this.input.dispatchEvent(new Event('click'));
+			this.a.dispatchEvent(createEvent('click'));
+			this.form.dispatchEvent(createEvent('submit'));
+			this.input.dispatchEvent(createEvent('click'));
 
 			assert.isTrue(spy.calledThrice);
 		});
 
 		it('binds to elements specified by custom selector', function () {
 			const customSelectorLink = document.createElement('a');
-			customSelectorLink.href = '/foo';
-			customSelectorLink.dataset.naja = true;
+			customSelectorLink.href = '/UIHandler/customSelector';
+			customSelectorLink.setAttribute('data-naja', true);
 			document.body.appendChild(customSelectorLink);
 
-			const spy = sinon.spy();
-			const handler = new this.UIHandler(this.mockNaja());
+			const spy = sinon.spy((e) => e.preventDefault());
+			const handler = new UIHandler(mockNaja());
 			handler.selector = '[data-naja]';
 			handler.bindUI(spy);
 
-			customSelectorLink.dispatchEvent(new Event('click'));
+			customSelectorLink.dispatchEvent(createEvent('click'));
 			assert.isTrue(spy.called);
 		});
 	});
 
 	describe('handleUI()', function () {
 		it('modifier keys should abort request', function () {
-			const naja = this.mockNaja();
+			const naja = mockNaja();
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
 				.never();
 
-			const handler = new this.UIHandler(naja);
+			const handler = new UIHandler(naja);
 
 			const evt = {
 				type: 'click',
@@ -113,12 +130,12 @@ describe('UIHandler', function () {
 		});
 
 		it('request for a non-URL URI should not be dispatched', function () {
-			const naja = this.mockNaja();
+			const naja = mockNaja();
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
 				.never();
 
-			const handler = new this.UIHandler(naja);
+			const handler = new UIHandler(naja);
 
 			const voidLink = document.createElement('a');
 			voidLink.href = 'javascript:void(0)';
@@ -130,46 +147,77 @@ describe('UIHandler', function () {
 				currentTarget: voidLink,
 			};
 			handler.handleUI(evt);
+
+			mock.verify();
+			document.body.removeChild(voidLink);
 		});
 
-		it('request for an external URL with allowed origin should be dispatched', function () {
-			const naja = this.mockNaja();
+		it('request for an absolute URL with same origin should be dispatched', function () {
+			const naja = mockNaja();
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
-				.withExactArgs('GET', 'https://google.com/', null, {})
+				.withExactArgs('GET', 'http://localhost:9876/UIHandler/sameOrigin', null, {})
 				.once();
 
-			const handler = new this.UIHandler(naja);
-			handler.allowedOrigins.push('https://google.com');
+			const handler = new UIHandler(naja);
 
 			const externalLink = document.createElement('a');
-			externalLink.href = 'https://google.com';
+			externalLink.href = 'http://localhost:9876/UIHandler/sameOrigin';
 			externalLink.classList.add('ajax');
-			externalLink.addEventListener('click', (e) => { e.preventDefault(); });
 			document.body.appendChild(externalLink);
 
+			const preventDefault = sinon.spy();
 			const evt = {
 				type: 'click',
 				currentTarget: externalLink,
-				preventDefault: () => true,
+				preventDefault,
 			};
 			handler.handleUI(evt);
 
 			mock.verify();
+			assert.isTrue(preventDefault.called);
+			document.body.removeChild(externalLink);
+		});
+
+		it('request for an external URL with allowed origin should be dispatched', function () {
+			const naja = mockNaja();
+			const mock = sinon.mock(naja);
+			mock.expects('makeRequest')
+				.withExactArgs('GET', 'http://another-site.com/foo', null, {})
+				.once();
+
+			const handler = new UIHandler(naja);
+			handler.allowedOrigins.push('http://another-site.com');
+
+			const externalLink = document.createElement('a');
+			externalLink.href = 'http://another-site.com/foo';
+			externalLink.classList.add('ajax');
+			document.body.appendChild(externalLink);
+
+			const preventDefault = sinon.spy();
+			const evt = {
+				type: 'click',
+				currentTarget: externalLink,
+				preventDefault,
+			};
+			handler.handleUI(evt);
+
+			mock.verify();
+			assert.isTrue(preventDefault.called);
+			document.body.removeChild(externalLink);
 		});
 
 		it('request for an external URL with disallowed origin should not be dispatched', function () {
-			const naja = this.mockNaja();
+			const naja = mockNaja();
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
 				.never();
 
-			const handler = new this.UIHandler(naja);
+			const handler = new UIHandler(naja);
 
 			const externalLink = document.createElement('a');
 			externalLink.href = 'https://google.com';
 			externalLink.classList.add('ajax');
-			externalLink.addEventListener('click', (e) => { e.preventDefault(); });
 			document.body.appendChild(externalLink);
 
 			const evt = {
@@ -179,14 +227,20 @@ describe('UIHandler', function () {
 			handler.handleUI(evt);
 
 			mock.verify();
+			document.body.removeChild(externalLink);
 		});
 
 		it('triggers interaction event', function () {
-			const naja = this.mockNaja();
+			const naja = mockNaja();
+			const mock = sinon.mock(naja);
+			mock.expects('makeRequest')
+				.withExactArgs('GET', 'http://localhost:9876/UIHandler/a', null, {})
+				.once();
+
 			const listener = sinon.spy();
 			naja.addEventListener('interaction', listener);
 
-			const handler = new this.UIHandler(naja);
+			const handler = new UIHandler(naja);
 
 			const evt = {
 				type: 'click',
@@ -199,21 +253,24 @@ describe('UIHandler', function () {
 				.and(sinon.match.has('element', this.a))
 				.and(sinon.match.has('originalEvent', evt))
 			));
+
+			mock.verify();
 		});
 
 		it('interaction event listener can abort request', function () {
-			const naja = this.mockNaja();
+			const naja = mockNaja();
 			naja.addEventListener('interaction', evt => evt.preventDefault());
 
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
 				.never();
 
-			const handler = new this.UIHandler(naja);
+			const handler = new UIHandler(naja);
 
 			const evt = {
 				type: 'click',
 				currentTarget: this.a,
+				preventDefault: () => undefined,
 			};
 			handler.handleUI(evt);
 
@@ -221,17 +278,17 @@ describe('UIHandler', function () {
 		});
 
 		it('interaction event listener can alter options', function () {
-			const naja = this.mockNaja();
+			const naja = mockNaja();
 			naja.addEventListener('interaction', ({options}) => {
 				options.foo = 42;
 			});
 
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
-				.withExactArgs('GET', 'http://example.com/foo', null, {foo: 42})
+				.withExactArgs('GET', 'http://localhost:9876/UIHandler/a', null, {foo: 42})
 				.once();
 
-			const handler = new this.UIHandler(naja);
+			const handler = new UIHandler(naja);
 
 			const evt = {
 				type: 'click',
@@ -244,13 +301,13 @@ describe('UIHandler', function () {
 		});
 
 		it('a.ajax', function () {
-			const naja = this.mockNaja();
+			const naja = mockNaja();
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
-				.withExactArgs('GET', 'http://example.com/foo', null, {})
+				.withExactArgs('GET', 'http://localhost:9876/UIHandler/a', null, {})
 				.once();
 
-			const handler = new this.UIHandler(naja);
+			const handler = new UIHandler(naja);
 
 			const preventDefault = sinon.spy();
 			const evt = {
@@ -265,13 +322,13 @@ describe('UIHandler', function () {
 		});
 
 		it('form.ajax', function () {
-			const naja = this.mockNaja();
+			const naja = mockNaja();
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
-				.withExactArgs('POST', 'http://example.com/bar', sinon.match.instanceOf(FormData), {})
+				.withExactArgs('POST', 'http://localhost:9876/UIHandler/form', sinon.match.instanceOf(FormData), {})
 				.once();
 
-			const handler = new this.UIHandler(naja);
+			const handler = new UIHandler(naja);
 
 			const preventDefault = sinon.spy();
 			const evt = {
@@ -286,14 +343,18 @@ describe('UIHandler', function () {
 		});
 
 		it('form input[type="submit"].ajax', function () {
-			const naja = this.mockNaja();
+			const naja = mockNaja();
 			const mock = sinon.mock(naja);
-			const containsSubmit = sinon.match(value => value.has('submit'), 'contains submit');
+			const containsSubmit = sinon.match((value) => {
+				// some browsers have no way of getting data *out* from FormData
+				return 'has' in value ? value.has('submit') : true;
+			});
+
 			mock.expects('makeRequest')
-				.withExactArgs('GET', 'http://example.com/baz', sinon.match.instanceOf(FormData).and(containsSubmit), {})
+				.withExactArgs('GET', 'http://localhost:9876/UIHandler/submit', sinon.match.instanceOf(FormData).and(containsSubmit), {})
 				.once();
 
-			const handler = new this.UIHandler(naja);
+			const handler = new UIHandler(naja);
 
 			const preventDefault = sinon.spy();
 			const evt = {
@@ -308,14 +369,18 @@ describe('UIHandler', function () {
 		});
 
 		it('form input[type="image"].ajax', function () {
-			const naja = this.mockNaja();
+			const naja = mockNaja();
 			const mock = sinon.mock(naja);
-			const containsImage = sinon.match(value => value.has('image.x') && value.has('image.y'), 'contains image');
+			const containsImage = sinon.match((value) => {
+				// some browsers have no way of getting data *out* from FormData
+				return 'has' in value ? (value.has('image.x') && value.has('image.y')) : true;
+			});
+
 			mock.expects('makeRequest')
-				.withExactArgs('GET', 'http://example.com/qux', sinon.match.instanceOf(FormData).and(containsImage), {})
+				.withExactArgs('GET', 'http://localhost:9876/UIHandler/image', sinon.match.instanceOf(FormData).and(containsImage), {})
 				.once();
 
-			const handler = new this.UIHandler(naja);
+			const handler = new UIHandler(naja);
 
 			const preventDefault = sinon.spy();
 			const evt = {

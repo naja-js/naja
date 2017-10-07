@@ -1,18 +1,18 @@
-import jsdom from './jsdomRegister';
+import mockNaja from './setup/mockNaja';
+import fakeXhr from './setup/fakeXhr';
+import cleanPopstateListener from "./setup/cleanPopstateListener";
 import {assert} from 'chai';
 import sinon from 'sinon';
 
 
 describe('makeRequest()', function () {
-	jsdom();
-
-	beforeEach(function () {
-		this.mockNaja = require('./setup/mockNaja').default;
-	});
+	fakeXhr();
 
 	it('should call success event if the request succeeds', function (done) {
-		const naja = this.mockNaja();
+		const naja = mockNaja();
 		naja.initialize();
+		cleanPopstateListener(naja.historyHandler);
+		sinon.stub(naja.historyHandler.historyAdapter);
 
 		const loadCallback = sinon.spy();
 		const beforeCallback = sinon.spy();
@@ -28,7 +28,7 @@ describe('makeRequest()', function () {
 		naja.addEventListener('error', errorCallback);
 		naja.addEventListener('complete', completeCallback);
 
-		const request = naja.makeRequest('GET', '/foo');
+		const request = naja.makeRequest('GET', '/makeRequest/success/events');
 		assert.equal(1, this.requests.length);
 
 		request.then(() => {
@@ -69,14 +69,14 @@ describe('makeRequest()', function () {
 			done();
 		});
 
-		this.requests[0].respond(200, {'Content-Type': 'application/json'}, JSON.stringify({answer: 42}));
+		this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({answer: 42}));
 	});
 
 	it('should resolve with the response if the request succeeds', function (done) {
-		const naja = this.mockNaja();
+		const naja = mockNaja();
 		naja.initialize();
 
-		const request = naja.makeRequest('GET', '/foo');
+		const request = naja.makeRequest('GET', '/makeRequest/success/resolve');
 		assert.equal(1, this.requests.length);
 
 		request.then((response) => {
@@ -84,12 +84,13 @@ describe('makeRequest()', function () {
 			done();
 		});
 
-		this.requests[0].respond(200, {'Content-Type': 'application/json'}, JSON.stringify({answer: 42}));
+		this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({answer: 42}));
 	});
 
 	it('should call error event if the request fails', function (done) {
-		const naja = this.mockNaja();
+		const naja = mockNaja();
 		naja.initialize();
+		cleanPopstateListener(naja.historyHandler);
 
 		const loadCallback = sinon.spy();
 		const beforeCallback = sinon.spy();
@@ -105,7 +106,7 @@ describe('makeRequest()', function () {
 		naja.addEventListener('error', errorCallback);
 		naja.addEventListener('complete', completeCallback);
 
-		const request = naja.makeRequest('GET', '/foo');
+		const request = naja.makeRequest('GET', '/makeRequest/error/events');
 		assert.equal(1, this.requests.length);
 
 		request.catch(() => {
@@ -145,14 +146,16 @@ describe('makeRequest()', function () {
 			done();
 		});
 
-		this.requests[0].respond(500, {'Content-Type': 'application/json'}, JSON.stringify({error: 'Internal Server Error'}));
+		this.requests.pop().respond(500, {'Content-Type': 'application/json'}, JSON.stringify({error: 'Internal Server Error'}));
 	});
 
 	it('should reject with the error if the request fails', function (done) {
-		const naja = this.mockNaja();
+		const naja = mockNaja();
 		naja.initialize();
+		cleanPopstateListener(naja.historyHandler);
+		sinon.stub(naja.historyHandler.historyAdapter);
 
-		const request = naja.makeRequest('GET', '/foo');
+		const request = naja.makeRequest('GET', '/makeRequest/error/reject');
 		assert.equal(1, this.requests.length);
 
 		request.catch((error) => {
@@ -160,11 +163,11 @@ describe('makeRequest()', function () {
 			done();
 		});
 
-		this.requests[0].respond(500, {'Content-Type': 'application/json'}, JSON.stringify({error: 'Internal Server Error'}));
+		this.requests.pop().respond(500, {'Content-Type': 'application/json'}, JSON.stringify({error: 'Internal Server Error'}));
 	});
 
 	it('should call abort event if the request is aborted', function () {
-		const naja = this.mockNaja();
+		const naja = mockNaja();
 		naja.initialize();
 
 		const abortCallback = sinon.spy();
@@ -176,8 +179,8 @@ describe('makeRequest()', function () {
 		naja.addEventListener('error', errorCallback);
 		naja.addEventListener('complete', completeCallback);
 
-		naja.makeRequest('GET', '/foo');
-		this.requests[0].abort();
+		naja.makeRequest('GET', '/makeRequest/abort');
+		this.requests.pop().abort();
 
 		assert.isTrue(abortCallback.called);
 		assert.isFalse(successCallback.called);
@@ -192,8 +195,9 @@ describe('makeRequest()', function () {
 	});
 
 	it('should not send the request if before event is aborted', function () {
-		const naja = this.mockNaja();
+		const naja = mockNaja();
 		naja.initialize();
+		cleanPopstateListener(naja.historyHandler);
 
 		const completeCallback = sinon.spy();
 		naja.addEventListener('complete', completeCallback);
@@ -202,7 +206,7 @@ describe('makeRequest()', function () {
 		let thrown = false;
 
 		try {
-			naja.makeRequest('GET', '/foo');
+			naja.makeRequest('GET', '/makeRequest/abortedBefore');
 
 		} catch (e) {
 			// sinon's fake XHR throws error if readyState is not OPENED
