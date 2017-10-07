@@ -62,13 +62,26 @@ You don't need to dispatch most of the requests manually though. Naja does lots 
 
 ##### Custom selector
 
-You can customize the bound selector easily, changing it to, for example, to a data attribute, or even disabling it entirely, so that *all* links and forms on your page are handled by Naja:
+You can customize the bound selector easily, changing it to a data attribute, inverting it, or even disabling it entirely (see below for further notes):
 
 ```js
 naja.uiHandler.selector = '[data-naja]';
 // or
+naja.uiHandler.selector = ':not(.synchronous)';
+// or
 naja.uiHandler.selector = '';
 ```
+
+
+##### Allowed origins
+
+Note that if you change the selector to an opt-out (`:not(.synchronous)`, empty string, etc.), *all* links will become asynchronous. Naja prevents you from shooting yourself in the foot and does not dispatch AJAX requests for external URLs unless you explicitly allow them:
+
+```js
+naja.uiHandler.allowedOrigins.push('https://allowed.origin.com:4000');
+```
+
+The current origin is allowed by default, i.e. it does not matter whether the `href` in the link points to a relative path or an absolute one.
 
 
 #### RedirectHandler

@@ -112,6 +112,75 @@ describe('UIHandler', function () {
 			mock.verify();
 		});
 
+		it('request for a non-URL URI should not be dispatched', function () {
+			const naja = this.mockNaja();
+			const mock = sinon.mock(naja);
+			mock.expects('makeRequest')
+				.never();
+
+			const handler = new this.UIHandler(naja);
+
+			const voidLink = document.createElement('a');
+			voidLink.href = 'javascript:void(0)';
+			voidLink.classList.add('ajax');
+			document.body.appendChild(voidLink);
+
+			const evt = {
+				type: 'click',
+				currentTarget: voidLink,
+			};
+			handler.handleUI(evt);
+		});
+
+		it('request for an external URL with allowed origin should be dispatched', function () {
+			const naja = this.mockNaja();
+			const mock = sinon.mock(naja);
+			mock.expects('makeRequest')
+				.withExactArgs('GET', 'https://google.com/', null, {})
+				.once();
+
+			const handler = new this.UIHandler(naja);
+			handler.allowedOrigins.push('https://google.com');
+
+			const externalLink = document.createElement('a');
+			externalLink.href = 'https://google.com';
+			externalLink.classList.add('ajax');
+			externalLink.addEventListener('click', (e) => { e.preventDefault(); });
+			document.body.appendChild(externalLink);
+
+			const evt = {
+				type: 'click',
+				currentTarget: externalLink,
+				preventDefault: () => true,
+			};
+			handler.handleUI(evt);
+
+			mock.verify();
+		});
+
+		it('request for an external URL with disallowed origin should not be dispatched', function () {
+			const naja = this.mockNaja();
+			const mock = sinon.mock(naja);
+			mock.expects('makeRequest')
+				.never();
+
+			const handler = new this.UIHandler(naja);
+
+			const externalLink = document.createElement('a');
+			externalLink.href = 'https://google.com';
+			externalLink.classList.add('ajax');
+			externalLink.addEventListener('click', (e) => { e.preventDefault(); });
+			document.body.appendChild(externalLink);
+
+			const evt = {
+				type: 'click',
+				currentTarget: externalLink,
+			};
+			handler.handleUI(evt);
+
+			mock.verify();
+		});
+
 		it('triggers interaction event', function () {
 			const naja = this.mockNaja();
 			const listener = sinon.spy();

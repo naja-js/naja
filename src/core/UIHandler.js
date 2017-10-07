@@ -3,11 +3,14 @@ import Component from '../Component';
 
 export default class UIHandler extends Component {
 	selector = '.ajax';
+	allowedOrigins = [];
 
 	constructor(naja) {
 		super(naja);
 		const handler = this.handleUI.bind(this);
 		naja.addEventListener('load', this.bindUI.bind(this, handler));
+
+		this.allowedOrigins.push(window.location.origin);
 	}
 
 	bindUI(handler) {
@@ -76,7 +79,14 @@ export default class UIHandler extends Component {
 			}
 		}
 
-		evt.preventDefault();
-		this.naja.makeRequest(method, url, data, options);
+		// ignore non-URL URIs (javascript:, data:, ...)
+		if (/^(?!https?)[^:/?#]+:/i.test(url)) {
+			return;
+		}
+
+		if ( ! /^https?/i.test(url) || this.allowedOrigins.find((origin) => new RegExp(`^${origin}`, 'i').test(url))) {
+			evt.preventDefault();
+			this.naja.makeRequest(method, url, data, options);
+		}
 	}
 }
