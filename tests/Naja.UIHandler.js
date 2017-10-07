@@ -55,18 +55,35 @@ describe('UIHandler', function () {
 		mock.verify();
 	});
 
-	it('bindUI()', function () {
-		const spy = sinon.spy();
-		this.input.form.addEventListener('submit', (evt) => evt.preventDefault());
+	describe('bindUI()', function () {
+		it('binds to .ajax elements by default', function () {
+			const spy = sinon.spy();
+			this.input.form.addEventListener('submit', (evt) => evt.preventDefault());
 
-		const handler = new this.UIHandler(this.mockNaja());
-		handler.bindUI(spy);
+			const handler = new this.UIHandler(this.mockNaja());
+			handler.bindUI(spy);
 
-		this.a.dispatchEvent(new Event('click'));
-		this.form.dispatchEvent(new Event('submit'));
-		this.input.dispatchEvent(new Event('click'));
+			this.a.dispatchEvent(new Event('click'));
+			this.form.dispatchEvent(new Event('submit'));
+			this.input.dispatchEvent(new Event('click'));
 
-		assert.isTrue(spy.calledThrice);
+			assert.isTrue(spy.calledThrice);
+		});
+
+		it('binds to elements specified by custom selector', function () {
+			const customSelectorLink = document.createElement('a');
+			customSelectorLink.href = '/foo';
+			customSelectorLink.dataset.naja = true;
+			document.body.appendChild(customSelectorLink);
+
+			const spy = sinon.spy();
+			const handler = new this.UIHandler(this.mockNaja());
+			handler.selector = '[data-naja]';
+			handler.bindUI(spy);
+
+			customSelectorLink.dispatchEvent(new Event('click'));
+			assert.isTrue(spy.called);
+		});
 	});
 
 	describe('handleUI()', function () {
@@ -80,14 +97,14 @@ describe('UIHandler', function () {
 
 			const evt = {
 				type: 'click',
-				target: this.a,
+				currentTarget: this.a,
 				button: 2,
 			};
 			handler.handleUI(evt);
 
 			const evt2 = {
 				type: 'click',
-				target: this.a,
+				currentTarget: this.a,
 				ctrlKey: true,
 			};
 			handler.handleUI(evt2);

@@ -2,6 +2,8 @@ import Component from '../Component';
 
 
 export default class UIHandler extends Component {
+	selector = '.ajax';
+
 	constructor(naja) {
 		super(naja);
 		const handler = this.handleUI.bind(this);
@@ -10,13 +12,13 @@ export default class UIHandler extends Component {
 
 	bindUI(handler) {
 		const selectors = [
-			'a.ajax',
-			'input[type="submit"].ajax',
-			'input[type="image"].ajax',
-			'button[type="submit"].ajax',
-			'form.ajax input[type="submit"]',
-			'form.ajax input[type="image"]',
-			'form.ajax button[type="submit"]',
+			`a${this.selector}`,
+			`input[type="submit"]${this.selector}`,
+			`input[type="image"]${this.selector}`,
+			`button[type="submit"]${this.selector}`,
+			`form${this.selector} input[type="submit"]`,
+			`form${this.selector} input[type="image"]`,
+			`form${this.selector} button[type="submit"]`,
 		].join(', ');
 
 		const elements = document.querySelectorAll(selectors);
@@ -26,7 +28,7 @@ export default class UIHandler extends Component {
 			node.addEventListener('click', handler);
 		}
 
-		const forms = document.querySelectorAll('form.ajax');
+		const forms = document.querySelectorAll(`form${this.selector}`);
 		for (let i = 0; i < forms.length; i++) {
 			const form = forms.item(i);
 			form.removeEventListener('submit', handler);

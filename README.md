@@ -60,6 +60,17 @@ You don't need to dispatch most of the requests manually though. Naja does lots 
 
 `UIHandler` binds Naja's AJAX handler to all links, forms and submit inputs marked with `ajax` class.
 
+##### Custom selector
+
+You can customize the bound selector easily, changing it to, for example, to a data attribute, or even disabling it entirely, so that *all* links and forms on your page are handled by Naja:
+
+```js
+naja.uiHandler.selector = '[data-naja]';
+// or
+naja.uiHandler.selector = '';
+```
+
+
 #### RedirectHandler
 
 `RedirectHandler` performs a redirection if there is `redirect` key in the response payload.
