@@ -6,20 +6,13 @@ import sinon from 'sinon';
 describe('RedirectHandler', function () {
 	jsdom();
 
-	beforeEach(function (done) {
-		this.Naja = require('../src/Naja').default;
+	beforeEach(function () {
+		this.mockNaja = require('./setup/mockNaja').default;
 		this.RedirectHandler = require('../src/core/RedirectHandler').default;
-		done();
-	});
-
-	it('registered in Naja.initialize()', function () {
-		const naja = new this.Naja();
-		naja.initialize();
-		assert.instanceOf(naja.redirectHandler, this.RedirectHandler);
 	});
 
 	it('constructor()', function () {
-		const naja = new this.Naja();
+		const naja = this.mockNaja();
 		const mock = sinon.mock(naja);
 		mock.expects('addEventListener')
 			.withExactArgs('success', sinon.match.instanceOf(Function))
@@ -30,7 +23,7 @@ describe('RedirectHandler', function () {
 	});
 
 	it('reads redirect from response', function (done) {
-		const naja = new this.Naja();
+		const naja = this.mockNaja();
 		const redirectHandler = new this.RedirectHandler(naja);
 
 		const mock = sinon.mock(redirectHandler);
@@ -47,7 +40,7 @@ describe('RedirectHandler', function () {
 	});
 
 	it('stops event propagation', function (done) {
-		const naja = new this.Naja();
+		const naja = this.mockNaja();
 		new this.RedirectHandler(naja);
 
 		const mock = sinon.mock(window.location);
@@ -69,7 +62,7 @@ describe('RedirectHandler', function () {
 	});
 
 	it('makes request if forceRedirect is false', function () {
-		const naja = new this.Naja();
+		const naja = this.mockNaja();
 		const redirectHandler = new this.RedirectHandler(naja);
 
 		const mock = sinon.mock(naja);
@@ -82,7 +75,7 @@ describe('RedirectHandler', function () {
 	});
 
 	it('redirects if forceRedirect is true', function () {
-		const naja = new this.Naja();
+		const naja = this.mockNaja();
 		const redirectHandler = new this.RedirectHandler(naja);
 
 		assert.equal(window.location.href, 'http://example.com/');
@@ -98,7 +91,7 @@ describe('RedirectHandler', function () {
 	});
 
 	it('makes request if url is local', function () {
-		const naja = new this.Naja();
+		const naja = this.mockNaja();
 		const redirectHandler = new this.RedirectHandler(naja);
 
 		const mock = sinon.mock(naja);
@@ -111,7 +104,7 @@ describe('RedirectHandler', function () {
 	});
 
 	it('redirects if url is external', function () {
-		const naja = new this.Naja();
+		const naja = this.mockNaja();
 		const redirectHandler = new this.RedirectHandler(naja);
 
 		assert.equal(window.location.href, 'http://example.com/');

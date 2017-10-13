@@ -6,20 +6,13 @@ import sinon from 'sinon';
 describe('FormsHandler', function () {
 	jsdom();
 
-	beforeEach(function (done) {
-		this.Naja = require('../src/Naja').default;
+	beforeEach(function () {
+		this.mockNaja = require('./setup/mockNaja').default;
 		this.FormsHandler = require('../src/core/FormsHandler').default;
-		done();
-	});
-
-	it('registered in Naja.initialize()', function () {
-		const naja = new this.Naja();
-		naja.initialize();
-		assert.instanceOf(naja.formsHandler, this.FormsHandler);
 	});
 
 	it('constructor()', function () {
-		const naja = new this.Naja();
+		const naja = this.mockNaja();
 		const mock = sinon.mock(naja);
 
 		mock.expects('addEventListener')
@@ -43,7 +36,7 @@ describe('FormsHandler', function () {
 		document.body.appendChild(form1);
 		document.body.appendChild(form2);
 
-		const naja = new this.Naja();
+		const naja = this.mockNaja();
 		new this.FormsHandler(naja);
 		naja.load();
 

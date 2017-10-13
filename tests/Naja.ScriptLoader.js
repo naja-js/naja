@@ -6,20 +6,13 @@ import sinon from 'sinon';
 describe('ScriptLoader', function () {
 	jsdom();
 
-	beforeEach(function (done) {
-		this.Naja = require('../src/Naja').default;
+	beforeEach(function () {
+		this.mockNaja = require('./setup/mockNaja').default;
 		this.ScriptLoader = require('../src/core/ScriptLoader').default;
-		done();
-	});
-
-	it('registered in Naja.initialize()', function () {
-		const naja = new this.Naja();
-		naja.initialize();
-		assert.instanceOf(naja.scriptLoader, this.ScriptLoader);
 	});
 
 	it('constructor()', function () {
-		const naja = new this.Naja();
+		const naja = this.mockNaja();
 		const mock = sinon.mock(naja);
 
 		mock.expects('addEventListener')
@@ -31,7 +24,7 @@ describe('ScriptLoader', function () {
 	});
 
 	it('loads scripts in snippets', function () {
-		const naja = new this.Naja();
+		const naja = this.mockNaja();
 		const scriptLoader = new this.ScriptLoader(naja);
 
 		const mock = sinon.mock(scriptLoader);
@@ -48,7 +41,7 @@ describe('ScriptLoader', function () {
 	});
 
 	it('loadScripts()', function () {
-		const naja = new this.Naja();
+		const naja = this.mockNaja();
 		const scriptLoader = new this.ScriptLoader(naja);
 
 		const el = document.createElement('div');

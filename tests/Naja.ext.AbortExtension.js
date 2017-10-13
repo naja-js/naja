@@ -5,14 +5,13 @@ import {assert} from 'chai';
 describe('AbortExtension', function () {
 	jsdom();
 
-	beforeEach(function (done) {
-		this.Naja = require('../src/Naja').default;
+	beforeEach(function () {
+		this.mockNaja = require('./setup/mockNaja').default;
 		this.AbortExtension = require('../src/extensions/AbortExtension').default;
-		done();
 	});
 
 	it('aborts request on Esc', function () {
-		const naja = new this.Naja();
+		const naja = this.mockNaja();
 		const abortExtension = new this.AbortExtension(naja);
 		abortExtension.initialize();
 
@@ -47,7 +46,7 @@ describe('AbortExtension', function () {
 	});
 
 	it('does not abort non-abortable request', function (done) {
-		const naja = new this.Naja();
+		const naja = this.mockNaja();
 		const abortExtension = new this.AbortExtension(naja);
 		abortExtension.initialize();
 

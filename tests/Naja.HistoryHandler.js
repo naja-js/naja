@@ -6,20 +6,14 @@ import sinon from 'sinon';
 describe('HistoryHandler', function () {
 	jsdom();
 
-	beforeEach(function (done) {
-		this.Naja = require('../src/Naja').default;
+	beforeEach(function () {
+		this.mockNaja = require('./setup/mockNaja').default;
+		this.SnippetHandler = require('../src/core/SnippetHandler').default;
 		this.HistoryHandler = require('../src/core/HistoryHandler').default;
-		done();
-	});
-
-	it('registered in Naja.initialize()', function () {
-		const naja = new this.Naja();
-		naja.initialize();
-		assert.instanceOf(naja.historyHandler, this.HistoryHandler);
 	});
 
 	it('constructor()', function () {
-		const naja = new this.Naja();
+		const naja = this.mockNaja();
 		const mock = sinon.mock(naja);
 
 		mock.expects('addEventListener')
@@ -39,7 +33,7 @@ describe('HistoryHandler', function () {
 	});
 
 	it('saves initial state', function () {
-		const naja = new this.Naja();
+		const naja = this.mockNaja();
 		const historyHandler = new this.HistoryHandler(naja);
 		historyHandler.initialize();
 
@@ -48,10 +42,16 @@ describe('HistoryHandler', function () {
 			title: '',
 			ui: {},
 		}, window.history.state);
+
+		// cleanup
+		window.removeEventListener('popstate', historyHandler.popStateHandler);
 	});
 
 	it('pushes new state after successful request', function (done) {
-		const naja = new this.Naja();
+		const naja = this.mockNaja({
+			snippetHandler: this.SnippetHandler,
+			historyHandler: this.HistoryHandler,
+		});
 		naja.initialize();
 
 		const el = document.createElement('div');
@@ -68,6 +68,9 @@ describe('HistoryHandler', function () {
 				},
 			}, window.history.state);
 
+			// cleanup
+			window.removeEventListener('popstate', naja.historyHandler.popStateHandler);
+
 			done();
 		});
 
@@ -75,7 +78,10 @@ describe('HistoryHandler', function () {
 	});
 
 	it('replaces the state after successful request if payload.history.replace', function () {
-		const naja = new this.Naja();
+		const naja = this.mockNaja({
+			snippetHandler: this.SnippetHandler,
+			historyHandler: this.HistoryHandler,
+		});
 		naja.initialize();
 
 		const el = document.createElement('div');
@@ -92,6 +98,9 @@ describe('HistoryHandler', function () {
 				},
 			}, window.history.state);
 
+			// cleanup
+			window.removeEventListener('popstate', naja.historyHandler.popStateHandler);
+
 			done();
 		});
 
@@ -99,7 +108,10 @@ describe('HistoryHandler', function () {
 	});
 
 	it('uses the url from payload if postGet is present', function (done) {
-		const naja = new this.Naja();
+		const naja = this.mockNaja({
+			snippetHandler: this.SnippetHandler,
+			historyHandler: this.HistoryHandler,
+		});
 		naja.initialize();
 
 		naja.makeRequest('GET', '/foo').then(() => {
@@ -110,6 +122,9 @@ describe('HistoryHandler', function () {
 				ui: {},
 			}, window.history.state);
 
+			// cleanup
+			window.removeEventListener('popstate', naja.historyHandler.popStateHandler);
+
 			done();
 		});
 
@@ -117,7 +132,10 @@ describe('HistoryHandler', function () {
 	});
 
 	it('redraws snippets on popstate', function () {
-		const naja = new this.Naja();
+		const naja = this.mockNaja({
+			snippetHandler: this.SnippetHandler,
+			historyHandler: this.HistoryHandler,
+		});
 		naja.initialize();
 
 		const el = document.createElement('div');
@@ -138,10 +156,16 @@ describe('HistoryHandler', function () {
 
 		assert.equal(document.title, 'new title');
 		assert.equal(el.innerHTML, 'foo bar baz');
+
+		// cleanup
+		window.removeEventListener('popstate', naja.historyHandler.popStateHandler);
 	});
 
 	it('does not trigger on initial pop', function () {
-		const naja = new this.Naja();
+		const naja = this.mockNaja({
+			snippetHandler: this.SnippetHandler,
+			historyHandler: this.HistoryHandler,
+		});
 		naja.initialize();
 
 		const el = document.createElement('div');
@@ -157,5 +181,8 @@ describe('HistoryHandler', function () {
 
 		assert.equal(document.title, '');
 		assert.equal(el.innerHTML, 'foo');
+
+		// cleanup
+		window.removeEventListener('popstate', naja.historyHandler.popStateHandler);
 	});
 });

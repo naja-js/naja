@@ -22,6 +22,17 @@ export default class Naja extends EventTarget {
 	extensions = [];
 
 
+	constructor(uiHandler, redirectHandler, snippetHandler, formsHandler, historyHandler, scriptLoader) {
+		super();
+		this.uiHandler = uiHandler ? new uiHandler(this) : new UIHandler(this);
+		this.redirectHandler = redirectHandler ? new redirectHandler(this) : new RedirectHandler(this);
+		this.snippetHandler = snippetHandler ? new snippetHandler(this) : new SnippetHandler(this);
+		this.formsHandler = formsHandler ? new formsHandler(this) : new FormsHandler(this);
+		this.historyHandler = historyHandler ? new historyHandler(this) : new HistoryHandler(this);
+		this.scriptLoader = scriptLoader ? new scriptLoader(this) : new ScriptLoader(this);
+	}
+
+
 	registerExtension(extensionClass, ...args) {
 		this.extensions.push([extensionClass, args]);
 	}
@@ -32,12 +43,6 @@ export default class Naja extends EventTarget {
 			throw new Error('Cannot initialize Naja, it is already initialized.');
 		}
 
-		this.uiHandler = new UIHandler(this);
-		this.redirectHandler = new RedirectHandler(this);
-		this.snippetHandler = new SnippetHandler(this);
-		this.formsHandler = new FormsHandler(this);
-		this.historyHandler = new HistoryHandler(this);
-		this.scriptLoader = new ScriptLoader(this);
 		this.extensions = this.extensions.map(([extensionClass, args]) => new extensionClass(this, ...args));
 
 		this.fireEvent('init');

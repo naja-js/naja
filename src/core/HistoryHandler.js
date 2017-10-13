@@ -4,6 +4,7 @@ import Component from '../Component';
 export default class HistoryHandler extends Component {
 	popped = false;
 	href = null;
+	initialUrl = null;
 	initialState = null;
 
 	constructor(naja) {
@@ -11,32 +12,36 @@ export default class HistoryHandler extends Component {
 		naja.addEventListener('init', this.initialize.bind(this));
 		naja.addEventListener('before', this.saveUrl.bind(this));
 		naja.addEventListener('success', this.pushNewState.bind(this));
+
+		this.popStateHandler = this.handlePopState.bind(this);
 	}
 
 	initialize() {
 		this.popped = !!window.history.state;
-		const initialUrl = window.location.href;
+		this.initialUrl = window.location.href;
 
-		window.addEventListener('popstate', (e) => {
-			const state = e.state || this.initialState;
-			const initialPop = !this.popped && initialUrl === state.href;
-			this.popped = true;
-
-			if (initialPop) {
-				return;
-			}
-
-			if (state.ui) {
-				this.handleSnippets(state.ui);
-				this.handleTitle(state.title);
-			}
-		});
+		window.addEventListener('popstate', this.popStateHandler);
 
 		window.history.replaceState(this.initialState = {
 			href: window.location.href,
 			title: window.document.title,
 			ui: this.findSnippets(),
 		}, window.document.title, window.location.href);
+	}
+
+	handlePopState(e) {
+		const state = e.state || this.initialState;
+		const initialPop = !this.popped && this.initialUrl === state.href;
+		this.popped = true;
+
+		if (initialPop) {
+			return;
+		}
+
+		if (state.ui) {
+			this.handleSnippets(state.ui);
+			this.handleTitle(state.title);
+		}
 	}
 
 	saveUrl({url}) {

@@ -6,9 +6,12 @@ import sinon from 'sinon';
 describe('makeRequest()', function () {
 	jsdom();
 
+	beforeEach(function () {
+		this.mockNaja = require('./setup/mockNaja').default;
+	});
+
 	it('should call success event if the request succeeds', function (done) {
-		const Naja = require('../src/Naja').default;
-		const naja = new Naja();
+		const naja = this.mockNaja();
 		naja.initialize();
 
 		const loadCallback = sinon.spy();
@@ -70,8 +73,7 @@ describe('makeRequest()', function () {
 	});
 
 	it('should resolve with the response if the request succeeds', function (done) {
-		const Naja = require('../src/Naja').default;
-		const naja = new Naja();
+		const naja = this.mockNaja();
 		naja.initialize();
 
 		const request = naja.makeRequest('GET', '/foo');
@@ -86,8 +88,7 @@ describe('makeRequest()', function () {
 	});
 
 	it('should call error event if the request fails', function (done) {
-		const Naja = require('../src/Naja').default;
-		const naja = new Naja();
+		const naja = this.mockNaja();
 		naja.initialize();
 
 		const loadCallback = sinon.spy();
@@ -148,8 +149,7 @@ describe('makeRequest()', function () {
 	});
 
 	it('should reject with the error if the request fails', function (done) {
-		const Naja = require('../src/Naja').default;
-		const naja = new Naja();
+		const naja = this.mockNaja();
 		naja.initialize();
 
 		const request = naja.makeRequest('GET', '/foo');
@@ -164,8 +164,7 @@ describe('makeRequest()', function () {
 	});
 
 	it('should call abort event if the request is aborted', function () {
-		const Naja = require('../src/Naja').default;
-		const naja = new Naja();
+		const naja = this.mockNaja();
 		naja.initialize();
 
 		const abortCallback = sinon.spy();
@@ -193,8 +192,7 @@ describe('makeRequest()', function () {
 	});
 
 	it('should not send the request if before event is aborted', function () {
-		const Naja = require('../src/Naja').default;
-		const naja = new Naja();
+		const naja = this.mockNaja();
 		naja.initialize();
 
 		const completeCallback = sinon.spy();

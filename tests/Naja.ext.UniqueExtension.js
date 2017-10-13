@@ -5,14 +5,13 @@ import {assert} from 'chai';
 describe('UniqueExtension', function () {
 	jsdom();
 
-	beforeEach(function (done) {
-		this.Naja = require('../src/Naja').default;
+	beforeEach(function () {
+		this.mockNaja = require('./setup/mockNaja').default;
 		this.UniqueExtension = require('../src/extensions/UniqueExtension').default;
-		done();
 	});
 
 	it('aborts previous request', function () {
-		const naja = new this.Naja();
+		const naja = this.mockNaja();
 		new this.UniqueExtension(naja);
 
 		naja.makeRequest('GET', '/foo');
@@ -34,7 +33,7 @@ describe('UniqueExtension', function () {
 	});
 
 	it('does not abort request if disabled', function (done) {
-		const naja = new this.Naja();
+		const naja = this.mockNaja();
 		new this.UniqueExtension(naja);
 
 		naja.makeRequest('GET', '/foo').then(() => {
