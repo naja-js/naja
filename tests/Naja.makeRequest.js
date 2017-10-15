@@ -6,13 +6,9 @@ import sinon from 'sinon';
 describe('makeRequest()', function () {
 	jsdom();
 
-	beforeEach(function (done) {
-		this.Naja = require('../src/Naja').default;
-		done();
-	});
-
 	it('should call success event if the request succeeds', function (done) {
-		const naja = new this.Naja();
+		const Naja = require('../src/Naja').default;
+		const naja = new Naja();
 		naja.initialize();
 
 		const loadCallback = sinon.spy();
@@ -74,7 +70,8 @@ describe('makeRequest()', function () {
 	});
 
 	it('should call error event if the request fails', function (done) {
-		const naja = new this.Naja();
+		const Naja = require('../src/Naja').default;
+		const naja = new Naja();
 		naja.initialize();
 
 		const loadCallback = sinon.spy();
@@ -134,29 +131,31 @@ describe('makeRequest()', function () {
 		this.requests[0].respond(500, {'Content-Type': 'application/json'}, JSON.stringify({error: 'Internal Server Error'}));
 	});
 
-	it('should call error event if the request is aborted', function () {
-		const naja = new this.Naja();
+	it('should call abort event if the request is aborted', function () {
+		const Naja = require('../src/Naja').default;
+		const naja = new Naja();
 		naja.initialize();
 
+		const abortCallback = sinon.spy();
+		const successCallback = sinon.spy();
 		const errorCallback = sinon.spy();
 		const completeCallback = sinon.spy();
-		naja.addEventListener('start', ({xhr}) => xhr.abort());
+		naja.addEventListener('abort', abortCallback);
+		naja.addEventListener('success', successCallback);
 		naja.addEventListener('error', errorCallback);
 		naja.addEventListener('complete', completeCallback);
 
 		naja.makeRequest('GET', '/foo');
+		this.requests[0].abort();
 
-		assert.isTrue(errorCallback.called);
-		assert.isTrue(errorCallback.calledWith(sinon.match.object
-			.and(sinon.match.has('error', sinon.match.truthy))
-			.and(sinon.match.has('response', sinon.match.typeOf('null')))
-			.and(sinon.match.has('xhr', sinon.match.instanceOf(window.XMLHttpRequest)))
-		));
+		assert.isTrue(abortCallback.called);
+		assert.isFalse(successCallback.called);
+		assert.isFalse(errorCallback.called);
 
 		assert.isTrue(completeCallback.called);
 		assert.isTrue(completeCallback.calledWith(sinon.match.object
-			.and(sinon.match.has('error', sinon.match.truthy))
-			.and(sinon.match.has('response', sinon.match.typeOf('null')))
+			.and(sinon.match.has('error', sinon.match.instanceOf(Error)))
+			.and(sinon.match.has('response', null))
 			.and(sinon.match.has('xhr', sinon.match.instanceOf(window.XMLHttpRequest)))
 		));
 	});

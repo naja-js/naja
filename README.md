@@ -147,6 +147,8 @@ The true power of Naja is in how easy you can implement your own extensions to i
 - **start:** This event is dispatched right after the request is sent. It has the following properties:
     - `request: Promise`, a Promise that resolves or rejects when the request is completed,
     - `xhr: XMLHttpRequest`, the XHR object.
+- **abort:** This event is dispatched if the request is aborted. Aborting the request does not trigger error handling because it is not an error per se, but it might be useful to react to it. This event has the following properites:
+    - `xhr: XMLHttpRequest`, the aborted XHR object.
 - **success:** This event is dispatched when the request successfully finishes. It has the following properties:
     - `xhr: XMLHttpRequest`, the XHR object,
     - `response: Object`, the parsed response payload.

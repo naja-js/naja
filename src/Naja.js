@@ -76,9 +76,8 @@ export default class Naja extends EventTarget {
 
 			// qwest does not handle response at all if the request is aborted
 			xhr.addEventListener('abort', () => {
-				const error = new Error('Request aborted.');
-				this.fireEvent('error', {error, xhr, response: null});
-				this.fireEvent('complete', {error, xhr, response: null});
+				this.fireEvent('abort', {xhr});
+				this.fireEvent('complete', {error: new Error('Request aborted'), xhr, response: null});
 			});
 		};
 
