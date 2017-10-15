@@ -69,6 +69,22 @@ describe('makeRequest()', function () {
 		this.requests[0].respond(200, {'Content-Type': 'application/json'}, JSON.stringify({answer: 42}));
 	});
 
+	it('should resolve with the response if the request succeeds', function (done) {
+		const Naja = require('../src/Naja').default;
+		const naja = new Naja();
+		naja.initialize();
+
+		const request = naja.makeRequest('GET', '/foo');
+		assert.equal(1, this.requests.length);
+
+		request.then((response) => {
+			assert.deepEqual(response, {answer: 42});
+			done();
+		});
+
+		this.requests[0].respond(200, {'Content-Type': 'application/json'}, JSON.stringify({answer: 42}));
+	});
+
 	it('should call error event if the request fails', function (done) {
 		const Naja = require('../src/Naja').default;
 		const naja = new Naja();
@@ -91,7 +107,7 @@ describe('makeRequest()', function () {
 		const request = naja.makeRequest('GET', '/foo');
 		assert.equal(1, this.requests.length);
 
-		request.then(() => {
+		request.catch(() => {
 			assert.isTrue(beforeCallback.calledWith(sinon.match.object
 				.and(sinon.match.has('xhr', sinon.match.instanceOf(window.XMLHttpRequest)))
 				.and(sinon.match.has('method', sinon.match.string))
@@ -125,6 +141,22 @@ describe('makeRequest()', function () {
 
 			assert.isTrue(loadCallback.called);
 			assert.isFalse(successCallback.called);
+			done();
+		});
+
+		this.requests[0].respond(500, {'Content-Type': 'application/json'}, JSON.stringify({error: 'Internal Server Error'}));
+	});
+
+	it('should reject with the error if the request fails', function (done) {
+		const Naja = require('../src/Naja').default;
+		const naja = new Naja();
+		naja.initialize();
+
+		const request = naja.makeRequest('GET', '/foo');
+		assert.equal(1, this.requests.length);
+
+		request.catch((error) => {
+			assert.isOk(error); // isOk = truthy
 			done();
 		});
 

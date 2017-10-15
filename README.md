@@ -48,6 +48,8 @@ naja.makeRequest(method, url, data = null, options = {})
 - `data: ?mixed` can be pretty much anything: array, object, string, `ArrayBuffer`, `Blob`, `FormData`, &hellip;
 - `options: ?Object` can be used to alter the behavior of some extensions (see below). On top of that, it carries the options for the underlying AJAX library, [`qwest`](https://github.com/pyrsmk/qwest). Please refer to its docs for reference.
 
+The `makeRequest` method returns a Promise which either resolves to the `response` object containing the parsed response body, or is rejected with the thrown `error`.
+
 
 ### Core components
 

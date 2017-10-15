@@ -86,11 +86,15 @@ export default class Naja extends EventTarget {
 				this.fireEvent('success', {xhr, response});
 				this.fireEvent('complete', {error: null, xhr, response});
 				this.load();
+
+				return response;
 			})
 			.catch((error, xhr, response) => {
 				this.fireEvent('error', {error, xhr, response});
 				this.fireEvent('complete', {error, xhr, response});
 				this.load();
+
+				throw error;
 			});
 
 		this.fireEvent('start', {request, xhr: currentXhr});
