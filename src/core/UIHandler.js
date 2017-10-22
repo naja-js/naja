@@ -10,7 +10,9 @@ export default class UIHandler extends Component {
 		const handler = this.handleUI.bind(this);
 		naja.addEventListener('load', this.bindUI.bind(this, handler));
 
-		this.allowedOrigins.push(window.location.origin);
+		// window.location.origin is not supported in IE 10
+		const origin = `${window.location.protocol}//${window.location.hostname}${window.location.port ? `:${window.location.port}` : ''}`;
+		this.allowedOrigins.push(origin);
 	}
 
 	bindUI(handler) {
@@ -48,6 +50,7 @@ export default class UIHandler extends Component {
 		let method, url, data;
 
 		if ( ! this.naja.fireEvent('interaction', {element: el, originalEvent: evt, options})) {
+			evt.preventDefault();
 			return;
 		}
 
@@ -69,12 +72,12 @@ export default class UIHandler extends Component {
 				data = new FormData(form);
 
 				if (el.type === 'submit' || el.tagName.toLowerCase() === 'button') {
-					data.set(el.name, el.value || '');
+					data.append(el.name, el.value || '');
 
 				} else if (el.type === 'image') {
 					const coords = el.getBoundingClientRect();
-					data.set(`${el.name}.x`, Math.max(0, Math.floor(evt.pageX - coords.left)));
-					data.set(`${el.name}.y`, Math.max(0, Math.floor(evt.pageY - coords.top)));
+					data.append(`${el.name}.x`, Math.max(0, Math.floor(evt.pageX - coords.left)));
+					data.append(`${el.name}.y`, Math.max(0, Math.floor(evt.pageY - coords.top)));
 				}
 			}
 		}
@@ -84,7 +87,7 @@ export default class UIHandler extends Component {
 			return;
 		}
 
-		if ( ! /^https?/i.test(url) || this.allowedOrigins.find((origin) => new RegExp(`^${origin}`, 'i').test(url))) {
+		if ( ! /^https?/i.test(url) || this.allowedOrigins.some((origin) => new RegExp(`^${origin}`, 'i').test(url))) {
 			evt.preventDefault();
 			this.naja.makeRequest(method, url, data, options);
 		}

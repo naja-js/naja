@@ -1,27 +1,12 @@
 sudo: false
 language: node_js
 node_js:
-  - 6
-  - 7
   - 8
 
-env:
-  - COVERAGE=on
-  - COVERAGE=off
-
-matrix:
-  exclude:
-    - node_js: 6
-      env: COVERAGE=on
-    - node_js: 7
-      env: COVERAGE=on
-    - node_js: 8
-      env: COVERAGE=off
-
-before_script: yarn run lint
 script:
+  - yarn run lint
   - yarn run test
+  - yarn run coverage
   - yarn run build
-after_success: if [ "$COVERAGE" == "on" ]; then yarn run coverage; fi
 
 cache: yarn

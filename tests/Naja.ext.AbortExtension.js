@@ -1,69 +1,62 @@
-import jsdom from './jsdomRegister';
+import mockNaja from './setup/mockNaja';
+import fakeXhr from './setup/fakeXhr';
 import {assert} from 'chai';
+
+import AbortExtension from '../src/extensions/AbortExtension';
 
 
 describe('AbortExtension', function () {
-	jsdom();
+	fakeXhr();
 
-	beforeEach(function () {
-		this.mockNaja = require('./setup/mockNaja').default;
-		this.AbortExtension = require('../src/extensions/AbortExtension').default;
-	});
+	const createKeyboardEvent = () => {
+		if (typeof(KeyboardEvent) === 'function') {
+			return new KeyboardEvent('keydown', {
+				bubbles: true,
+				cancelable: true,
+				key: 'Escape',
+				keyCode: 27,
+			});
+
+		} else {
+			const event = document.createEvent('KeyboardEvent');
+			event.initKeyboardEvent('keydown', true, true, document.defaultView, 'Escape', 27, '', '', false, '');
+			return event;
+		}
+	};
 
 	it('aborts request on Esc', function () {
-		const naja = this.mockNaja();
-		const abortExtension = new this.AbortExtension(naja);
+		const naja = mockNaja();
+		const abortExtension = new AbortExtension(naja);
 		abortExtension.initialize();
 
-		naja.makeRequest('GET', '/foo').then(() => {
-			assert.equal(this.requests[0].readyState, XMLHttpRequest.UNSENT);
-			done();
-		});
+		naja.makeRequest('GET', '/AbortExtension/abortable');
+		const evt = createKeyboardEvent();
 
-		document.body.dispatchEvent(new KeyboardEvent('keydown', {
-			bubbles: true,
-			cancelable: true,
-			ctrlKey: false,
-			shiftKey: false,
-			altKey: false,
-			metaKey: false,
-			key: 'Escape',
-		}));
-
-		let thrown = false;
-
-		try {
-			this.requests[0].respond(200, {'Content-Type': 'application/json'}, JSON.stringify({answer: 42}));
-
-		} catch (e) {
-			// sinon's fake XHR throws error if readyState is not DONE
-			if (e.message === "INVALID_STATE_ERR - " + XMLHttpRequest.UNSENT) {
-				thrown = true;
-			}
+		// some browsers do not initialize event's keyCode
+		if (evt.key === 'Escape' || evt.keyCode === 27) {
+			document.dispatchEvent(evt);
+			assert.isTrue(this.requests.pop().aborted);
 		}
-
-		assert.isTrue(thrown);
 	});
 
 	it('does not abort non-abortable request', function (done) {
-		const naja = this.mockNaja();
-		const abortExtension = new this.AbortExtension(naja);
+		const naja = mockNaja();
+		const abortExtension = new AbortExtension(naja);
 		abortExtension.initialize();
 
-		naja.makeRequest('GET', '/foo', null, {abort: false}).then(() => {
+		naja.makeRequest('GET', '/AbortExtension/nonAbortable', null, {abort: false}).then(() => {
 			done();
 		});
 
-		document.dispatchEvent(new KeyboardEvent('keydown', {
-			bubbles: true,
-			cancelable: true,
-			ctrlKey: false,
-			shiftKey: false,
-			altKey: false,
-			metaKey: false,
-			key: 'Escape',
-		}));
+		const evt = createKeyboardEvent();
 
-		this.requests[0].respond(200, {'Content-Type': 'application/json'}, JSON.stringify({answer: 42}));
+		// some browsers do not initialize event's keyCode
+		if (evt.key === 'Escape' || evt.keyCode === 27) {
+			document.dispatchEvent(evt);
+			this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({answer: 42}));
+
+		} else {
+			done();
+		}
 	});
 });

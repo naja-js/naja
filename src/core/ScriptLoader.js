@@ -14,7 +14,7 @@ export default class ScriptLoader extends Component {
 	loadScripts(snippets) {
 		Object.keys(snippets).forEach((id) => {
 			const content = snippets[id];
-			if ( ! /<[^>]*script/i.test(content)) {
+			if ( ! /<script/i.test(content)) {
 				return;
 			}
 
@@ -24,8 +24,19 @@ export default class ScriptLoader extends Component {
 			const scripts = el.querySelectorAll('script');
 			for (let i = 0; i < scripts.length; i++) {
 				const script = scripts.item(i);
-				window.document.head.appendChild(script)
-					.parentNode.removeChild(script);
+				const scriptEl = window.document.createElement('script');
+				scriptEl.innerHTML = script.innerHTML;
+
+				if (script.hasAttributes()) {
+					const attrs = script.attributes;
+					for (let j = 0; j < attrs.length; j++) {
+						const attrName = attrs[j].name;
+						scriptEl[attrName] = attrs[j].value;
+					}
+				}
+
+				window.document.head.appendChild(scriptEl)
+					.parentNode.removeChild(scriptEl);
 			}
 		});
 	}

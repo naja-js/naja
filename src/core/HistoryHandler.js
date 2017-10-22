@@ -14,6 +14,10 @@ export default class HistoryHandler extends Component {
 		naja.addEventListener('success', this.pushNewState.bind(this));
 
 		this.popStateHandler = this.handlePopState.bind(this);
+		this.historyAdapter = {
+			replaceState: (data, title, url) => window.history.replaceState(data, title, url),
+			pushState: (data, title, url) => window.history.pushState(data, title, url),
+		};
 	}
 
 	initialize() {
@@ -22,7 +26,7 @@ export default class HistoryHandler extends Component {
 
 		window.addEventListener('popstate', this.popStateHandler);
 
-		window.history.replaceState(this.initialState = {
+		this.historyAdapter.replaceState(this.initialState = {
 			href: window.location.href,
 			title: window.document.title,
 			ui: this.findSnippets(),
@@ -54,7 +58,7 @@ export default class HistoryHandler extends Component {
 		}
 
 		const method = response.replaceHistory ? 'replaceState' : 'pushState';
-		history[method]({
+		this.historyAdapter[method]({
 			href: this.href,
 			title: window.document.title,
 			ui: this.findSnippets(),

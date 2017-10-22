@@ -1,16 +1,10 @@
-import jsdom from './jsdomRegister';
+import mockNaja from './setup/mockNaja';
 import {assert} from 'chai';
 
 
 describe('Naja.js', function () {
-	jsdom();
-
-	beforeEach(function () {
-		this.mockNaja = require('./setup/mockNaja').default;
-	});
-
 	it('should initialize once', function () {
-		const naja = this.mockNaja();
+		const naja = mockNaja();
 		let thrown = false;
 		assert.isFalse(naja.initialized);
 
@@ -31,7 +25,7 @@ describe('Naja.js', function () {
 
 	describe('event system', function () {
 		it('should call event listener', function () {
-			const naja = this.mockNaja();
+			const naja = mockNaja();
 			let initCalled = false;
 
 			naja.addEventListener('init', evt => initCalled = true);
@@ -41,7 +35,7 @@ describe('Naja.js', function () {
 		});
 
 		it('should not call listener after evt.stopImmediatePropagation() call', function () {
-			const naja = this.mockNaja();
+			const naja = mockNaja();
 			let loadCalled = false;
 			let loadCalled2 = false;
 
@@ -54,7 +48,7 @@ describe('Naja.js', function () {
 		});
 
 		it('should return false after evt.preventDefault() call', function () {
-			const naja = this.mockNaja();
+			const naja = mockNaja();
 			assert.isTrue(naja.fireEvent('foo'));
 
 			naja.addEventListener('foo', evt => evt.preventDefault());
@@ -64,7 +58,7 @@ describe('Naja.js', function () {
 
 	describe('extensions system', function () {
 		it('registers extensions', function () {
-			const naja = this.mockNaja();
+			const naja = mockNaja();
 
 			let initialized = false;
 			const extension = class {
