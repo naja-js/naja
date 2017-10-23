@@ -7,15 +7,6 @@ module.exports = function(config) {
     process.exit(1);
   }
 
-  var customLaunchers = {
-    'chrome': {
-      base: 'SauceLabs',
-      browserName: 'chrome',
-      platform: 'Windows 10',
-      version: 'latest'
-    }
-  };
-
   config.set({
     basePath: '',
     frameworks: ['mocha'],
@@ -70,8 +61,15 @@ module.exports = function(config) {
       build: process.env.TRAVIS_BUILD_NUMBER
     },
 
-    customLaunchers: customLaunchers,
-    browsers: Object.keys(customLaunchers),
+    customLaunchers: {
+      'chrome': {
+        base: 'SauceLabs',
+        browserName: 'chrome',
+        platform: 'Windows 10',
+        version: 'latest'
+      }
+    },
+    browsers: ['chrome'],
     concurrency: 5
   })
 };

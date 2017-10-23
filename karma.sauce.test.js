@@ -133,8 +133,9 @@ module.exports = function(config) {
 
     customLaunchers: customLaunchers,
     browsers: Object.keys(customLaunchers),
-    browserDisconnectTolerance: 3,
-    browserNoActivityTimeout: 120000, // try to give simulators some time to boot up
+    browserDisconnectTolerance: 2,
+    browserNoActivityTimeout: 60000,
+    captureTimeout: 120000, // try to give ios simulators some time to boot up
     concurrency: 5
   })
 };
