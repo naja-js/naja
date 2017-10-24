@@ -20,8 +20,12 @@ describe('HistoryHandler', function () {
 			.once();
 
 		mock.expects('addEventListener')
-			.withExactArgs('before', sinon.match.instanceOf(Function))
+			.withExactArgs('interaction', sinon.match.instanceOf(Function))
 			.once();
+
+		mock.expects('addEventListener')
+			.withExactArgs('before', sinon.match.instanceOf(Function))
+			.twice();
 
 		mock.expects('addEventListener')
 			.withExactArgs('success', sinon.match.instanceOf(Function))
@@ -61,6 +65,11 @@ describe('HistoryHandler', function () {
 		el.id = 'snippet-history-foo';
 		document.body.appendChild(el);
 
+		const ignoredEl = document.createElement('div');
+		ignoredEl.id = 'snippet-history-bar';
+		ignoredEl.setAttribute('data-naja-history-nocache', true);
+		document.body.appendChild(ignoredEl);
+
 		const mock = sinon.mock(naja.historyHandler.historyAdapter);
 		mock.expects('pushState').withExactArgs({
 			href: '/HistoryHandler/pushState',
@@ -71,6 +80,39 @@ describe('HistoryHandler', function () {
 		}, '', '/HistoryHandler/pushState').once();
 
 		naja.makeRequest('GET', '/HistoryHandler/pushState').then(() => {
+			mock.verify();
+			mock.restore();
+
+			document.body.removeChild(el);
+			document.body.removeChild(ignoredEl);
+			done();
+		});
+
+		this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({snippets: {'snippet-history-foo': 'foo'}}));
+	});
+
+	it('replaces the state after successful request if options.history === "replace"', function (done) {
+		const naja = mockNaja({
+			snippetHandler: SnippetHandler,
+			historyHandler: HistoryHandler,
+		});
+		naja.initialize();
+		cleanPopstateListener(naja.historyHandler);
+
+		const el = document.createElement('div');
+		el.id = 'snippet-history-foo';
+		document.body.appendChild(el);
+
+		const mock = sinon.mock(naja.historyHandler.historyAdapter);
+		mock.expects('replaceState').withExactArgs({
+			href: '/HistoryHandler/replaceState',
+			title: '',
+			ui: {
+				'snippet-history-foo': 'foo'
+			},
+		}, '', '/HistoryHandler/replaceState').once();
+
+		naja.makeRequest('GET', '/HistoryHandler/replaceState', null, {history: 'replace'}).then(() => {
 			mock.verify();
 			mock.restore();
 
@@ -137,6 +179,27 @@ describe('HistoryHandler', function () {
 		this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({url: '/HistoryHandler/postGet/targetUrl', postGet: true}));
 	});
 
+	it('does not alter the history if options.history === false', function (done) {
+		const naja = mockNaja({
+			snipperHandler: SnippetHandler,
+			historyHandler: HistoryHandler,
+		});
+		naja.initialize();
+		cleanPopstateListener(naja.historyHandler);
+
+		const mock = sinon.mock(naja.historyHandler.historyAdapter);
+		mock.expects('pushState').never();
+		mock.expects('replaceState').never();
+
+		naja.makeRequest('GET', '/HistoryHandler/disabled', null, {history: false}).then(() => {
+			mock.verify();
+			mock.restore();
+			done();
+		});
+
+		this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({snippets: {'snippet-history-foo': 'foo'}}));
+	});
+
 
 	const createPopStateEvent = (state) => {
 		if (typeof(PopStateEvent) === 'function') {
@@ -152,8 +215,6 @@ describe('HistoryHandler', function () {
 			event.initPopStateEvent('popstate', true, true, state);
 			return event;
 		}
-
-		initPopStateEvent
 	};
 
 

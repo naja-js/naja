@@ -130,13 +130,20 @@ if ($this->isAjax()) {
 }
 ```
 
-Furthermore, if you want to replace the current state instead of pushing a new one, which makes sense for certain types of signals, also add `replaceHistory: true` to the response payload.
-
 ##### UI cache
 
 HistoryHandler caches the UI state (content of all snippets) in the history entry's state and reapplies it when navigating through the history. (And does so cleverly, so that `-prepend` and `-append` snippets do not break.)
 
 You might, however, want to disable the cache for specific snippets (e.g. the shopping cart) so that their content is not reverted when the user navigates through the history. This can be done by adding the `data-naja-history-nocache` attribute to the snippet element.
+
+##### Replace instead of push
+
+If you want to replace the current state instead of pushing a new one, which makes sense for certain types of signals, you can add `history: 'replace'` to the options object (see above) when calling `makeRequest` manually, or add `data-naja-history="replace"` attribute to the `.ajax` element.
+
+##### Disabling history
+
+Similarly, you can keep a request off-the-record and not alter the browser's history at all by adding `history: false` to the options or `data-naja-history="off"` attribute to the element.
+
 
 #### ScriptLoader
 
