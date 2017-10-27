@@ -33,6 +33,12 @@ module.exports = function(config) {
       platform: 'Windows 10',
       version: 'latest'
     },
+    'edge-1': {
+      base: 'SauceLabs',
+      browserName: 'MicrosoftEdge',
+      platform: 'Windows 10',
+      version: 'latest-1'
+    },
     'msie10': {
       base: 'SauceLabs',
       browserName: 'internet explorer',
@@ -64,14 +70,16 @@ module.exports = function(config) {
       browserName: 'Safari',
       platformName: 'iOS',
       platformVersion: '10.3',
-      deviceName: 'iPhone 7 Simulator'
+      deviceName: 'iPhone 7 Simulator',
+      idleTimeout: 120
     },
     'ios11': {
       base: 'SauceLabs',
       browserName: 'Safari',
       platformName: 'iOS',
       platformVersion: '11.0',
-      deviceName: 'iPhone 7 Simulator'
+      deviceName: 'iPhone 7 Simulator',
+      idleTimeout: 120
     },
 
     'android51': {
