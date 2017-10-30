@@ -1,9 +1,5 @@
-import Component from '../Component';
-
-
-export default class FormsHandler extends Component {
+export default class FormsHandler {
 	constructor(naja) {
-		super(naja);
 		naja.addEventListener('load', FormsHandler.initForms);
 		naja.addEventListener('interaction', FormsHandler.processForm);
 	}

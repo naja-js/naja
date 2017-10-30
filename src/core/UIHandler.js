@@ -1,12 +1,10 @@
-import Component from '../Component';
-
-
-export default class UIHandler extends Component {
+export default class UIHandler {
 	selector = '.ajax';
 	allowedOrigins = [];
 
 	constructor(naja) {
-		super(naja);
+		this.naja = naja;
+
 		const handler = this.handleUI.bind(this);
 		naja.addEventListener('load', this.bindUI.bind(this, handler));
 

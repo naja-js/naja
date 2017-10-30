@@ -1,9 +1,5 @@
-import Component from '../Component';
-
-
-export default class SnippetHandler extends Component {
+export default class SnippetHandler {
 	constructor(naja) {
-		super(naja);
 		naja.addEventListener('success', ({response}) => {
 			if (response.snippets) {
 				this.updateSnippets(response.snippets);

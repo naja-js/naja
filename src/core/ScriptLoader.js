@@ -1,9 +1,5 @@
-import Component from '../Component';
-
-
-export default class ScriptLoader extends Component {
+export default class ScriptLoader {
 	constructor(naja) {
-		super(naja);
 		naja.addEventListener('success', ({response}) => {
 			if (response.snippets) {
 				this.loadScripts(response.snippets);
