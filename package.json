@@ -48,6 +48,7 @@
   },
   "scripts": {
     "build": "NODE_ENV=production webpack --config webpack.config.js",
+    "test-local": "karma start karma.conf.js",
     "test": "karma start karma.sauce.test.js",
     "coverage": "karma start karma.sauce.coverage.js && codecov",
     "lint": "node_modules/.bin/eslint src"

@@ -51,7 +51,7 @@ module.exports = function(config) {
     autoWatch: true,
     singleRun: false,
 
-    browsers: ['Chrome', 'Firefox', 'Safari'],
+    browsers: ['Chrome', 'Firefox'],
     concurrency: Infinity
   })
 };
