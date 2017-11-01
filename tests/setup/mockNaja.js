@@ -1,47 +1,25 @@
 import Naja from '../../src/Naja';
-import Component from '../../src/Component';
 
 
-class UIHandlerMock extends Component {
-	constructor(naja) {
-		super(naja);
-	}
+class UIHandlerMock {
 }
 
-class RedirectHandlerMock extends Component {
-	constructor(naja) {
-		super(naja);
-	}
+class RedirectHandlerMock {
 }
 
-class SnippetHandlerMock extends Component {
-	constructor(naja) {
-		super(naja);
-	}
-
+class SnippetHandlerMock {
 	updateSnippets(snippets, forceReplace = false) {}
 }
 
-class FormsHandlerMock extends Component {
-	constructor(naja) {
-		super(naja);
-	}
-
+class FormsHandlerMock {
 	static initForms() {}
 	static processForm(evt) {}
 }
 
-class HistoryHandlerMock extends Component {
-	constructor(naja) {
-		super(naja);
-	}
+class HistoryHandlerMock {
 }
 
-class ScriptLoaderMock extends Component {
-	constructor(naja) {
-		super(naja);
-	}
-
+class ScriptLoaderMock {
 	loadScripts(snippets) {}
 }
 

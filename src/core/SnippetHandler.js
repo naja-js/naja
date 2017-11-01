@@ -1,5 +1,9 @@
-export default class SnippetHandler {
+import EventTarget from 'event-target-shim';
+
+
+export default class SnippetHandler extends EventTarget {
 	constructor(naja) {
+		super();
 		naja.addEventListener('success', ({response}) => {
 			if (response.snippets) {
 				this.updateSnippets(response.snippets);
@@ -17,6 +21,17 @@ export default class SnippetHandler {
 	}
 
 	updateSnippet(el, content, forceReplace) {
+		const canUpdate = this.dispatchEvent({
+			type: 'beforeUpdate',
+			cancelable: true,
+			snippet: el,
+			content,
+		});
+
+		if ( ! canUpdate) {
+			return;
+		}
+
 		if (el.tagName.toLowerCase() === 'title') {
 			document.title = content;
 
@@ -31,5 +46,12 @@ export default class SnippetHandler {
 				el.innerHTML = content;
 			}
 		}
+
+		this.dispatchEvent({
+			type: 'afterUpdate',
+			cancelable: true,
+			snippet: el,
+			content,
+		});
 	}
 }
