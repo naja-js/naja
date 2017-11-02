@@ -153,4 +153,62 @@ describe('SnippetHandler', function () {
 		assert.equal(el.innerHTML, 'new content');
 		document.body.removeChild(el);
 	});
+
+	it('updateSnippet() events', function () {
+		const naja = mockNaja();
+		const snippetHandler = new SnippetHandler(naja);
+
+		const beforeCallback = sinon.spy();
+		const afterCallback = sinon.spy();
+		snippetHandler.addEventListener('beforeUpdate', beforeCallback);
+		snippetHandler.addEventListener('afterUpdate', afterCallback);
+
+		const el = document.createElement('div');
+		el.id = 'snippet--foo';
+		el.innerHTML = 'Foo';
+		document.body.appendChild(el);
+		snippetHandler.updateSnippet(el, 'Bar');
+
+		assert.isTrue(beforeCallback.calledOnce);
+		assert.isTrue(beforeCallback.calledWith(sinon.match.object
+			.and(sinon.match.has('snippet', el))
+			.and(sinon.match.has('content', sinon.match.string))
+		));
+
+		assert.isTrue(afterCallback.calledOnce);
+		assert.isTrue(afterCallback.calledAfter(beforeCallback));
+		assert.isTrue(beforeCallback.calledWith(sinon.match.object
+			.and(sinon.match.has('snippet', el))
+			.and(sinon.match.has('content', sinon.match.string))
+		));
+
+		document.body.removeChild(el);
+	});
+
+	it('updateSnippet() beforeUpdate event can cancel the update', function () {
+		const naja = mockNaja();
+		const snippetHandler = new SnippetHandler(naja);
+
+		const beforeCallback = sinon.spy((evt) => evt.preventDefault());
+		const afterCallback = sinon.spy();
+		snippetHandler.addEventListener('beforeUpdate', beforeCallback);
+		snippetHandler.addEventListener('afterUpdate', afterCallback);
+
+		const el = document.createElement('div');
+		el.id = 'snippet--foo';
+		el.innerHTML = 'Foo';
+		document.body.appendChild(el);
+		snippetHandler.updateSnippet(el, 'Bar');
+
+		assert.isTrue(beforeCallback.calledOnce);
+		assert.isTrue(beforeCallback.calledWith(sinon.match.object
+			.and(sinon.match.has('snippet', el))
+			.and(sinon.match.has('content', sinon.match.string))
+		));
+
+		assert.isFalse(afterCallback.called);
+
+		assert.equal(el.innerHTML, 'Foo');
+		document.body.removeChild(el);
+	});
 });

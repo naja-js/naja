@@ -1,9 +1,7 @@
-import Component from '../Component';
-
-
-export default class RedirectHandler extends Component {
+export default class RedirectHandler {
 	constructor(naja) {
-		super(naja);
+		this.naja = naja;
+
 		naja.addEventListener('success', (evt) => {
 			const {response} = evt;
 			if (response.redirect) {

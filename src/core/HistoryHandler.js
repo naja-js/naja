@@ -1,7 +1,4 @@
-import Component from '../Component';
-
-
-export default class HistoryHandler extends Component {
+export default class HistoryHandler {
 	mode = true;
 	popped = false;
 	href = null;
@@ -9,7 +6,8 @@ export default class HistoryHandler extends Component {
 	initialState = null;
 
 	constructor(naja) {
-		super(naja);
+		this.naja = naja;
+
 		naja.addEventListener('init', this.initialize.bind(this));
 		naja.addEventListener('interaction', this.configureMode.bind(this));
 		naja.addEventListener('before', this.configureMode.bind(this));
