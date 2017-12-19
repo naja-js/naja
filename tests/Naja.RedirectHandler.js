@@ -37,6 +37,23 @@ describe('RedirectHandler', function () {
 		this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({redirect: '/RedirectHandler/redirect/redirectTo', forceRedirect: true}));
 	});
 
+	it('reads forceRedirect from options', function (done) {
+		const naja = mockNaja();
+		const redirectHandler = new RedirectHandler(naja);
+
+		const mock = sinon.mock(redirectHandler);
+		mock.expects('makeRedirect')
+			.withExactArgs('/RedirectHandler/redirect/redirectTo', true)
+			.once();
+
+		naja.makeRequest('GET', '/RedirectHandler/forceRedirect/options', null, {forceRedirect: true}).then(() => {
+			mock.verify();
+			done();
+		});
+
+		this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({redirect: '/RedirectHandler/redirect/redirectTo', forceRedirect: false}));
+	});
+
 	it('stops event propagation', function (done) {
 		const naja = mockNaja();
 		const redirectHandler = new RedirectHandler(naja);
