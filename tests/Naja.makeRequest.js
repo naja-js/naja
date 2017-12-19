@@ -54,6 +54,7 @@ describe('makeRequest()', function () {
 			assert.isTrue(successCallback.calledWith(sinon.match.object
 				.and(sinon.match.has('response'))
 				.and(sinon.match.has('xhr', sinon.match.instanceOf(window.XMLHttpRequest)))
+				.and(sinon.match.has('options', sinon.match.object))
 			));
 
 			assert.isTrue(completeCallback.called);
@@ -62,6 +63,7 @@ describe('makeRequest()', function () {
 				.and(sinon.match.has('error', null))
 				.and(sinon.match.has('response'))
 				.and(sinon.match.has('xhr', sinon.match.instanceOf(window.XMLHttpRequest)))
+				.and(sinon.match.has('options', sinon.match.object))
 			));
 
 			assert.isTrue(loadCallback.called);
@@ -131,6 +133,7 @@ describe('makeRequest()', function () {
 				.and(sinon.match.has('error', sinon.match.truthy))
 				.and(sinon.match.has('response'))
 				.and(sinon.match.has('xhr', sinon.match.instanceOf(window.XMLHttpRequest)))
+				.and(sinon.match.has('options', sinon.match.object))
 			));
 
 			assert.isTrue(completeCallback.called);
@@ -139,6 +142,7 @@ describe('makeRequest()', function () {
 				.and(sinon.match.has('error', sinon.match.truthy))
 				.and(sinon.match.has('response'))
 				.and(sinon.match.has('xhr', sinon.match.instanceOf(window.XMLHttpRequest)))
+				.and(sinon.match.has('options', sinon.match.object))
 			));
 
 			assert.isTrue(loadCallback.called);
@@ -191,6 +195,7 @@ describe('makeRequest()', function () {
 			.and(sinon.match.has('error', sinon.match.instanceOf(Error)))
 			.and(sinon.match.has('response', null))
 			.and(sinon.match.has('xhr', sinon.match.instanceOf(window.XMLHttpRequest)))
+			.and(sinon.match.has('options', sinon.match.object))
 		));
 	});
 

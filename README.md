@@ -215,15 +215,18 @@ The true power of Naja is in how easy you can implement your own extensions to i
     - `xhr: XMLHttpRequest`, the aborted XHR object.
 - **success:** This event is dispatched when the request successfully finishes. It has the following properties:
     - `xhr: XMLHttpRequest`, the XHR object,
-    - `response: Object`, the parsed response payload.
+    - `response: Object`, the parsed response payload,
+    - `options: Object`.
 - **error:** This event is dispatched when the request finishes with errors. It has the following properties:
     - `error: Error`, an object describing the error,
     - `xhr: XMLHttpRequest`, the XHR object,
-    - `response: ?Object`, if provided.
+    - `response: ?Object`, if provided,
+    - `options: Object`.
 - **complete:** This event is dispatched when the request finishes, regardless of whether it succeeded or failed. It has the following properties:
     - `error: ?Error`, an object describing the error, if one occurred,
     - `xhr: XMLHttpRequest`, the XHR object,
-    - `response: ?Object`, if provided.
+    - `response: ?Object`, if provided,
+    - `options: Object`.
 
 
 #### Extension implementation
