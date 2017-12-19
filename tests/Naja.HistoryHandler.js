@@ -25,7 +25,7 @@ describe('HistoryHandler', function () {
 
 		mock.expects('addEventListener')
 			.withExactArgs('before', sinon.match.instanceOf(Function))
-			.twice();
+			.once();
 
 		mock.expects('addEventListener')
 			.withExactArgs('success', sinon.match.instanceOf(Function))

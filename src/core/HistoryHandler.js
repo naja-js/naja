@@ -1,5 +1,4 @@
 export default class HistoryHandler {
-	mode = true;
 	popped = false;
 	href = null;
 	initialUrl = null;
@@ -10,7 +9,6 @@ export default class HistoryHandler {
 
 		naja.addEventListener('init', this.initialize.bind(this));
 		naja.addEventListener('interaction', this.configureMode.bind(this));
-		naja.addEventListener('before', this.configureMode.bind(this));
 		naja.addEventListener('before', this.saveUrl.bind(this));
 		naja.addEventListener('success', this.pushNewState.bind(this));
 
@@ -54,14 +52,8 @@ export default class HistoryHandler {
 	}
 
 	configureMode({element, options}) {
-		if (element) {
-			this.mode = this.constructor.normalizeMode(element.getAttribute('data-naja-history'));
-		} else {
-			this.mode = this.constructor.normalizeMode(options.history);
-		}
-
-		// propagate to options if called in interaction event
-		options.history = this.mode;
+		// propagate mode to options
+		options.history = this.constructor.normalizeMode(element.getAttribute('data-naja-history'));
 	}
 
 	static normalizeMode(mode) {
@@ -75,8 +67,9 @@ export default class HistoryHandler {
 		return true;
 	}
 
-	pushNewState({response}) {
-		if (this.mode === false) {
+	pushNewState({response, options}) {
+		const mode = this.constructor.normalizeMode(options.history);
+		if (mode === false) {
 			return;
 		}
 
@@ -84,7 +77,7 @@ export default class HistoryHandler {
 			this.href = response.url;
 		}
 
-		const method = response.replaceHistory || this.mode === 'replace' ? 'replaceState' : 'pushState';
+		const method = response.replaceHistory || mode === 'replace' ? 'replaceState' : 'pushState';
 		this.historyAdapter[method]({
 			href: this.href,
 			title: window.document.title,
