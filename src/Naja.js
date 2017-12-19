@@ -21,6 +21,8 @@ export default class Naja extends EventTarget {
 	scriptLoader = null;
 	extensions = [];
 
+	defaultOptions = {};
+
 
 	constructor(uiHandler, redirectHandler, snippetHandler, formsHandler, historyHandler, scriptLoader) {
 		super();
@@ -68,7 +70,7 @@ export default class Naja extends EventTarget {
 			responseType: 'auto',
 		};
 
-		options = objectAssign({}, defaultOptions, options || {});
+		options = objectAssign({}, defaultOptions, this.defaultOptions, options || {});
 
 		let currentXhr;
 		const beforeCallback = (xhr) => {

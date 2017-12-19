@@ -48,9 +48,20 @@ naja.makeRequest(method, url, data = null, options = {})
 - `method: string` is the request method, usually `GET` or `POST`. It is case-insensitive.
 - `url: string` is the target URL.
 - `data: ?mixed` can be pretty much anything: array, object, string, `ArrayBuffer`, `Blob`, `FormData`, &hellip;
-- `options: ?Object` can be used to alter the behavior of some extensions (see below). On top of that, it carries the options for the underlying AJAX library, [`qwest`](https://github.com/pyrsmk/qwest). Please refer to its docs for reference.
+- `options: ?Object` can be used to alter the behavior of some components or extensions (see below). On top of that, it carries the options for the underlying AJAX library, [`qwest`](https://github.com/pyrsmk/qwest). Please refer to its docs for reference.
 
 The `makeRequest` method returns a Promise which either resolves to the `response` object containing the parsed response body, or is rejected with the thrown `error`.
+
+#### Default options
+
+You can also provide default options for your extensions or Naja's core components:
+
+```js
+naja.defaultOptions = {
+	history: false,
+	myCustomOption: 42
+};
+```
 
 
 ### Core components
