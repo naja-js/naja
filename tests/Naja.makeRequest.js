@@ -54,6 +54,7 @@ describe('makeRequest()', function () {
 			assert.isTrue(successCallback.calledWith(sinon.match.object
 				.and(sinon.match.has('response'))
 				.and(sinon.match.has('xhr', sinon.match.instanceOf(window.XMLHttpRequest)))
+				.and(sinon.match.has('options', sinon.match.object))
 			));
 
 			assert.isTrue(completeCallback.called);
@@ -62,6 +63,7 @@ describe('makeRequest()', function () {
 				.and(sinon.match.has('error', null))
 				.and(sinon.match.has('response'))
 				.and(sinon.match.has('xhr', sinon.match.instanceOf(window.XMLHttpRequest)))
+				.and(sinon.match.has('options', sinon.match.object))
 			));
 
 			assert.isTrue(loadCallback.called);
@@ -131,6 +133,7 @@ describe('makeRequest()', function () {
 				.and(sinon.match.has('error', sinon.match.truthy))
 				.and(sinon.match.has('response'))
 				.and(sinon.match.has('xhr', sinon.match.instanceOf(window.XMLHttpRequest)))
+				.and(sinon.match.has('options', sinon.match.object))
 			));
 
 			assert.isTrue(completeCallback.called);
@@ -139,6 +142,7 @@ describe('makeRequest()', function () {
 				.and(sinon.match.has('error', sinon.match.truthy))
 				.and(sinon.match.has('response'))
 				.and(sinon.match.has('xhr', sinon.match.instanceOf(window.XMLHttpRequest)))
+				.and(sinon.match.has('options', sinon.match.object))
 			));
 
 			assert.isTrue(loadCallback.called);
@@ -191,6 +195,7 @@ describe('makeRequest()', function () {
 			.and(sinon.match.has('error', sinon.match.instanceOf(Error)))
 			.and(sinon.match.has('response', null))
 			.and(sinon.match.has('xhr', sinon.match.instanceOf(window.XMLHttpRequest)))
+			.and(sinon.match.has('options', sinon.match.object))
 		));
 	});
 
@@ -217,5 +222,97 @@ describe('makeRequest()', function () {
 
 		assert.isTrue(thrown);
 		assert.isFalse(completeCallback.called);
+	});
+
+	describe('options', function () {
+		it('should be set to default options', function (done) {
+			const naja = mockNaja();
+			naja.initialize();
+			cleanPopstateListener(naja.historyHandler);
+
+			const beforeCallback = sinon.spy();
+			naja.addEventListener('before', beforeCallback);
+
+			const request = naja.makeRequest('GET', '/makeRequest/options/defaultOptions');
+			assert.equal(1, this.requests.length);
+
+			request.then(() => {
+				assert.isTrue(beforeCallback.called);
+				assert.isTrue(beforeCallback.calledWith(sinon.match.object
+					.and(sinon.match.has('options', sinon.match.object
+						.and(sinon.match.has('dataType', 'post'))
+						.and(sinon.match.has('responseType', 'auto'))
+					))
+				));
+
+				done();
+			});
+
+			this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({answer: 42}));
+		});
+
+		it('should be overridden by defaultOptions', function (done) {
+			const naja = mockNaja();
+			naja.initialize();
+			cleanPopstateListener(naja.historyHandler);
+
+			const beforeCallback = sinon.spy();
+			naja.addEventListener('before', beforeCallback);
+
+			naja.defaultOptions = {
+				'dataType': 'json',
+				'customOption': 42,
+			};
+
+			const request = naja.makeRequest('GET', '/makeRequest/options/defaultOptions');
+			assert.equal(1, this.requests.length);
+
+			request.then(() => {
+				assert.isTrue(beforeCallback.called);
+				assert.isTrue(beforeCallback.calledWith(sinon.match.object
+					.and(sinon.match.has('options', sinon.match.object
+						.and(sinon.match.has('dataType', 'json'))
+						.and(sinon.match.has('responseType', 'auto'))
+						.and(sinon.match.has('customOption', 42))
+					))
+				));
+
+				done();
+			});
+
+			this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({answer: 42}));
+		});
+
+		it('should be overridden by ad-hoc options', function (done) {
+			const naja = mockNaja();
+			naja.initialize();
+			cleanPopstateListener(naja.historyHandler);
+
+			const beforeCallback = sinon.spy();
+			naja.addEventListener('before', beforeCallback);
+
+			naja.defaultOptions = {
+				'customOption': 42,
+			};
+
+			const request = naja.makeRequest('GET', '/makeRequest/options/defaultOptions', null, {'customOption': 24, 'anotherOption': 42});
+			assert.equal(1, this.requests.length);
+
+			request.then(() => {
+				assert.isTrue(beforeCallback.called);
+				assert.isTrue(beforeCallback.calledWith(sinon.match.object
+					.and(sinon.match.has('options', sinon.match.object
+						.and(sinon.match.has('dataType', 'post'))
+						.and(sinon.match.has('responseType', 'auto'))
+						.and(sinon.match.has('customOption', 24))
+						.and(sinon.match.has('anotherOption', 42))
+					))
+				));
+
+				done();
+			});
+
+			this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({answer: 42}));
+		});
 	});
 });

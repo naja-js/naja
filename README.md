@@ -48,9 +48,20 @@ naja.makeRequest(method, url, data = null, options = {})
 - `method: string` is the request method, usually `GET` or `POST`. It is case-insensitive.
 - `url: string` is the target URL.
 - `data: ?mixed` can be pretty much anything: array, object, string, `ArrayBuffer`, `Blob`, `FormData`, &hellip;
-- `options: ?Object` can be used to alter the behavior of some extensions (see below). On top of that, it carries the options for the underlying AJAX library, [`qwest`](https://github.com/pyrsmk/qwest). Please refer to its docs for reference.
+- `options: ?Object` can be used to alter the behavior of some components or extensions (see below). On top of that, it carries the options for the underlying AJAX library, [`qwest`](https://github.com/pyrsmk/qwest). Please refer to its docs for reference.
 
 The `makeRequest` method returns a Promise which either resolves to the `response` object containing the parsed response body, or is rejected with the thrown `error`.
+
+#### Default options
+
+You can also provide default options for your extensions or Naja's core components:
+
+```js
+naja.defaultOptions = {
+	history: false,
+	myCustomOption: 42
+};
+```
 
 
 ### Core components
@@ -204,15 +215,18 @@ The true power of Naja is in how easy you can implement your own extensions to i
     - `xhr: XMLHttpRequest`, the aborted XHR object.
 - **success:** This event is dispatched when the request successfully finishes. It has the following properties:
     - `xhr: XMLHttpRequest`, the XHR object,
-    - `response: Object`, the parsed response payload.
+    - `response: Object`, the parsed response payload,
+    - `options: Object`.
 - **error:** This event is dispatched when the request finishes with errors. It has the following properties:
     - `error: Error`, an object describing the error,
     - `xhr: XMLHttpRequest`, the XHR object,
-    - `response: ?Object`, if provided.
+    - `response: ?Object`, if provided,
+    - `options: Object`.
 - **complete:** This event is dispatched when the request finishes, regardless of whether it succeeded or failed. It has the following properties:
     - `error: ?Error`, an object describing the error, if one occurred,
     - `xhr: XMLHttpRequest`, the XHR object,
-    - `response: ?Object`, if provided.
+    - `response: ?Object`, if provided,
+    - `options: Object`.
 
 
 #### Extension implementation

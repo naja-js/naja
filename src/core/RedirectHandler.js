@@ -3,9 +3,9 @@ export default class RedirectHandler {
 		this.naja = naja;
 
 		naja.addEventListener('success', (evt) => {
-			const {response} = evt;
+			const {response, options} = evt;
 			if (response.redirect) {
-				this.makeRedirect(response.redirect, response.forceRedirect);
+				this.makeRedirect(response.redirect, response.forceRedirect || options.forceRedirect);
 				evt.stopImmediatePropagation();
 			}
 		});
