@@ -93,7 +93,7 @@ export default class HistoryHandler {
 		const snippets = window.document.querySelectorAll('[id^="snippet-"]');
 		for (let i = 0; i < snippets.length; i++) {
 			const snippet = snippets.item(i);
-			if (!snippet.getAttribute('data-naja-history-nocache') && !snippet.getAttribute('data-history-nocache')) {
+			if (!snippet.hasAttribute('data-naja-history-nocache') && !snippet.hasAttribute('data-history-nocache')) {
 				result[snippet.id] = snippet.innerHTML;
 			}
 		}
