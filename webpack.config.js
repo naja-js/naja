@@ -34,6 +34,6 @@ module.exports = {
 			comments: /$./,
 			sourceMap: true,
 		}),
-		new webpack.BannerPlugin({banner: `Naja.ja\nv${version}\n\nby Jiří Pudil <https://jiripudil.cz>`}),
+		new webpack.BannerPlugin({banner: `Naja.js\nv${version}\n\nby Jiří Pudil <https://jiripudil.cz>`}),
 	]
 };
