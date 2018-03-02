@@ -36,10 +36,10 @@ export default class SnippetHandler extends EventTarget {
 			document.title = content;
 
 		} else {
-			if ((el.getAttribute('data-naja-snippet-prepend') || el.getAttribute('data-ajax-prepend')) && ! forceReplace) {
+			if ((el.hasAttribute('data-naja-snippet-prepend') || el.hasAttribute('data-ajax-prepend')) && ! forceReplace) {
 				el.innerHTML = content + el.innerHTML;
 
-			} else if ((el.getAttribute('data-naja-snippet-append') || el.getAttribute('data-ajax-append')) && ! forceReplace) {
+			} else if ((el.hasAttribute('data-naja-snippet-append') || el.hasAttribute('data-ajax-append')) && ! forceReplace) {
 				el.innerHTML = el.innerHTML + content;
 
 			} else {
