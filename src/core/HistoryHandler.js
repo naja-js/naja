@@ -1,8 +1,5 @@
 export default class HistoryHandler {
-	popped = false;
 	href = null;
-	initialUrl = null;
-	initialState = null;
 
 	constructor(naja) {
 		this.naja = naja;
@@ -20,12 +17,8 @@ export default class HistoryHandler {
 	}
 
 	initialize() {
-		this.popped = !!window.history.state;
-		this.initialUrl = window.location.href;
-
 		window.addEventListener('popstate', this.popStateHandler);
-
-		this.historyAdapter.replaceState(this.initialState = {
+		this.historyAdapter.replaceState({
 			href: window.location.href,
 			title: window.document.title,
 			ui: this.findSnippets(),
@@ -33,17 +26,13 @@ export default class HistoryHandler {
 	}
 
 	handlePopState(e) {
-		const state = e.state || this.initialState;
-		const initialPop = !this.popped && this.initialUrl === state.href;
-		this.popped = true;
-
-		if (initialPop) {
+		if ( ! e.state) {
 			return;
 		}
 
-		if (state.ui) {
-			this.handleSnippets(state.ui);
-			this.handleTitle(state.title);
+		if (e.state.ui) {
+			this.handleSnippets(e.state.ui);
+			this.handleTitle(e.state.title);
 		}
 	}
 
@@ -85,7 +74,6 @@ export default class HistoryHandler {
 		}, window.document.title, this.href);
 
 		this.href = null;
-		this.popped = true;
 	}
 
 	findSnippets() {
