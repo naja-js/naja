@@ -21,8 +21,11 @@ export default class FormsHandler {
 		}
 
 		if ((element.tagName === 'form' || element.form) && window.Nette && ! window.Nette.validateForm(element)) {
-			originalEvent.stopImmediatePropagation();
-			originalEvent.preventDefault();
+			if (originalEvent) {
+				originalEvent.stopImmediatePropagation();
+				originalEvent.preventDefault();
+			}
+
 			evt.preventDefault();
 		}
 	}

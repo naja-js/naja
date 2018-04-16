@@ -99,6 +99,18 @@ naja.uiHandler.allowedOrigins.push('https://allowed.origin.com:4000');
 The current origin is allowed by default, i.e. it does not matter whether the `href` in the link points to a relative path or an absolute one.
 
 
+##### Manual dispatch
+
+Since version 1.4.0, `UIHandler` exposes two helper methods for dispatching UI-bound requests manually. This is especially useful if you need to submit a form programmatically, because `form.submit()` does not trigger the form's `submit` event.
+
+```js
+naja.uiHandler.clickElement(element);
+naja.uiHandler.submitForm(form);
+```
+
+Neither `element` nor `form` have to be bound to Naja via the configured selector. However, the aforementioned allowed origin rules still apply, and the `interaction` event (see below) is triggered with `originalEvent` set to undefined.
+
+
 #### RedirectHandler
 
 `RedirectHandler` performs a redirection if there is `redirect` key in the response payload.
@@ -202,7 +214,7 @@ The true power of Naja is in how easy you can implement your own extensions to i
 - **load:** This event is dispatched after `init` and then after every request, be it successful or not. It can be used to reload things, re-add event listeners, etc. It has no properties.
 - **interaction:** This event is dispatched when the user interacts with a DOM element that has the Naja's listener bound to it. It has the following properties:
     - `element: HTMLElement`, the element the user interacted with,
-    - `originalEvent: Event`, the original UI event,
+    - `originalEvent: ?Event`, the original UI event, or undefined if the request was dispatched via `UIHandler.clickElement()` or `UIHandler.submitForm()` (see above),
     - `options: Object`, an empty object that can be populated with options based on the element's attributes.
 - **before:** This event is dispatched when the `XMLHttpRequest` object is created but not yet sent. At this point, you can call the event's `preventDefault()` method to cancel the request. The event has the following properties:
     - `xhr: XMLHttpRequest`, the XHR object,
