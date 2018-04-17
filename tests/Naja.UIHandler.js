@@ -394,4 +394,94 @@ describe('UIHandler', function () {
 			mock.verify();
 		});
 	});
+
+	describe('clickElement()', function () {
+		it('dispatches request', function () {
+			const naja = mockNaja();
+			const mock = sinon.mock(naja);
+
+			mock.expects('makeRequest')
+				.withExactArgs('GET', 'http://localhost:9876/UIHandler/clickElement', null, {})
+				.once();
+
+			const a = document.createElement('a');
+			a.href = '/UIHandler/clickElement';
+
+			const handler = new UIHandler(naja);
+			handler.clickElement(a);
+
+			mock.verify();
+		});
+
+		it('triggers interaction event', function () {
+			const naja = mockNaja();
+			const mock = sinon.mock(naja);
+
+			mock.expects('makeRequest')
+				.withExactArgs('GET', 'http://localhost:9876/UIHandler/clickElement', null, {})
+				.once();
+
+			const listener = sinon.spy();
+			naja.addEventListener('interaction', listener);
+
+			const a = document.createElement('a');
+			a.href = '/UIHandler/clickElement';
+
+			const handler = new UIHandler(naja);
+			handler.clickElement(a);
+
+			assert.isTrue(listener.calledWithMatch(sinon.match.object
+				.and(sinon.match.has('element', a))
+				.and(sinon.match.has('originalEvent', undefined))
+			));
+
+			mock.verify();
+		});
+	});
+
+	describe('submitForm()', function () {
+		it('dispatches request', function () {
+			const naja = mockNaja();
+			const mock = sinon.mock(naja);
+
+			mock.expects('makeRequest')
+				.withExactArgs('POST', 'http://localhost:9876/UIHandler/submitForm', sinon.match.instanceOf(FormData), {})
+				.once();
+
+			const form = document.createElement('form');
+			form.method = 'POST';
+			form.action = '/UIHandler/submitForm';
+
+			const handler = new UIHandler(naja);
+			handler.submitForm(form);
+
+			mock.verify();
+		});
+
+		it('triggers interaction event', function () {
+			const naja = mockNaja();
+			const mock = sinon.mock(naja);
+
+			mock.expects('makeRequest')
+				.withExactArgs('POST', 'http://localhost:9876/UIHandler/submitForm', sinon.match.instanceOf(FormData), {})
+				.once();
+
+			const listener = sinon.spy();
+			naja.addEventListener('interaction', listener);
+
+			const form = document.createElement('form');
+			form.method = 'POST';
+			form.action = '/UIHandler/submitForm';
+
+			const handler = new UIHandler(naja);
+			handler.submitForm(form);
+
+			assert.isTrue(listener.calledWithMatch(sinon.match.object
+				.and(sinon.match.has('element', form))
+				.and(sinon.match.has('originalEvent', undefined))
+			));
+
+			mock.verify();
+		});
+	});
 });
