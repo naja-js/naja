@@ -1,26 +1,30 @@
 export default class FormsHandler {
+	netteForms;
+
 	constructor(naja) {
-		naja.addEventListener('load', FormsHandler.initForms);
-		naja.addEventListener('interaction', FormsHandler.processForm);
+		naja.addEventListener('load', this.initForms.bind(this));
+		naja.addEventListener('interaction', this.processForm.bind(this));
 	}
 
-	static initForms() {
-		if (window.Nette) {
+	initForms() {
+		const netteForms = this.netteForms || window.Nette;
+		if (netteForms) {
 			const forms = window.document.querySelectorAll('form');
 			for (let i = 0; i < forms.length; i++) {
-				window.Nette.initForm(forms.item(i));
+				netteForms.initForm(forms.item(i));
 			}
 		}
 	}
 
-	static processForm(evt) {
+	processForm(evt) {
 		const {element, originalEvent} = evt;
 
 		if (element.form) {
 			element.form['nette-submittedBy'] = element;
 		}
 
-		if ((element.tagName === 'form' || element.form) && window.Nette && ! window.Nette.validateForm(element)) {
+		const netteForms = this.netteForms || window.Nette;
+		if ((element.tagName === 'form' || element.form) && netteForms && ! netteForms.validateForm(element)) {
 			if (originalEvent) {
 				originalEvent.stopImmediatePropagation();
 				originalEvent.preventDefault();
