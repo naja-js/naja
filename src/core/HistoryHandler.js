@@ -42,7 +42,9 @@ export default class HistoryHandler {
 
 	configureMode({element, options}) {
 		// propagate mode to options
-		options.history = this.constructor.normalizeMode(element.getAttribute('data-naja-history'));
+		if (element && element.hasAttribute('data-naja-history')) {
+			options.history = this.constructor.normalizeMode(element.getAttribute('data-naja-history'));
+		}
 	}
 
 	static normalizeMode(mode) {

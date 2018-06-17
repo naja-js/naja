@@ -6,6 +6,7 @@ import sinon from 'sinon';
 
 import SnippetHandler from '../src/core/SnippetHandler';
 import HistoryHandler from '../src/core/HistoryHandler';
+import UIHandler from '../src/core/UIHandler';
 
 
 describe('HistoryHandler', function () {
@@ -198,6 +199,96 @@ describe('HistoryHandler', function () {
 		});
 
 		this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({snippets: {'snippet-history-foo': 'foo'}}));
+	});
+
+	describe('configures mode properly on interaction', function () {
+		it('missing data-naja-history', () => {
+			const naja = mockNaja();
+			const mock = sinon.mock(naja);
+			mock.expects('makeRequest')
+				.withExactArgs('GET', 'http://localhost:9876/foo', null, {})
+				.once();
+
+			// initialize history handler
+			new HistoryHandler(naja);
+
+			const link = document.createElement('a');
+			link.href = '/foo';
+			link.classList.add('ajax');
+			document.body.appendChild(link);
+
+			new UIHandler(naja).clickElement(link);
+
+			mock.verify();
+			document.body.removeChild(link);
+		});
+
+		it('does not override naja.defaultOptions.history', function () {
+			const naja = mockNaja();
+			const mock = sinon.mock(naja);
+
+			mock.expects('makeRequest')
+				.withExactArgs('GET', 'http://localhost:9876/foo', null, {})
+				.once();
+
+			// initialize history handler
+			new HistoryHandler(naja);
+			naja.defaultOptions.history = false;
+
+			const link = document.createElement('a');
+			link.href = '/foo';
+			link.classList.add('ajax');
+			document.body.appendChild(link);
+
+			new UIHandler(naja).clickElement(link);
+
+			mock.verify();
+			document.body.removeChild(link);
+		});
+
+		it('data-naja-history=replace', () => {
+			const naja = mockNaja();
+			const mock = sinon.mock(naja);
+			mock.expects('makeRequest')
+				.withExactArgs('GET', 'http://localhost:9876/foo', null, {history: 'replace'})
+				.once();
+
+			// initialize history handler
+			new HistoryHandler(naja);
+
+			const link = document.createElement('a');
+			link.href = '/foo';
+			link.classList.add('ajax');
+			link.setAttribute('data-naja-history', 'replace');
+			document.body.appendChild(link);
+
+			new UIHandler(naja).clickElement(link);
+
+			mock.verify();
+			document.body.removeChild(link);
+		});
+
+		it('data-naja-history=off', () => {
+			const naja = mockNaja();
+			const mock = sinon.mock(naja);
+			mock.expects('makeRequest')
+				.withExactArgs('GET', 'http://localhost:9876/foo', null, {history: false})
+				.once();
+
+			// initialize history handler
+			new HistoryHandler(naja);
+
+			const link = document.createElement('a');
+			link.href = '/foo';
+			link.classList.add('ajax');
+			link.setAttribute('data-naja-history', 'off');
+			document.body.appendChild(link);
+
+			new UIHandler(naja).clickElement(link);
+
+			mock.verify();
+			document.body.removeChild(link);
+		});
 	});
 
 
