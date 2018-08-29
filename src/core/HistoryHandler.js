@@ -1,5 +1,6 @@
 export default class HistoryHandler {
 	href = null;
+	uiCache = true;
 
 	constructor(naja) {
 		this.naja = naja;
@@ -18,11 +19,11 @@ export default class HistoryHandler {
 
 	initialize() {
 		window.addEventListener('popstate', this.popStateHandler);
-		this.historyAdapter.replaceState({
-			href: window.location.href,
-			title: window.document.title,
-			ui: this.findSnippets(),
-		}, window.document.title, window.location.href);
+		this.historyAdapter.replaceState(
+			this.buildState(window.location.href, this.uiCache),
+			window.document.title,
+			window.location.href,
+		);
 	}
 
 	handlePopState(e) {
@@ -33,6 +34,17 @@ export default class HistoryHandler {
 		if (e.state.ui) {
 			this.handleSnippets(e.state.ui);
 			this.handleTitle(e.state.title);
+
+		} else if (e.state.ui === false) {
+			this.naja.makeRequest(
+				'GET',
+				e.state.href,
+				null,
+				{
+					history: false,
+					historyUiCache: false,
+				},
+			);
 		}
 	}
 
@@ -42,8 +54,16 @@ export default class HistoryHandler {
 
 	configureMode({element, options}) {
 		// propagate mode to options
-		if (element && element.hasAttribute('data-naja-history')) {
+		if ( ! element) {
+			return;
+		}
+
+		if (element.hasAttribute('data-naja-history')) {
 			options.history = this.constructor.normalizeMode(element.getAttribute('data-naja-history'));
+		}
+
+		if (element.hasAttribute('data-naja-history-cache')) {
+			options.historyUiCache = element.getAttribute('data-naja-history-cache') !== 'off';
 		}
 	}
 
@@ -69,13 +89,30 @@ export default class HistoryHandler {
 		}
 
 		const method = response.replaceHistory || mode === 'replace' ? 'replaceState' : 'pushState';
-		this.historyAdapter[method]({
-			href: this.href,
-			title: window.document.title,
-			ui: this.findSnippets(),
-		}, window.document.title, this.href);
+		const uiCache = options.historyUiCache === true || (options.historyUiCache !== false && this.uiCache); // eslint-disable-line no-extra-parens
+		this.historyAdapter[method](
+			this.buildState(this.href, uiCache),
+			window.document.title,
+			this.href,
+		);
 
 		this.href = null;
+	}
+
+	buildState(href, uiCache) {
+		const state = {
+			href,
+		};
+
+		if (uiCache) {
+			state.title = window.document.title;
+			state.ui = this.findSnippets();
+
+		} else {
+			state.ui = false;
+		}
+
+		return state;
 	}
 
 	findSnippets() {
