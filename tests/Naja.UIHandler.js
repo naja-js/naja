@@ -3,6 +3,7 @@ import {assert} from 'chai';
 import sinon from 'sinon';
 
 import UIHandler from '../src/core/UIHandler';
+import SnippetHandler from '../src/core/SnippetHandler';
 
 
 describe('UIHandler', function () {
@@ -52,7 +53,7 @@ describe('UIHandler', function () {
 		const naja = mockNaja();
 		const mock = sinon.mock(naja);
 		mock.expects('addEventListener')
-			.withExactArgs('load', sinon.match.instanceOf(Function))
+			.withExactArgs('init', sinon.match.instanceOf(Function))
 			.once();
 
 		new UIHandler(naja);
@@ -75,16 +76,18 @@ describe('UIHandler', function () {
 		};
 
 		it('binds to .ajax elements by default', function () {
-			const spy = sinon.spy((e) => e.preventDefault());
-
-			const handler = new UIHandler(mockNaja());
-			handler.bindUI(spy);
+			const naja = mockNaja({
+				snippetHandler: SnippetHandler,
+				uiHandler: UIHandler,
+			});
+			naja.uiHandler.handler = sinon.spy((evt) => evt.preventDefault());
+			naja.initialize();
 
 			this.a.dispatchEvent(createEvent('click'));
 			this.form.dispatchEvent(createEvent('submit'));
 			this.input.dispatchEvent(createEvent('click'));
 
-			assert.isTrue(spy.calledThrice);
+			assert.isTrue(naja.uiHandler.handler.calledThrice);
 		});
 
 		it('binds to elements specified by custom selector', function () {
@@ -93,13 +96,40 @@ describe('UIHandler', function () {
 			customSelectorLink.setAttribute('data-naja', true);
 			document.body.appendChild(customSelectorLink);
 
-			const spy = sinon.spy((e) => e.preventDefault());
-			const handler = new UIHandler(mockNaja());
-			handler.selector = '[data-naja]';
-			handler.bindUI(spy);
+			const naja = mockNaja({
+				snippetHandler: SnippetHandler,
+				uiHandler: UIHandler,
+			});
+			naja.uiHandler.selector = '[data-naja]';
+			naja.uiHandler.handler = sinon.spy((evt) => evt.preventDefault());
+			naja.initialize();
 
 			customSelectorLink.dispatchEvent(createEvent('click'));
-			assert.isTrue(spy.called);
+			assert.isTrue(naja.uiHandler.handler.called);
+			document.body.removeChild(customSelectorLink);
+		});
+
+		it('binds after snippet update', function () {
+			const snippetDiv = document.createElement('div');
+			snippetDiv.id = 'snippet-uiHandler-snippet-bind';
+			document.body.appendChild(snippetDiv);
+
+			const naja = mockNaja({
+				snippetHandler: SnippetHandler,
+				uiHandler: UIHandler,
+			});
+			naja.uiHandler.handler = sinon.spy((evt) => evt.preventDefault());
+			naja.initialize();
+
+			naja.snippetHandler.updateSnippets({
+				'snippet-uiHandler-snippet-bind': '<a href="/UIHandler/snippetBind" class="ajax" id="uiHandler-snippet-bind">test</a>',
+			});
+
+			const a = document.getElementById('uiHandler-snippet-bind');
+			a.dispatchEvent(createEvent('click'));
+
+			assert.isTrue(naja.uiHandler.handler.called);
+			document.body.removeChild(snippetDiv);
 		});
 	});
 

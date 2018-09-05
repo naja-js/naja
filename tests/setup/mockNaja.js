@@ -12,8 +12,8 @@ class SnippetHandlerMock {
 }
 
 class FormsHandlerMock {
-	static initForms() {}
-	static processForm(evt) {}
+	initForms() {}
+	processForm(evt) {}
 }
 
 class HistoryHandlerMock {

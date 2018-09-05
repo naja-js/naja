@@ -4,6 +4,7 @@ import netteForms from 'nette-forms';
 import sinon from 'sinon';
 
 import FormsHandler from '../src/core/FormsHandler';
+import SnippetHandler from '../src/core/SnippetHandler';
 
 
 describe('FormsHandler', function () {
@@ -12,7 +13,7 @@ describe('FormsHandler', function () {
 		const mock = sinon.mock(naja);
 
 		mock.expects('addEventListener')
-			.withExactArgs('load', sinon.match.instanceOf(Function))
+			.withExactArgs('init', sinon.match.instanceOf(Function))
 			.once();
 
 		mock.expects('addEventListener')
@@ -31,15 +32,40 @@ describe('FormsHandler', function () {
 		document.body.appendChild(form1);
 		document.body.appendChild(form2);
 
-		const naja = mockNaja();
-		new FormsHandler(naja);
-		naja.load();
+		const naja = mockNaja({
+			formsHandler: FormsHandler,
+			snippetHandler: SnippetHandler,
+		});
+		naja.initialize();
 
 		assert.equal(window.Nette.initForm.callCount, 2);
 		window.Nette.initForm.restore();
 
 		document.body.removeChild(form1);
 		document.body.removeChild(form2);
+	});
+
+	it('initializes on snippet update', function () {
+		sinon.spy(window.Nette, 'initForm');
+
+		const snippetDiv = document.createElement('div');
+		snippetDiv.id = 'snippet-formsHandler-snippet-init';
+		document.body.appendChild(snippetDiv);
+
+		const naja = mockNaja({
+			formsHandler: FormsHandler,
+			snippetHandler: SnippetHandler,
+		});
+		naja.initialize();
+
+		naja.snippetHandler.updateSnippets({
+			'snippet-formsHandler-snippet-init': '<form><input type="hidden" name="test"></form>',
+		});
+
+		assert.isTrue(window.Nette.initForm.calledOnce);
+		window.Nette.initForm.restore();
+
+		document.body.removeChild(snippetDiv);
 	});
 
 	it('processes form', function () {
@@ -85,10 +111,12 @@ describe('FormsHandler', function () {
 		form.appendChild(element);
 		document.body.appendChild(form);
 
-		const naja = mockNaja();
-		const formsHandler = new FormsHandler(naja);
-		formsHandler.netteForms = netteForms;
-		naja.load();
+		const naja = mockNaja({
+			formsHandler: FormsHandler,
+			snippetHandler: SnippetHandler,
+		});
+		naja.formsHandler.netteForms = netteForms;
+		naja.initialize();
 
 		assert.equal(window.Nette.initForm.callCount, 0);
 
@@ -103,7 +131,7 @@ describe('FormsHandler', function () {
 			preventDefault: sinon.spy(),
 		};
 
-		formsHandler.processForm(evt);
+		naja.formsHandler.processForm(evt);
 
 		assert.equal(element, element.form['nette-submittedBy']);
 		assert.isTrue(originalEvent.stopImmediatePropagation.called);
