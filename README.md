@@ -31,4 +31,4 @@ document.addEventListener('DOMContentLoaded', naja.initialize.bind(naja));
 
 ## Documentation
 
-You can find the documentation [here](https://jiripudil.github.io/Naja).
+You can find the documentation [here](https://naja.js.org).
