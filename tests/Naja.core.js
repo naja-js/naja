@@ -1,3 +1,4 @@
+import Naja from '../src/Naja';
 import mockNaja from './setup/mockNaja';
 import {assert} from 'chai';
 import sinon from 'sinon';
@@ -81,7 +82,7 @@ describe('Naja.js', function () {
 			const extension = class {
 				constructor(naja, foo, bar) {
 					initialized = true;
-					assert.instanceOf(naja, require('../src/Naja').default);
+					assert.instanceOf(naja, Naja);
 					assert.equal(42, foo);
 					assert.equal('42', bar);
 				}

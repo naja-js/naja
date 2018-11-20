@@ -33,3 +33,4 @@ deploy:
       repo: jiripudil/Naja
 
 cache: yarn
+

@@ -1,7 +1,8 @@
-var path = require('path');
+var babel = require('rollup-plugin-babel');
+var commonjs = require('rollup-plugin-commonjs');
+var resolve = require('rollup-plugin-node-resolve');
 
-
-module.exports = function(config) {
+module.exports = (config) => {
   config.set({
     basePath: '',
     frameworks: ['mocha'],
@@ -11,38 +12,30 @@ module.exports = function(config) {
     ],
 
     preprocessors: {
-      'tests/index.js': ['webpack', 'sourcemap']
+      'tests/index.js': ['rollup']
     },
-    webpack: {
-      module: {
-        rules: [
-          {
-            test: /\.js$/,
-            use: {
-              loader: 'babel-loader'
-            },
-            exclude: /node_modules/
+    rollupPreprocessor: {
+      plugins: [
+        babel({
+          exclude: 'node_modules/**',
+          runtimeHelpers: true,
+        }),
+        resolve(),
+        commonjs({
+          namedExports: {
+            'node_modules/chai/index.js': ['assert'],
           },
-          {
-            test: /\.js$/,
-            use: {
-              loader: 'istanbul-instrumenter-loader',
-              options: {
-                esModules: true
-              }
-            },
-            include: path.resolve('src'),
-            enforce: 'post'
-          }
-        ],
+        }),
+      ],
+      output: {
+        format: 'iife',
+        sourceMap: 'inline',
       },
-      devtool: 'inline-source-map'
     },
 
     reporters: ['dots', 'coverage-istanbul'],
     coverageIstanbulReporter: {
       reports: ['text-summary', 'html', 'lcovonly'],
-      fixWebpackSourcePaths: true
     },
 
     port: 9876,
@@ -52,6 +45,6 @@ module.exports = function(config) {
     singleRun: false,
 
     browsers: ['Chrome', 'Firefox'],
-    concurrency: Infinity
-  })
+    concurrency: Infinity,
+  });
 };

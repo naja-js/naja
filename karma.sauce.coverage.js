@@ -1,7 +1,9 @@
-var path = require('path');
+var babel = require('rollup-plugin-babel');
+var commonjs = require('rollup-plugin-commonjs');
+var istanbul = require('rollup-plugin-istanbul');
+var resolve = require('rollup-plugin-node-resolve');
 
-
-module.exports = function(config) {
+module.exports = (config) => {
   if ( ! process.env.SAUCE_USERNAME || ! process.env.SAUCE_ACCESS_KEY) {
     console.error('Make sure the SAUCE_USERNAME and SAUCE_ACCESS_KEY environment variables are set.');
     process.exit(1);
@@ -16,38 +18,24 @@ module.exports = function(config) {
     ],
 
     preprocessors: {
-      'tests/index.js': ['webpack', 'sourcemap']
+      'tests/index.js': ['rollup']
     },
-    webpack: {
-      module: {
-        rules: [
-          {
-            test: /\.js$/,
-            use: {
-              loader: 'babel-loader'
-            },
-            exclude: /node_modules/
-          },
-          {
-            test: /\.js$/,
-            use: {
-              loader: 'istanbul-instrumenter-loader',
-              options: {
-                esModules: true
-              }
-            },
-            include: path.resolve('src'),
-            enforce: 'post'
-          }
-        ],
-      },
-      devtool: 'inline-source-map'
+    rollupPreprocessor: {
+      plugins: [
+        babel({
+          exclude: 'node_modules/**',
+          runtimeHelpers: true,
+        }),
+        resolve(),
+        commonjs(),
+      ],
+      format: 'iife',
+      sourceMap: 'inline',
     },
 
     reporters: ['dots', 'saucelabs', 'coverage-istanbul'],
     coverageIstanbulReporter: {
       reports: ['text-summary', 'lcovonly'],
-      fixWebpackSourcePaths: true
     },
 
     port: 9876,
@@ -70,6 +58,6 @@ module.exports = function(config) {
       }
     },
     browsers: ['chrome'],
-    concurrency: 5
-  })
+    concurrency: 5,
+  });
 };
