@@ -1,5 +1,6 @@
 {
 	"exclude": [
+		"node_modules",
 		"tests"
 	],
 	"reporter": [
