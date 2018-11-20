@@ -1,7 +1,8 @@
-var path = require('path');
+var babel = require('rollup-plugin-babel');
+var commonjs = require('rollup-plugin-commonjs');
+var resolve = require('rollup-plugin-node-resolve');
 
-
-module.exports = function(config) {
+module.exports = (config) => {
   if ( ! process.env.SAUCE_USERNAME || ! process.env.SAUCE_ACCESS_KEY) {
     console.error('Make sure the SAUCE_USERNAME and SAUCE_ACCESS_KEY environment variables are set.');
     process.exit(1);
@@ -38,12 +39,6 @@ module.exports = function(config) {
       browserName: 'MicrosoftEdge',
       platform: 'Windows 10',
       version: 'latest-1'
-    },
-    'msie10': {
-      base: 'SauceLabs',
-      browserName: 'internet explorer',
-      platform: 'Windows 8',
-      version: '10.0'
     },
     'msie11': {
       base: 'SauceLabs',
@@ -107,24 +102,19 @@ module.exports = function(config) {
     ],
 
     preprocessors: {
-      'tests/index.js': ['webpack']
+      'tests/index.js': ['rollup']
     },
-    webpack: {
-      module: {
-        rules: [
-          {
-            test: /\.js$/,
-            use: {
-              loader: 'babel-loader',
-              options: {
-                sourceMap: false
-              }
-            },
-            exclude: /node_modules/
-          }
-        ],
-      },
-      devtool: ''
+    rollupPreprocessor: {
+      plugins: [
+        babel({
+          exclude: 'node_modules/**',
+          runtimeHelpers: true,
+        }),
+        resolve(),
+        commonjs(),
+      ],
+      format: 'iife',
+      sourceMap: 'inline',
     },
 
     reporters: ['dots', 'saucelabs'],
@@ -144,6 +134,6 @@ module.exports = function(config) {
     browserDisconnectTolerance: 2,
     browserNoActivityTimeout: 120000,
     captureTimeout: 120000, // try to give ios simulators some time to boot up
-    concurrency: 5
-  })
+    concurrency: 5,
+  });
 };

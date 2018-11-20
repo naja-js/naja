@@ -1,13 +1,13 @@
+# Build artifacts
+dist/
+
 # Logs
-logs
 *.log
 npm-debug.log*
 
 # Dependency management
-node_modules
-.npm
-.yarn-integrity
+node_modules/
 
 # Coverage reports
-coverage
+coverage/
 .nyc_output
