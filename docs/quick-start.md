@@ -11,7 +11,7 @@ Naja comes in the form of an npm package. You can install and `import` it into y
 If you're not friends with npm, you can download the archive from Github and load the bundled script from `dist`
 directory into your site.
 
-If you like to learn by example, [@f3l1x](https://github.com/f3l1x) has created
+?> If you like to learn by example, [@f3l1x](https://github.com/f3l1x) has created
 [a demo](https://github.com/trainit/2018-03-nette-webpack) which shows how to use Naja in a Nette Framework
 application with Webpack.
 
