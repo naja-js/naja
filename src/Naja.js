@@ -40,11 +40,12 @@ export default class Naja extends EventTarget {
 	}
 
 
-	initialize() {
+	initialize(defaultOptions = {}) {
 		if (this.initialized) {
 			throw new Error('Cannot initialize Naja, it is already initialized.');
 		}
 
+		this.defaultOptions = defaultOptions;
 		this.extensions = this.extensions.map(([extensionClass, args]) => new extensionClass(this, ...args));
 
 		this.fireEvent('init');

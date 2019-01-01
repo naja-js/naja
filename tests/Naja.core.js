@@ -3,24 +3,26 @@ import {assert} from 'chai';
 
 
 describe('Naja.js', function () {
-	it('should initialize once', function () {
-		const naja = mockNaja();
-		let thrown = false;
-		assert.isFalse(naja.initialized);
+	describe('initialize', function () {
+		it('should initialize once', function () {
+			const naja = mockNaja();
+			assert.isFalse(naja.initialized);
 
-		naja.initialize();
-		assert.isTrue(naja.initialized);
-
-		try {
 			naja.initialize();
+			assert.isTrue(naja.initialized);
 
-		} catch (e) {
-			assert.instanceOf(e, Error);
-			assert.equal(e.message, "Cannot initialize Naja, it is already initialized.");
-			thrown = true;
-		}
+			assert.throws(
+				() => naja.initialize(),
+				Error,
+				'Cannot initialize Naja, it is already initialized.'
+			);
+		});
 
-		assert.isTrue(thrown);
+		it('should initialize with default options', function () {
+			const naja = mockNaja();
+			naja.initialize({answer: 42});
+			assert.deepEqual({answer: 42}, naja.defaultOptions);
+		});
 	});
 
 	describe('event system', function () {
