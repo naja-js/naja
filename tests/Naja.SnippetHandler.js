@@ -1,5 +1,5 @@
 import mockNaja from './setup/mockNaja';
-import fakeXhr from './setup/fakeXhr';
+import fakeFetch from './setup/fakeFetch';
 import {assert} from 'chai';
 import sinon from 'sinon';
 
@@ -7,7 +7,7 @@ import SnippetHandler from '../src/core/SnippetHandler';
 
 
 describe('SnippetHandler', function () {
-	fakeXhr();
+	fakeFetch();
 
 	it('constructor()', function () {
 		const naja = mockNaja();
@@ -20,7 +20,7 @@ describe('SnippetHandler', function () {
 		mock.verify();
 	});
 
-	it('reads snippets from response', function (done) {
+	it('reads snippets from response', function () {
 		const naja = mockNaja();
 		const snippetHandler = new SnippetHandler(naja);
 
@@ -29,12 +29,10 @@ describe('SnippetHandler', function () {
 			.withExactArgs({'snippet--foo': 'foo'})
 			.once();
 
-		naja.makeRequest('GET', '/SnippetHandler/updateSnippets').then(() => {
+		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet--foo': 'foo'}});
+		return naja.makeRequest('GET', '/SnippetHandler/updateSnippets').then(() => {
 			mock.verify();
-			done();
 		});
-
-		this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({snippets: {'snippet--foo': 'foo'}}));
 	});
 
 	it('updateSnippets()', function () {

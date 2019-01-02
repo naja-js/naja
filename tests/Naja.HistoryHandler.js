@@ -1,5 +1,5 @@
 import mockNaja from './setup/mockNaja';
-import fakeXhr from './setup/fakeXhr';
+import fakeFetch from './setup/fakeFetch';
 import cleanPopstateListener from "./setup/cleanPopstateListener";
 import {assert} from 'chai';
 import sinon from 'sinon';
@@ -10,7 +10,7 @@ import UIHandler from '../src/core/UIHandler';
 
 
 describe('HistoryHandler', function () {
-	fakeXhr();
+	fakeFetch();
 
 	it('constructor()', function () {
 		const naja = mockNaja();
@@ -54,7 +54,7 @@ describe('HistoryHandler', function () {
 		mock.restore();
 	});
 
-	it('pushes new state after successful request', function (done) {
+	it('pushes new state after successful request', function () {
 		const naja = mockNaja({
 			snippetHandler: SnippetHandler,
 			historyHandler: HistoryHandler,
@@ -80,19 +80,17 @@ describe('HistoryHandler', function () {
 			},
 		}, '', '/HistoryHandler/pushState').once();
 
-		naja.makeRequest('GET', '/HistoryHandler/pushState').then(() => {
+		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet-history-foo': 'foo'}});
+		return naja.makeRequest('GET', '/HistoryHandler/pushState').then(() => {
 			mock.verify();
 			mock.restore();
 
 			document.body.removeChild(el);
 			document.body.removeChild(ignoredEl);
-			done();
 		});
-
-		this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({snippets: {'snippet-history-foo': 'foo'}}));
 	});
 
-	it('replaces the state after successful request if options.history === "replace"', function (done) {
+	it('replaces the state after successful request if options.history === "replace"', function () {
 		const naja = mockNaja({
 			snippetHandler: SnippetHandler,
 			historyHandler: HistoryHandler,
@@ -113,18 +111,16 @@ describe('HistoryHandler', function () {
 			},
 		}, '', '/HistoryHandler/replaceState').once();
 
-		naja.makeRequest('GET', '/HistoryHandler/replaceState', null, {history: 'replace'}).then(() => {
+		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet-history-foo': 'foo'}});
+		return naja.makeRequest('GET', '/HistoryHandler/replaceState', null, {history: 'replace'}).then(() => {
 			mock.verify();
 			mock.restore();
 
 			document.body.removeChild(el);
-			done();
 		});
-
-		this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({snippets: {'snippet-history-foo': 'foo'}}));
 	});
 
-	it('replaces the state after successful request if payload.replaceHistory', function (done) {
+	it('replaces the state after successful request if payload.replaceHistory', function () {
 		const naja = mockNaja({
 			snippetHandler: SnippetHandler,
 			historyHandler: HistoryHandler,
@@ -145,18 +141,16 @@ describe('HistoryHandler', function () {
 			},
 		}, '', '/HistoryHandler/replaceState').once();
 
-		naja.makeRequest('GET', '/HistoryHandler/replaceState').then(() => {
+		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet-history-foo': 'foo'}, replaceHistory: true});
+		return naja.makeRequest('GET', '/HistoryHandler/replaceState').then(() => {
 			mock.verify();
 			mock.restore();
 
 			document.body.removeChild(el);
-			done();
 		});
-
-		this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({snippets: {'snippet-history-foo': 'foo'}, replaceHistory: true}));
 	});
 
-	it('uses the url from payload if postGet is present', function (done) {
+	it('uses the url from payload if postGet is present', function () {
 		const naja = mockNaja({
 			snippetHandler: SnippetHandler,
 			historyHandler: HistoryHandler,
@@ -171,18 +165,16 @@ describe('HistoryHandler', function () {
 			ui: {},
 		}, '', '/HistoryHandler/postGet/targetUrl').once();
 
-		naja.makeRequest('GET', '/HistoryHandler/postGet').then(() => {
+		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {url: '/HistoryHandler/postGet/targetUrl', postGet: true});
+		return naja.makeRequest('GET', '/HistoryHandler/postGet').then(() => {
 			mock.verify();
 			mock.restore();
-			done();
 		});
-
-		this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({url: '/HistoryHandler/postGet/targetUrl', postGet: true}));
 	});
 
-	it('does not alter the history if options.history === false', function (done) {
+	it('does not alter the history if options.history === false', function () {
 		const naja = mockNaja({
-			snipperHandler: SnippetHandler,
+			snippetHandler: SnippetHandler,
 			historyHandler: HistoryHandler,
 		});
 		naja.initialize();
@@ -192,13 +184,11 @@ describe('HistoryHandler', function () {
 		mock.expects('pushState').never();
 		mock.expects('replaceState').never();
 
-		naja.makeRequest('GET', '/HistoryHandler/disabled', null, {history: false}).then(() => {
+		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet-history-foo': 'foo'}});
+		return naja.makeRequest('GET', '/HistoryHandler/disabled', null, {history: false}).then(() => {
 			mock.verify();
 			mock.restore();
-			done();
 		});
-
-		this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({snippets: {'snippet-history-foo': 'foo'}}));
 	});
 
 	describe('configures mode properly on interaction', function () {
@@ -311,7 +301,7 @@ describe('HistoryHandler', function () {
 			mock.restore();
 		});
 
-		it('does not push snippets to state if uiCache is disabled globally', function (done) {
+		it('does not push snippets to state if uiCache is disabled globally', function () {
 			const naja = mockNaja({
 				historyHandler: HistoryHandler,
 			});
@@ -329,18 +319,16 @@ describe('HistoryHandler', function () {
 				ui: false,
 			}, 'new title', '/HistoryHandler/pushStateWithoutCache').once();
 
-			naja.makeRequest('GET', '/HistoryHandler/pushStateWithoutCache').then(() => {
+			this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet-history-foo': 'foo'}});
+			return naja.makeRequest('GET', '/HistoryHandler/pushStateWithoutCache').then(() => {
 				mock.verify();
 				mock.restore();
 
 				document.body.removeChild(el);
-				done();
 			});
-
-			this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({snippets: {'snippet-history-foo': 'foo'}}));
 		});
 
-		it('does not push snippets to state if uiCache is enabled globally but disabled via options', function (done) {
+		it('does not push snippets to state if uiCache is enabled globally but disabled via options', function () {
 			const naja = mockNaja({
 				historyHandler: HistoryHandler,
 			});
@@ -357,18 +345,16 @@ describe('HistoryHandler', function () {
 				ui: false,
 			}, 'new title', '/HistoryHandler/pushStateWithoutCacheOption').once();
 
-			naja.makeRequest('GET', '/HistoryHandler/pushStateWithoutCacheOption', null, {historyUiCache: false}).then(() => {
+			this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet-history-foo': 'foo'}});
+			return naja.makeRequest('GET', '/HistoryHandler/pushStateWithoutCacheOption', null, {historyUiCache: false}).then(() => {
 				mock.verify();
 				mock.restore();
 
 				document.body.removeChild(el);
-				done();
 			});
-
-			this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({snippets: {'snippet-history-foo': 'foo'}}));
 		});
 
-		it('pushes snippets to state if uiCache is disabled globally but enabled via options', function (done) {
+		it('pushes snippets to state if uiCache is disabled globally but enabled via options', function () {
 			const naja = mockNaja({
 				snippetHandler: SnippetHandler,
 				historyHandler: HistoryHandler,
@@ -390,15 +376,13 @@ describe('HistoryHandler', function () {
 				},
 			}, 'new title', '/HistoryHandler/pushStateWithCache').once();
 
-			naja.makeRequest('GET', '/HistoryHandler/pushStateWithCache', null, {historyUiCache: true}).then(() => {
+			this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet-history-foo': 'foo'}});
+			return naja.makeRequest('GET', '/HistoryHandler/pushStateWithCache', null, {historyUiCache: true}).then(() => {
 				mock.verify();
 				mock.restore();
 
 				document.body.removeChild(el);
-				done();
 			});
-
-			this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({snippets: {'snippet-history-foo': 'foo'}}));
 		});
 
 		it('replays request on popstate if it had uiCache disabled', () => {

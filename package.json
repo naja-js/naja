@@ -13,9 +13,11 @@
   "module": "dist/Naja.esm.js",
   "dependencies": {
     "@babel/runtime": "^7.2.0",
+    "abortcontroller-polyfill": "^1.2.1",
     "event-target-shim": "^2.0.0",
     "object-assign": "^4.1.0",
-    "qwest": "^4.4.5"
+    "url-polyfill": "^1.1.3",
+    "whatwg-fetch": "^3.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",

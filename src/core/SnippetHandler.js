@@ -4,9 +4,9 @@ import EventTarget from 'event-target-shim';
 export default class SnippetHandler extends EventTarget {
 	constructor(naja) {
 		super();
-		naja.addEventListener('success', ({response}) => {
-			if (response.snippets) {
-				this.updateSnippets(response.snippets);
+		naja.addEventListener('success', ({payload}) => {
+			if (payload.snippets) {
+				this.updateSnippets(payload.snippets);
 			}
 		});
 	}

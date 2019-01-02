@@ -1,5 +1,3 @@
-import qwest from 'qwest';
-import objectAssign from 'object-assign';
 import EventTarget from 'event-target-shim';
 
 import UIHandler from './core/UIHandler';
@@ -60,52 +58,82 @@ export default class Naja extends EventTarget {
 
 
 	fireEvent(type, args = {}) {
-		const evt = objectAssign(args, {type, cancelable: true});
+		const evt = {...args, type, cancelable: true};
 		return this.dispatchEvent(evt);
 	}
 
 
-	makeRequest(method, url, data, options) {
-		const defaultOptions = {
-			dataType: 'post',
-			responseType: 'auto',
+	async makeRequest(method, url, data = null, options = {}) {
+		options = {
+			...this.defaultOptions,
+			...options,
+			fetch: {
+				...this.defaultOptions.fetch || {},
+				...options.fetch || {},
+			},
 		};
 
-		options = objectAssign({}, defaultOptions, this.defaultOptions, options || {});
+		const abortController = new AbortController();
+		const request = new Request(url, {
+			credentials: 'same-origin',
+			...options.fetch,
+			method,
+			headers: new Headers(options.fetch.headers || {}),
+			body: data !== null && Object.getPrototypeOf(data) === Object.prototype
+				? new URLSearchParams(data)
+				: data,
+			signal: abortController.signal,
+		});
 
-		let currentXhr;
-		const beforeCallback = (xhr) => {
-			currentXhr = xhr;
+		// impersonate XHR so that Nette can detect isAjax()
+		request.headers.set('X-Requested-With', 'XMLHttpRequest');
 
-			// abort request if beforeEvent.preventDefault() is called
-			if ( ! this.fireEvent('before', {xhr, method, url, data, options})) {
-				xhr.abort();
+		if ( ! this.fireEvent('before', {request, method, url, data, options})) {
+			return {};
+		}
+
+		const promise = window.fetch(request);
+		this.fireEvent('start', {request, promise, abortController, options});
+
+		let response, payload;
+
+		try {
+			response = await promise;
+			if ( ! response.ok) {
+				throw new HttpError(response);
 			}
 
-			// qwest does not handle response at all if the request is aborted
-			xhr.addEventListener('abort', () => {
-				this.fireEvent('abort', {xhr});
-				this.fireEvent('complete', {error: new Error('Request aborted'), xhr, response: null, options});
-			});
-		};
+			payload = await response.json();
 
-		const request = qwest.map(method, url, data, options, beforeCallback)
-			.then((xhr, response) => {
-				this.fireEvent('success', {xhr, response, options});
-				this.fireEvent('complete', {error: null, xhr, response, options});
-				this.load();
+		} catch (error) {
+			if (error.name === 'AbortError') {
+				this.fireEvent('abort', {request, error, options});
+				this.fireEvent('complete', {request, response, payload: undefined, error, options});
+				return {};
+			}
 
-				return response;
-			})
-			.catch((error, xhr, response) => {
-				this.fireEvent('error', {error, xhr, response, options});
-				this.fireEvent('complete', {error, xhr, response, options});
-				this.load();
+			this.fireEvent('error', {request, response, error, options});
+			this.fireEvent('complete', {request, response, payload: undefined, error, options});
+			this.load();
 
-				throw error;
-			});
+			throw error;
+		}
 
-		this.fireEvent('start', {request, xhr: currentXhr});
-		return request;
+		this.fireEvent('success', {request, response, payload, options});
+		this.fireEvent('complete', {request, response, payload, error: undefined, options});
+		this.load();
+
+		return payload;
+	}
+}
+
+class HttpError extends Error {
+	constructor(response) {
+		const message = `HTTP ${response.status}: ${response.statusText}`;
+		super(message);
+
+		this.name = this.constructor.name;
+		this.stack = (new Error(message)).stack;
+		this.response = response;
 	}
 }
