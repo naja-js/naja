@@ -48,7 +48,7 @@ export default class Naja extends EventTarget {
 		this.defaultOptions = defaultOptions;
 		this.extensions = this.extensions.map(([extensionClass, args]) => new extensionClass(this, ...args));
 
-		this.fireEvent('init');
+		this.fireEvent('init', {defaultOptions});
 		this.initialized = true;
 		this.load();
 	}

@@ -1,5 +1,6 @@
 import mockNaja from './setup/mockNaja';
 import {assert} from 'chai';
+import sinon from 'sinon';
 
 
 describe('Naja.js', function () {
@@ -22,6 +23,20 @@ describe('Naja.js', function () {
 			const naja = mockNaja();
 			naja.initialize({answer: 42});
 			assert.deepEqual({answer: 42}, naja.defaultOptions);
+		});
+
+		it('dispatches init event with default options', function () {
+			const naja = mockNaja();
+
+			const initCallback = sinon.spy();
+			naja.addEventListener('init', initCallback);
+
+			const defaultOptions = {answer: 42};
+			naja.initialize(defaultOptions);
+			assert.isTrue(initCallback.calledOnce);
+			assert.isTrue(initCallback.calledWith(sinon.match.object
+				.and(sinon.match.has('defaultOptions', defaultOptions))
+			));
 		});
 	});
 

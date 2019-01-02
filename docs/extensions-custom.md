@@ -11,7 +11,8 @@ Specifically, it dispatches the following events:
 
 - **init:** This event is dispatched when `naja.initialize()` is called. It can be used to initialize all the necessities
     of the extension. If you've followed the instructions, the DOM is already loaded by the time this event is dispatched,
-    so that you can access DOM elements in the listener. The `init` event has no properties.
+    so that you can access DOM elements in the listener. The `init` event has the following properties:
+    - `defaultOptions: Object`, an object holding the default options passed to `naja.initialize()` method.
 
 - **load:** This event is dispatched after `init` and then after every request, be it successful or not. It can be used
     to reload things, re-add event listeners, etc. It has no properties.
