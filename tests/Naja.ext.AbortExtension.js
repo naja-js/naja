@@ -1,12 +1,12 @@
 import mockNaja from './setup/mockNaja';
-import fakeXhr from './setup/fakeXhr';
+import fakeFetch from './setup/fakeFetch';
 import {assert} from 'chai';
 
 import AbortExtension from '../src/extensions/AbortExtension';
 
 
 describe('AbortExtension', function () {
-	fakeXhr();
+	fakeFetch();
 
 	const createKeyboardEvent = () => {
 		if (typeof(KeyboardEvent) === 'function') {
@@ -29,34 +29,50 @@ describe('AbortExtension', function () {
 		const abortExtension = new AbortExtension(naja);
 		abortExtension.initialize();
 
-		naja.makeRequest('GET', '/AbortExtension/abortable');
-		const evt = createKeyboardEvent();
+		this.fetchMock.when()
+			.handler = (request) => new Promise((resolve, reject) => {
+				const abortError = new Error('AbortError');
+				abortError.name = 'AbortError';
+				request.signal.onabort = () => reject(abortError);
+			});
+
+		const request = naja.makeRequest('GET', '/AbortExtension/abortable');
 
 		// some browsers do not initialize event's keyCode
+		const evt = createKeyboardEvent();
 		if (evt.key === 'Escape' || evt.keyCode === 27) {
 			document.dispatchEvent(evt);
-			assert.isTrue(this.requests.pop().aborted);
 		}
+
+		return request.catch((error) => {
+			assert.equal(error.name, 'AbortError');
+		});
 	});
 
-	it('does not abort non-abortable request', function (done) {
+	it('does not abort non-abortable request', function () {
 		const naja = mockNaja();
 		const abortExtension = new AbortExtension(naja);
 		abortExtension.initialize();
 
-		naja.makeRequest('GET', '/AbortExtension/nonAbortable', null, {abort: false}).then(() => {
-			done();
-		});
+		this.fetchMock.when()
+			.handler = (request) => new Promise((resolve, reject) => {
+				const abortError = new Error('AbortError');
+				abortError.name = 'AbortError';
+				request.signal.onabort = () => reject(abortError);
 
-		const evt = createKeyboardEvent();
+				const body = new Blob(['{}']);
+				const response = new Response(body, {status: 200, headers: {'Content-Type': 'application/json'}});
+				setTimeout(() => resolve(response), 1000);
+			});
+
+		const request = naja.makeRequest('GET', '/AbortExtension/nonAbortable', null, {abort: false});
 
 		// some browsers do not initialize event's keyCode
+		const evt = createKeyboardEvent();
 		if (evt.key === 'Escape' || evt.keyCode === 27) {
 			document.dispatchEvent(evt);
-			this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({answer: 42}));
-
-		} else {
-			done();
 		}
+
+		return request;
 	});
 });

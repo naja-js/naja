@@ -1,33 +1,53 @@
 import mockNaja from './setup/mockNaja';
-import fakeXhr from './setup/fakeXhr';
+import fakeFetch from './setup/fakeFetch';
 import {assert} from 'chai';
 
 import UniqueExtension from '../src/extensions/UniqueExtension';
 
 
 describe('UniqueExtension', function () {
-	fakeXhr();
+	fakeFetch();
 
 	it('aborts previous request', function () {
 		const naja = mockNaja();
 		new UniqueExtension(naja);
 
-		naja.makeRequest('GET', '/UniqueExtension/enabled/first');
+		this.fetchMock.when((request) => /first/.test(request.url))
+			.handler = (request) => new Promise((resolve, reject) => {
+				const abortError = new Error('AbortError');
+				abortError.name = 'AbortError';
+				request.signal.onabort = () => reject(abortError);
+			});
+
+		this.fetchMock.when((request) => /second/.test(request.url))
+			.respond(200, {}, {});
+
+		const firstRequest = naja.makeRequest('GET', '/UniqueExtension/enabled/first');
 		naja.makeRequest('GET', '/UniqueExtension/enabled/second');
 
-		assert.isTrue(this.requests[0].aborted);
+		return firstRequest.catch((error) => {
+			assert.equal(error.name, 'AbortError');
+		});
 	});
 
-	it('does not abort request if disabled', function (done) {
+	it('does not abort request if disabled', function () {
 		const naja = mockNaja();
 		new UniqueExtension(naja);
 
-		naja.makeRequest('GET', '/UniqueExtension/disabled/first').then(() => {
-			done();
-		});
+		this.fetchMock.when()
+			.handler = (request) => new Promise((resolve, reject) => {
+				const abortError = new Error('AbortError');
+				abortError.name = 'AbortError';
+				request.signal.onabort = () => reject(abortError);
 
-		naja.makeRequest('GET', '/UniqueExtension/disabled/second', null, {unique: false});
+				const body = new Blob(['{}']);
+				const response = new Response(body, {status: 200, headers: {'Content-Type': 'application/json'}});
+				setTimeout(() => resolve(response), 1000);
+			});
 
-		this.requests[0].respond(200, {'Content-Type': 'application/json'}, JSON.stringify({answer: 42}));
+		const firstRequest = naja.makeRequest('GET', '/UniqueExtension/disabled/first');
+		const secondRequest = naja.makeRequest('GET', '/UniqueExtension/disabled/second', null, {unique: false});
+
+		return Promise.all([firstRequest, secondRequest]);
 	});
 });

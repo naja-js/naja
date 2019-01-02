@@ -1,6 +1,5 @@
 var babel = require('rollup-plugin-babel');
 var commonjs = require('rollup-plugin-commonjs');
-var istanbul = require('rollup-plugin-istanbul');
 var resolve = require('rollup-plugin-node-resolve');
 
 module.exports = (config) => {
@@ -27,10 +26,17 @@ module.exports = (config) => {
           runtimeHelpers: true,
         }),
         resolve(),
-        commonjs(),
+        commonjs({
+          namedExports: {
+            'node_modules/chai/index.js': ['assert'],
+          },
+        }),
       ],
-      format: 'iife',
-      sourceMap: 'inline',
+      output: {
+        name: 'naja',
+        format: 'iife',
+        sourcemap: 'inline',
+      },
     },
 
     reporters: ['dots', 'saucelabs', 'coverage-istanbul'],
