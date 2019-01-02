@@ -111,10 +111,17 @@ module.exports = (config) => {
           runtimeHelpers: true,
         }),
         resolve(),
-        commonjs(),
+        commonjs({
+          namedExports: {
+            'node_modules/chai/index.js': ['assert'],
+          },
+        }),
       ],
-      format: 'iife',
-      sourceMap: 'inline',
+      output: {
+        name: 'naja',
+        format: 'iife',
+        sourcemap: 'inline',
+      },
     },
 
     reporters: ['dots', 'saucelabs'],

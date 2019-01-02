@@ -78,17 +78,17 @@ export default class HistoryHandler {
 		return true;
 	}
 
-	pushNewState({response, options}) {
+	pushNewState({payload, options}) {
 		const mode = this.constructor.normalizeMode(options.history);
 		if (mode === false) {
 			return;
 		}
 
-		if (response.postGet && response.url) {
-			this.href = response.url;
+		if (payload.postGet && payload.url) {
+			this.href = payload.url;
 		}
 
-		if ('replaceHistory' in response) {
+		if ('replaceHistory' in payload) {
 			// eslint-disable-next-line no-console
 			console.warn(
 				'Support for `replaceHistory` key in response payload is deprecated and will be removed in Naja 2.0. '
@@ -96,7 +96,7 @@ export default class HistoryHandler {
 			);
 		}
 
-		const method = response.replaceHistory || mode === 'replace' ? 'replaceState' : 'pushState';
+		const method = payload.replaceHistory || mode === 'replace' ? 'replaceState' : 'pushState';
 		const uiCache = options.historyUiCache === true || (options.historyUiCache !== false && this.uiCache); // eslint-disable-line no-extra-parens
 		this.historyAdapter[method](
 			this.buildState(this.href, uiCache),

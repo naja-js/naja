@@ -28,8 +28,9 @@ module.exports = (config) => {
         }),
       ],
       output: {
+        name: 'naja',
         format: 'iife',
-        sourceMap: 'inline',
+        sourcemap: 'inline',
       },
     },
 

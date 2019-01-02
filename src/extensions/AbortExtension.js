@@ -3,22 +3,22 @@ export default class AbortExtension {
 		naja.addEventListener('init', this.initialize.bind(this));
 		naja.addEventListener('interaction', this.checkAbortable.bind(this));
 		naja.addEventListener('before', this.checkAbortable.bind(this));
-		naja.addEventListener('start', this.saveXhr.bind(this));
-		naja.addEventListener('complete', this.clearXhr.bind(this));
+		naja.addEventListener('start', this.saveAbortController.bind(this));
+		naja.addEventListener('complete', this.clearAbortController.bind(this));
 	}
 
 
 	abortable = true;
-	xhr = null;
+	abortController = null;
 	initialize() {
 		document.addEventListener('keydown', (evt) => {
-			if (!!this.xhr
+			if (this.abortController !== null
 				&& ('key' in evt ? evt.key === 'Escape' : evt.keyCode === 27)
 				&& !(evt.ctrlKey || evt.shiftKey || evt.altKey || evt.metaKey)
 				&& this.abortable
 			) {
-				this.xhr.abort();
-				this.xhr = null;
+				this.abortController.abort();
+				this.abortController = null;
 			}
 		});
 	}
@@ -32,12 +32,12 @@ export default class AbortExtension {
 		options.abort = this.abortable;
 	}
 
-	saveXhr({xhr}) {
-		this.xhr = xhr;
+	saveAbortController({abortController}) {
+		this.abortController = abortController;
 	}
 
-	clearXhr() {
-		this.xhr = null;
+	clearAbortController() {
+		this.abortController = null;
 		this.abortable = true;
 	}
 }
