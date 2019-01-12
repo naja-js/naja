@@ -1,4 +1,6 @@
 sudo: false
+dist: xenial
+
 language: node_js
 node_js:
   - lts/*
@@ -7,6 +9,26 @@ script:
   - yarn run lint
   - yarn run test
   - yarn run coverage
+
+before_deploy:
   - yarn run build
+
+deploy:
+  - provider: releases
+    token: $GITHUB_API_TOKEN
+    cleanup: false
+    file:
+      - dist/Naja.js
+      - dist/Naja.js.map
+    on:
+      tags: true
+      repo: jiripudil/Naja
+  - provider: npm
+    email: naja@jiripudil.cz
+    api_token: $NPM_API_TOKEN
+    cleanup: false
+    on:
+      tags: true
+      repo: jiripudil/Naja
 
 cache: yarn
