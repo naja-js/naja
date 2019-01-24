@@ -37,10 +37,10 @@ export default class SnippetHandler extends EventTarget {
 
 		} else {
 			if ((el.hasAttribute('data-naja-snippet-prepend') || el.hasAttribute('data-ajax-prepend')) && ! forceReplace) {
-				el.innerHTML = content + el.innerHTML;
+				el.insertAdjacentHTML('afterbegin', content);
 
 			} else if ((el.hasAttribute('data-naja-snippet-append') || el.hasAttribute('data-ajax-append')) && ! forceReplace) {
-				el.innerHTML = el.innerHTML + content;
+				el.insertAdjacentHTML('beforeend', content);
 
 			} else {
 				el.innerHTML = content;
