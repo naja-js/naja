@@ -1,26 +1,43 @@
 import mockNaja from './setup/mockNaja';
 import {assert} from 'chai';
+import sinon from 'sinon';
 
 
 describe('Naja.js', function () {
-	it('should initialize once', function () {
-		const naja = mockNaja();
-		let thrown = false;
-		assert.isFalse(naja.initialized);
+	describe('initialize', function () {
+		it('should initialize once', function () {
+			const naja = mockNaja();
+			assert.isFalse(naja.initialized);
 
-		naja.initialize();
-		assert.isTrue(naja.initialized);
-
-		try {
 			naja.initialize();
+			assert.isTrue(naja.initialized);
 
-		} catch (e) {
-			assert.instanceOf(e, Error);
-			assert.equal(e.message, "Cannot initialize Naja, it is already initialized.");
-			thrown = true;
-		}
+			assert.throws(
+				() => naja.initialize(),
+				Error,
+				'Cannot initialize Naja, it is already initialized.'
+			);
+		});
 
-		assert.isTrue(thrown);
+		it('should initialize with default options', function () {
+			const naja = mockNaja();
+			naja.initialize({answer: 42});
+			assert.deepEqual({answer: 42}, naja.defaultOptions);
+		});
+
+		it('dispatches init event with default options', function () {
+			const naja = mockNaja();
+
+			const initCallback = sinon.spy();
+			naja.addEventListener('init', initCallback);
+
+			const defaultOptions = {answer: 42};
+			naja.initialize(defaultOptions);
+			assert.isTrue(initCallback.calledOnce);
+			assert.isTrue(initCallback.calledWith(sinon.match.object
+				.and(sinon.match.has('defaultOptions', defaultOptions))
+			));
+		});
 	});
 
 	describe('event system', function () {

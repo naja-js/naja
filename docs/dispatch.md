@@ -28,13 +28,15 @@ The `options` object has multiple roles:
 
 ### Default options
 
-You can also configure the default options for your extensions or Naja's core components:
+You can also configure the default options for your extensions or Naja's core components via the `initialize` method:
 
 ```js
-naja.defaultOptions = {
+naja.initialize({
 	history: false,
 	myCustomOption: 42
-};
+});
 ```
 
-?> The default options configuration is available since version 1.3.0.
+?> The default options configuration through the `initialize()` method is available since version 1.6.0. Previously
+(since version 1.3.0), the default options could only be configured by directly modifying `naja.defaultOptions`; this
+way is now deprecated and will be removed in 2.0.0.
