@@ -48,3 +48,18 @@ origin rules still apply, and the `interaction` event (see [Writing extensions](
 with `originalEvent` set to undefined.
 
 ?> The manual dispatch methods are available since version 1.4.0.
+
+
+## Manual bind
+
+You can also manually bind the AJAX handler to DOM nodes that are created dynamically via a different mechanism than
+Nette snippets:
+
+```js
+naja.uiHandler.bindUI(element);
+```
+
+The method searches the given `element` and its children for elements that match the configured selector and attaches
+the AJAX handler to them.
+
+?> The manual bind method is available since version 1.6.0.

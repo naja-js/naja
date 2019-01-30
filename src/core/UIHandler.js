@@ -1,19 +1,29 @@
+const matchesMethodName = 'matches' in Element.prototype ? 'matches' : 'msMatchesSelector';
+
 export default class UIHandler {
 	selector = '.ajax';
 	allowedOrigins = [];
+	handler;
 
 	constructor(naja) {
 		this.naja = naja;
 
-		const handler = this.handleUI.bind(this);
-		naja.addEventListener('load', this.bindUI.bind(this, handler));
+		this.handler = this.handleUI.bind(this);
+		naja.addEventListener('init', this.initialize.bind(this));
 
 		// window.location.origin is not supported in IE 10
 		const origin = `${window.location.protocol}//${window.location.hostname}${window.location.port ? `:${window.location.port}` : ''}`;
 		this.allowedOrigins.push(origin);
 	}
 
-	bindUI(handler) {
+	initialize() {
+		this.bindUI(window.document.body);
+		this.naja.snippetHandler.addEventListener('afterUpdate', ({snippet}) => {
+			this.bindUI(snippet);
+		});
+	}
+
+	bindUI(element) {
 		const selectors = [
 			`a${this.selector}`,
 			`input[type="submit"]${this.selector}`,
@@ -24,18 +34,32 @@ export default class UIHandler {
 			`form${this.selector} button[type="submit"]`,
 		].join(', ');
 
-		const elements = document.querySelectorAll(selectors);
+		const bindElement = (element) => {
+			element.removeEventListener('click', this.handler);
+			element.addEventListener('click', this.handler);
+		};
+
+		const elements = element.querySelectorAll(selectors);
 		for (let i = 0; i < elements.length; i++) {
-			const node = elements.item(i);
-			node.removeEventListener('click', handler);
-			node.addEventListener('click', handler);
+			bindElement(elements.item(i));
 		}
 
-		const forms = document.querySelectorAll(`form${this.selector}`);
+		if (element[matchesMethodName](selectors)) {
+			bindElement(element);
+		}
+
+		const bindForm = (form) => {
+			form.removeEventListener('submit', this.handler);
+			form.addEventListener('submit', this.handler);
+		};
+
+		if (element[matchesMethodName](`form${this.selector}`)) {
+			bindForm(element);
+		}
+
+		const forms = element.querySelectorAll(`form${this.selector}`);
 		for (let i = 0; i < forms.length; i++) {
-			const form = forms.item(i);
-			form.removeEventListener('submit', handler);
-			form.addEventListener('submit', handler);
+			bindForm(forms.item(i));
 		}
 	}
 
