@@ -292,6 +292,144 @@ describe('HistoryHandler', function () {
 	});
 
 
+	describe('disabling uiCache', () => {
+		it('does not save snippets in initial state if uiCache is disabled globally', () => {
+			const naja = mockNaja();
+			const historyHandler = new HistoryHandler(naja);
+			historyHandler.uiCache = false;
+
+			const mock = sinon.mock(historyHandler.historyAdapter);
+			mock.expects('replaceState').withExactArgs({
+				href: 'http://localhost:9876/context.html',
+				ui: false,
+			}, 'new title', 'http://localhost:9876/context.html').once();
+
+			historyHandler.initialize();
+			cleanPopstateListener(historyHandler);
+
+			mock.verify();
+			mock.restore();
+		});
+
+		it('does not push snippets to state if uiCache is disabled globally', function (done) {
+			const naja = mockNaja({
+				historyHandler: HistoryHandler,
+			});
+			naja.historyHandler.uiCache = false;
+			naja.initialize();
+			cleanPopstateListener(naja.historyHandler);
+
+			const el = document.createElement('div');
+			el.id = 'snippet-history-foo';
+			document.body.appendChild(el);
+
+			const mock = sinon.mock(naja.historyHandler.historyAdapter);
+			mock.expects('pushState').withExactArgs({
+				href: '/HistoryHandler/pushStateWithoutCache',
+				ui: false,
+			}, 'new title', '/HistoryHandler/pushStateWithoutCache').once();
+
+			naja.makeRequest('GET', '/HistoryHandler/pushStateWithoutCache').then(() => {
+				mock.verify();
+				mock.restore();
+
+				document.body.removeChild(el);
+				done();
+			});
+
+			this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({snippets: {'snippet-history-foo': 'foo'}}));
+		});
+
+		it('does not push snippets to state if uiCache is enabled globally but disabled via options', function (done) {
+			const naja = mockNaja({
+				historyHandler: HistoryHandler,
+			});
+			naja.initialize();
+			cleanPopstateListener(naja.historyHandler);
+
+			const el = document.createElement('div');
+			el.id = 'snippet-history-foo';
+			document.body.appendChild(el);
+
+			const mock = sinon.mock(naja.historyHandler.historyAdapter);
+			mock.expects('pushState').withExactArgs({
+				href: '/HistoryHandler/pushStateWithoutCacheOption',
+				ui: false,
+			}, 'new title', '/HistoryHandler/pushStateWithoutCacheOption').once();
+
+			naja.makeRequest('GET', '/HistoryHandler/pushStateWithoutCacheOption', null, {historyUiCache: false}).then(() => {
+				mock.verify();
+				mock.restore();
+
+				document.body.removeChild(el);
+				done();
+			});
+
+			this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({snippets: {'snippet-history-foo': 'foo'}}));
+		});
+
+		it('pushes snippets to state if uiCache is disabled globally but enabled via options', function (done) {
+			const naja = mockNaja({
+				snippetHandler: SnippetHandler,
+				historyHandler: HistoryHandler,
+			});
+			naja.historyHandler.uiCache = false;
+			naja.initialize();
+			cleanPopstateListener(naja.historyHandler);
+
+			const el = document.createElement('div');
+			el.id = 'snippet-history-foo';
+			document.body.appendChild(el);
+
+			const mock = sinon.mock(naja.historyHandler.historyAdapter);
+			mock.expects('pushState').withExactArgs({
+				href: '/HistoryHandler/pushStateWithCache',
+				title: 'new title',
+				ui: {
+					'snippet-history-foo': 'foo'
+				},
+			}, 'new title', '/HistoryHandler/pushStateWithCache').once();
+
+			naja.makeRequest('GET', '/HistoryHandler/pushStateWithCache', null, {historyUiCache: true}).then(() => {
+				mock.verify();
+				mock.restore();
+
+				document.body.removeChild(el);
+				done();
+			});
+
+			this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({snippets: {'snippet-history-foo': 'foo'}}));
+		});
+
+		it('replays request on popstate if it had uiCache disabled', () => {
+			const naja = mockNaja({
+				historyHandler: HistoryHandler,
+			});
+			naja.initialize();
+
+			const mock = sinon.mock(naja);
+			mock.expects('makeRequest').withExactArgs(
+				'GET',
+				'/HistoryHandler/popStateWithoutCache',
+				null,
+				{
+					history: false,
+					historyUiCache: false,
+				},
+			).once();
+
+			window.dispatchEvent(createPopStateEvent({
+				href: '/HistoryHandler/popStateWithoutCache',
+				ui: false,
+			}));
+
+			cleanPopstateListener(naja.historyHandler);
+			mock.verify();
+			mock.restore();
+		});
+	});
+
+
 	const createPopStateEvent = (state) => {
 		if (typeof(PopStateEvent) === 'function') {
 			return new PopStateEvent('popstate', {
