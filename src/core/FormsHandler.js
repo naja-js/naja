@@ -10,7 +10,8 @@ export default class FormsHandler {
 
 	initialize() {
 		this.initForms(window.document.body);
-		this.naja.snippetHandler.addEventListener('afterUpdate', ({snippet}) => {
+		this.naja.snippetHandler.addEventListener('afterUpdate', (event) => {
+			const {snippet} = event.detail;
 			this.initForms(snippet);
 		});
 	}
@@ -29,8 +30,8 @@ export default class FormsHandler {
 		}
 	}
 
-	processForm(evt) {
-		const {element, originalEvent} = evt;
+	processForm(event) {
+		const {element, originalEvent} = event.detail;
 
 		if (element.form) {
 			element.form['nette-submittedBy'] = element;
@@ -43,7 +44,7 @@ export default class FormsHandler {
 				originalEvent.preventDefault();
 			}
 
-			evt.preventDefault();
+			event.preventDefault();
 		}
 	}
 }

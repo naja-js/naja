@@ -81,11 +81,14 @@ describe('FormsHandler', function () {
 			preventDefault: sinon.spy(),
 		};
 
-		const evt = {
-			element,
-			originalEvent,
-			preventDefault: sinon.spy(),
-		};
+		const evt = new CustomEvent('interaction', {
+			detail: {
+				element,
+				originalEvent,
+			},
+		});
+
+		sinon.spy(evt, 'preventDefault');
 
 		const naja = mockNaja();
 		const formsHandler = new FormsHandler(naja);
@@ -125,11 +128,14 @@ describe('FormsHandler', function () {
 			preventDefault: sinon.spy(),
 		};
 
-		const evt = {
-			element,
-			originalEvent,
-			preventDefault: sinon.spy(),
-		};
+		const evt = new CustomEvent('interaction', {
+			detail: {
+				element,
+				originalEvent,
+			},
+		});
+
+		sinon.spy(evt, 'preventDefault');
 
 		naja.formsHandler.processForm(evt);
 

@@ -1,13 +1,10 @@
-import EventTarget from 'event-target-shim';
-
-
 export default class RedirectHandler extends EventTarget {
 	constructor(naja) {
 		super();
 		this.naja = naja;
 
-		naja.addEventListener('interaction', (evt) => {
-			const {element, options} = evt;
+		naja.addEventListener('interaction', (event) => {
+			const {element, options} = event.detail;
 			if ( ! element) {
 				return;
 			}
@@ -17,8 +14,8 @@ export default class RedirectHandler extends EventTarget {
 			}
 		});
 
-		naja.addEventListener('success', (evt) => {
-			const {payload, options} = evt;
+		naja.addEventListener('success', (event) => {
+			const {payload, options} = event.detail;
 			if (payload.redirect) {
 				if ('forceRedirect' in payload) {
 					// eslint-disable-next-line no-console
@@ -29,7 +26,7 @@ export default class RedirectHandler extends EventTarget {
 				}
 
 				this.makeRedirect(payload.redirect, payload.forceRedirect || options.forceRedirect, options);
-				evt.stopImmediatePropagation();
+				event.stopImmediatePropagation();
 			}
 		});
 
@@ -40,15 +37,16 @@ export default class RedirectHandler extends EventTarget {
 
 	makeRedirect(url, force, options = {}) {
 		let isHardRedirect = force || ! this.naja.uiHandler.isUrlAllowed(url);
-		const canRedirect = this.dispatchEvent({
-			type: 'redirect',
+		const canRedirect = this.dispatchEvent(new CustomEvent('redirect', {
 			cancelable: true,
-			url,
-			isHardRedirect,
-			setHardRedirect(value) {
-				isHardRedirect = !!value;
+			detail: {
+				url,
+				isHardRedirect,
+				setHardRedirect(value) {
+					isHardRedirect = !!value;
+				},
 			},
-		});
+		}));
 
 		if ( ! canRedirect) {
 			return;

@@ -5,7 +5,7 @@ class UIHandlerMock {
 	isUrlAllowed(url) {}
 }
 
-class RedirectHandlerMock {
+class RedirectHandlerMock extends EventTarget {
 }
 
 class SnippetHandlerMock {
