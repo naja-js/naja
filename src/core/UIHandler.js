@@ -18,7 +18,8 @@ export default class UIHandler {
 
 	initialize() {
 		this.bindUI(window.document.body);
-		this.naja.snippetHandler.addEventListener('afterUpdate', ({snippet}) => {
+		this.naja.snippetHandler.addEventListener('afterUpdate', (event) => {
+			const {snippet} = event.detail;
 			this.bindUI(snippet);
 		});
 	}

@@ -10,7 +10,11 @@ const output = {
 };
 
 const babelPlugin = babel({
-	exclude: 'node_modules/**',
+	exclude: /node_modules\/(?!event-target-shim)/,
+	include: [
+		'src/**',
+		'node_modules/event-target-shim/**',
+	],
 	runtimeHelpers: true,
 });
 
@@ -28,8 +32,8 @@ export default [
 			...Object.keys(pkg.peerDependencies || {}),
 		],
 		plugins: [
-			resolve(),
 			babelPlugin,
+			resolve(),
 			commonjs(),
 		],
 	},
@@ -44,8 +48,8 @@ export default [
 		},
 		external: Object.keys(pkg.peerDependencies || {}),
 		plugins: [
-			resolve(),
 			babelPlugin,
+			resolve(),
 			commonjs(),
 			uglify(),
 		],
@@ -61,8 +65,8 @@ export default [
 		},
 		external: Object.keys(pkg.peerDependencies || {}),
 		plugins: [
-			resolve(),
 			babelPlugin,
+			resolve(),
 			commonjs(),
 		],
 	},

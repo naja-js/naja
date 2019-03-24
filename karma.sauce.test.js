@@ -40,12 +40,6 @@ module.exports = (config) => {
       platform: 'Windows 10',
       version: 'latest-1'
     },
-    'msie11': {
-      base: 'SauceLabs',
-      browserName: 'internet explorer',
-      platform: 'Windows 10',
-      version: '11.103'
-    },
 
     'safari12': {
       base: 'SauceLabs',

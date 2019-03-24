@@ -48,11 +48,14 @@ export default class HistoryHandler {
 		}
 	}
 
-	saveUrl({url}) {
+	saveUrl(event) {
+		const {url} = event.detail;
 		this.href = url;
 	}
 
-	configureMode({element, options}) {
+	configureMode(event) {
+		const {element, options} = event.detail;
+
 		// propagate mode to options
 		if ( ! element) {
 			return;
@@ -78,7 +81,8 @@ export default class HistoryHandler {
 		return true;
 	}
 
-	pushNewState({payload, options}) {
+	pushNewState(event) {
+		const {payload, options} = event.detail;
 		const mode = this.constructor.normalizeMode(options.history);
 		if (mode === false) {
 			return;

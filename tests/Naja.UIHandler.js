@@ -279,9 +279,11 @@ describe('UIHandler', function () {
 			};
 			handler.handleUI(evt);
 
-			assert.isTrue(listener.calledWithMatch(sinon.match.object
-				.and(sinon.match.has('element', this.a))
-				.and(sinon.match.has('originalEvent', evt))
+			assert.isTrue(listener.calledWith(sinon.match.instanceOf(CustomEvent)
+				.and(sinon.match.has('detail', sinon.match.object
+					.and(sinon.match.has('element', this.a))
+					.and(sinon.match.has('originalEvent', evt))
+				))
 			));
 
 			mock.verify();
@@ -289,7 +291,7 @@ describe('UIHandler', function () {
 
 		it('interaction event listener can abort request', function () {
 			const naja = mockNaja();
-			naja.addEventListener('interaction', evt => evt.preventDefault());
+			naja.addEventListener('interaction', (evt) => evt.preventDefault());
 
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
@@ -309,8 +311,8 @@ describe('UIHandler', function () {
 
 		it('interaction event listener can alter options', function () {
 			const naja = mockNaja();
-			naja.addEventListener('interaction', ({options}) => {
-				options.foo = 42;
+			naja.addEventListener('interaction', (event) => {
+				event.detail.options.foo = 42;
 			});
 
 			const mock = sinon.mock(naja);
@@ -460,9 +462,11 @@ describe('UIHandler', function () {
 			const handler = new UIHandler(naja);
 			handler.clickElement(a);
 
-			assert.isTrue(listener.calledWithMatch(sinon.match.object
-				.and(sinon.match.has('element', a))
-				.and(sinon.match.has('originalEvent', undefined))
+			assert.isTrue(listener.calledWith(sinon.match.instanceOf(CustomEvent)
+				.and(sinon.match.has('detail', sinon.match.object
+					.and(sinon.match.has('element', a))
+					.and(sinon.match.has('originalEvent', undefined))
+				))
 			));
 
 			mock.verify();
@@ -506,9 +510,11 @@ describe('UIHandler', function () {
 			const handler = new UIHandler(naja);
 			handler.submitForm(form);
 
-			assert.isTrue(listener.calledWithMatch(sinon.match.object
-				.and(sinon.match.has('element', form))
-				.and(sinon.match.has('originalEvent', undefined))
+			assert.isTrue(listener.calledWith(sinon.match.instanceOf(CustomEvent)
+				.and(sinon.match.has('detail', sinon.match.object
+					.and(sinon.match.has('element', form))
+					.and(sinon.match.has('originalEvent', undefined))
+				))
 			));
 
 			mock.verify();

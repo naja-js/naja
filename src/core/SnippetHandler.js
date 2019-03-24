@@ -1,10 +1,8 @@
-import EventTarget from 'event-target-shim';
-
-
 export default class SnippetHandler extends EventTarget {
 	constructor(naja) {
 		super();
-		naja.addEventListener('success', ({payload}) => {
+		naja.addEventListener('success', (event) => {
+			const {payload} = event.detail;
 			if (payload.snippets) {
 				this.updateSnippets(payload.snippets);
 			}
@@ -21,12 +19,13 @@ export default class SnippetHandler extends EventTarget {
 	}
 
 	updateSnippet(el, content, forceReplace) {
-		const canUpdate = this.dispatchEvent({
-			type: 'beforeUpdate',
+		const canUpdate = this.dispatchEvent(new CustomEvent('beforeUpdate', {
 			cancelable: true,
-			snippet: el,
-			content,
-		});
+			detail: {
+				snippet: el,
+				content,
+			},
+		}));
 
 		if ( ! canUpdate) {
 			return;
@@ -47,11 +46,12 @@ export default class SnippetHandler extends EventTarget {
 			}
 		}
 
-		this.dispatchEvent({
-			type: 'afterUpdate',
+		this.dispatchEvent(new CustomEvent('afterUpdate', {
 			cancelable: true,
-			snippet: el,
-			content,
-		});
+			detail: {
+				snippet: el,
+				content,
+			},
+		}));
 	}
 }

@@ -168,16 +168,20 @@ describe('SnippetHandler', function () {
 		snippetHandler.updateSnippet(el, 'Bar');
 
 		assert.isTrue(beforeCallback.calledOnce);
-		assert.isTrue(beforeCallback.calledWith(sinon.match.object
-			.and(sinon.match.has('snippet', el))
-			.and(sinon.match.has('content', sinon.match.string))
+		assert.isTrue(beforeCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+			.and(sinon.match.has('detail', sinon.match.object
+				.and(sinon.match.has('snippet', el))
+				.and(sinon.match.has('content', sinon.match.string))
+			))
 		));
 
 		assert.isTrue(afterCallback.calledOnce);
 		assert.isTrue(afterCallback.calledAfter(beforeCallback));
-		assert.isTrue(beforeCallback.calledWith(sinon.match.object
-			.and(sinon.match.has('snippet', el))
-			.and(sinon.match.has('content', sinon.match.string))
+		assert.isTrue(beforeCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+			.and(sinon.match.has('detail', sinon.match.object
+				.and(sinon.match.has('snippet', el))
+				.and(sinon.match.has('content', sinon.match.string))
+			))
 		));
 
 		document.body.removeChild(el);
@@ -199,9 +203,11 @@ describe('SnippetHandler', function () {
 		snippetHandler.updateSnippet(el, 'Bar');
 
 		assert.isTrue(beforeCallback.calledOnce);
-		assert.isTrue(beforeCallback.calledWith(sinon.match.object
-			.and(sinon.match.has('snippet', el))
-			.and(sinon.match.has('content', sinon.match.string))
+		assert.isTrue(beforeCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+			.and(sinon.match.has('detail', sinon.match.object
+				.and(sinon.match.has('snippet', el))
+				.and(sinon.match.has('content', sinon.match.string))
+			))
 		));
 
 		assert.isFalse(afterCallback.called);

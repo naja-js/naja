@@ -8,11 +8,13 @@ export default class UniqueExtension {
 
 	previousAbortController = null;
 
-	checkUniqueness({element, options}) {
+	checkUniqueness(event) {
+		const {element, options} = event.detail;
 		options.unique = element.getAttribute('data-naja-unique') !== 'off';
 	}
 
-	abortPreviousRequest({abortController, options}) {
+	abortPreviousRequest(event) {
+		const {abortController, options} = event.detail;
 		if (this.previousAbortController !== null && options.unique !== false) {
 			this.previousAbortController.abort();
 		}

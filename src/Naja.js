@@ -1,5 +1,3 @@
-import EventTarget from 'event-target-shim';
-
 import UIHandler from './core/UIHandler';
 import FormsHandler from './core/FormsHandler';
 import RedirectHandler from './core/RedirectHandler';
@@ -57,9 +55,12 @@ export default class Naja extends EventTarget {
 	}
 
 
-	fireEvent(type, args = {}) {
-		const evt = {...args, type, cancelable: true};
-		return this.dispatchEvent(evt);
+	fireEvent(type, detail = {}) {
+		const event = new CustomEvent(type, {
+			cancelable: true,
+			detail,
+		});
+		return this.dispatchEvent(event);
 	}
 
 

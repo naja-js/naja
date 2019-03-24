@@ -1,6 +1,6 @@
 import mockNaja from './setup/mockNaja';
 import fakeFetch from './setup/fakeFetch';
-import cleanPopstateListener from "./setup/cleanPopstateListener";
+import cleanPopstateListener from './setup/cleanPopstateListener';
 import {assert} from 'chai';
 import sinon from 'sinon';
 
@@ -34,40 +34,48 @@ describe('makeRequest()', function () {
 		return request.then(() => {
 			assert.isTrue(beforeCallback.called);
 			assert.isTrue(beforeCallback.calledBefore(startCallback));
-			assert.isTrue(beforeCallback.calledWith(sinon.match.object
-				.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
-				.and(sinon.match.has('method', sinon.match.string))
-				.and(sinon.match.has('url', sinon.match.string))
-				.and(sinon.match.has('data'))
-				.and(sinon.match.has('options', sinon.match.object))
+			assert.isTrue(beforeCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+				.and(sinon.match.has('detail', sinon.match.object
+					.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
+					.and(sinon.match.has('method', sinon.match.string))
+					.and(sinon.match.has('url', sinon.match.string))
+					.and(sinon.match.has('data'))
+					.and(sinon.match.has('options', sinon.match.object))
+				))
 			));
 
 			assert.isTrue(startCallback.called);
 			assert.isTrue(startCallback.calledBefore(successCallback));
-			assert.isTrue(startCallback.calledWith(sinon.match.object
-				.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
-				.and(sinon.match.has('promise', sinon.match.instanceOf(Promise)))
-				.and(sinon.match.has('abortController', sinon.match.instanceOf(AbortController)))
-				.and(sinon.match.has('options', sinon.match.object))
+			assert.isTrue(startCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+				.and(sinon.match.has('detail', sinon.match.object
+					.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
+					.and(sinon.match.has('promise', sinon.match.instanceOf(Promise)))
+					.and(sinon.match.has('abortController', sinon.match.instanceOf(AbortController)))
+					.and(sinon.match.has('options', sinon.match.object))
+				))
 			));
 
 			assert.isTrue(successCallback.called);
 			assert.isTrue(successCallback.calledBefore(completeCallback));
-			assert.isTrue(successCallback.calledWith(sinon.match.object
-				.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
-				.and(sinon.match.has('response', sinon.match.instanceOf(Response)))
-				.and(sinon.match.has('payload'))
-				.and(sinon.match.has('options', sinon.match.object))
+			assert.isTrue(successCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+				.and(sinon.match.has('detail', sinon.match.object
+					.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
+					.and(sinon.match.has('response', sinon.match.instanceOf(Response)))
+					.and(sinon.match.has('payload'))
+					.and(sinon.match.has('options', sinon.match.object))
+				))
 			));
 
 			assert.isTrue(completeCallback.called);
 			assert.isTrue(completeCallback.calledBefore(loadCallback));
-			assert.isTrue(completeCallback.calledWith(sinon.match.object
-				.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
-				.and(sinon.match.has('response', sinon.match.instanceOf(Response)))
-				.and(sinon.match.has('payload'))
-				.and(sinon.match.has('error', undefined))
-				.and(sinon.match.has('options', sinon.match.object))
+			assert.isTrue(completeCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+				.and(sinon.match.has('detail', sinon.match.object
+					.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
+					.and(sinon.match.has('response', sinon.match.instanceOf(Response)))
+					.and(sinon.match.has('payload'))
+					.and(sinon.match.has('error', undefined))
+					.and(sinon.match.has('options', sinon.match.object))
+				))
 			));
 
 			assert.isTrue(loadCallback.called);
@@ -110,40 +118,48 @@ describe('makeRequest()', function () {
 		const request = naja.makeRequest('GET', '/makeRequest/error/events');
 
 		return request.catch(() => {
-			assert.isTrue(beforeCallback.calledWith(sinon.match.object
-				.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
-				.and(sinon.match.has('method', sinon.match.string))
-				.and(sinon.match.has('url', sinon.match.string))
-				.and(sinon.match.has('data'))
-				.and(sinon.match.has('options', sinon.match.object))
+			assert.isTrue(beforeCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+				.and(sinon.match.has('detail', sinon.match.object
+					.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
+					.and(sinon.match.has('method', sinon.match.string))
+					.and(sinon.match.has('url', sinon.match.string))
+					.and(sinon.match.has('data'))
+					.and(sinon.match.has('options', sinon.match.object))
+				))
 			));
 
 			assert.isTrue(startCallback.called);
 			assert.isTrue(startCallback.calledBefore(successCallback));
-			assert.isTrue(startCallback.calledWith(sinon.match.object
-				.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
-				.and(sinon.match.has('promise', sinon.match.instanceOf(Promise)))
-				.and(sinon.match.has('abortController', sinon.match.instanceOf(AbortController)))
-				.and(sinon.match.has('options', sinon.match.object))
+			assert.isTrue(startCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+				.and(sinon.match.has('detail', sinon.match.object
+					.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
+					.and(sinon.match.has('promise', sinon.match.instanceOf(Promise)))
+					.and(sinon.match.has('abortController', sinon.match.instanceOf(AbortController)))
+					.and(sinon.match.has('options', sinon.match.object))
+				))
 			));
 
 			assert.isTrue(errorCallback.called);
 			assert.isTrue(errorCallback.calledBefore(completeCallback));
-			assert.isTrue(errorCallback.calledWith(sinon.match.object
-				.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
-				.and(sinon.match.has('response', sinon.match.instanceOf(Response)))
-				.and(sinon.match.has('error', sinon.match.truthy))
-				.and(sinon.match.has('options', sinon.match.object))
+			assert.isTrue(errorCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+				.and(sinon.match.has('detail', sinon.match.object
+					.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
+					.and(sinon.match.has('response', sinon.match.instanceOf(Response)))
+					.and(sinon.match.has('error', sinon.match.truthy))
+					.and(sinon.match.has('options', sinon.match.object))
+				))
 			));
 
 			assert.isTrue(completeCallback.called);
 			assert.isTrue(completeCallback.calledBefore(loadCallback));
-			assert.isTrue(completeCallback.calledWith(sinon.match.object
-				.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
-				.and(sinon.match.has('response', sinon.match.instanceOf(Response)))
-				.and(sinon.match.has('payload', undefined))
-				.and(sinon.match.has('error', sinon.match.truthy))
-				.and(sinon.match.has('options', sinon.match.object))
+			assert.isTrue(completeCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+				.and(sinon.match.has('detail', sinon.match.object
+					.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
+					.and(sinon.match.has('response', sinon.match.instanceOf(Response)))
+					.and(sinon.match.has('payload', undefined))
+					.and(sinon.match.has('error', sinon.match.truthy))
+					.and(sinon.match.has('options', sinon.match.object))
+				))
 			));
 
 			assert.isTrue(loadCallback.called);
@@ -191,40 +207,48 @@ describe('makeRequest()', function () {
 		const request = naja.makeRequest('GET', '/makeRequest/error/events');
 
 		return request.catch(() => {
-			assert.isTrue(beforeCallback.calledWith(sinon.match.object
-				.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
-				.and(sinon.match.has('method', sinon.match.string))
-				.and(sinon.match.has('url', sinon.match.string))
-				.and(sinon.match.has('data'))
-				.and(sinon.match.has('options', sinon.match.object))
+			assert.isTrue(beforeCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+				.and(sinon.match.has('detail', sinon.match.object
+					.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
+					.and(sinon.match.has('method', sinon.match.string))
+					.and(sinon.match.has('url', sinon.match.string))
+					.and(sinon.match.has('data'))
+					.and(sinon.match.has('options', sinon.match.object))
+				))
 			));
 
 			assert.isTrue(startCallback.called);
 			assert.isTrue(startCallback.calledBefore(successCallback));
-			assert.isTrue(startCallback.calledWith(sinon.match.object
-				.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
-				.and(sinon.match.has('promise', sinon.match.instanceOf(Promise)))
-				.and(sinon.match.has('abortController', sinon.match.instanceOf(AbortController)))
-				.and(sinon.match.has('options', sinon.match.object))
+			assert.isTrue(startCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+				.and(sinon.match.has('detail', sinon.match.object
+					.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
+					.and(sinon.match.has('promise', sinon.match.instanceOf(Promise)))
+					.and(sinon.match.has('abortController', sinon.match.instanceOf(AbortController)))
+					.and(sinon.match.has('options', sinon.match.object))
+				))
 			));
 
 			assert.isTrue(errorCallback.called);
 			assert.isTrue(errorCallback.calledBefore(completeCallback));
-			assert.isTrue(errorCallback.calledWith(sinon.match.object
-				.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
-				.and(sinon.match.has('response', undefined))
-				.and(sinon.match.has('error', error))
-				.and(sinon.match.has('options', sinon.match.object))
+			assert.isTrue(errorCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+				.and(sinon.match.has('detail', sinon.match.object
+					.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
+					.and(sinon.match.has('response', undefined))
+					.and(sinon.match.has('error', error))
+					.and(sinon.match.has('options', sinon.match.object))
+				))
 			));
 
 			assert.isTrue(completeCallback.called);
 			assert.isTrue(completeCallback.calledBefore(loadCallback));
-			assert.isTrue(completeCallback.calledWith(sinon.match.object
-				.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
-				.and(sinon.match.has('response', undefined))
-				.and(sinon.match.has('payload', undefined))
-				.and(sinon.match.has('error', error))
-				.and(sinon.match.has('options', sinon.match.object))
+			assert.isTrue(completeCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+				.and(sinon.match.has('detail', sinon.match.object
+					.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
+					.and(sinon.match.has('response', undefined))
+					.and(sinon.match.has('payload', undefined))
+					.and(sinon.match.has('error', error))
+					.and(sinon.match.has('options', sinon.match.object))
+				))
 			));
 
 			assert.isTrue(loadCallback.called);
@@ -268,22 +292,26 @@ describe('makeRequest()', function () {
 			assert.deepEqual(payload, {});
 
 			assert.isTrue(abortCallback.called);
-			assert.isTrue(abortCallback.calledWith(sinon.match.object
-				.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
-				.and(sinon.match.has('error', sinon.match.truthy))
-				.and(sinon.match.has('options', sinon.match.object))
+			assert.isTrue(abortCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+				.and(sinon.match.has('detail', sinon.match.object
+					.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
+					.and(sinon.match.has('error', sinon.match.truthy))
+					.and(sinon.match.has('options', sinon.match.object))
+				))
 			));
 
 			assert.isFalse(successCallback.called);
 			assert.isFalse(errorCallback.called);
 
 			assert.isTrue(completeCallback.called);
-			assert.isTrue(completeCallback.calledWith(sinon.match.object
-				.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
-				.and(sinon.match.has('response', undefined))
-				.and(sinon.match.has('payload', undefined))
-				.and(sinon.match.has('error', sinon.match.truthy))
-				.and(sinon.match.has('options', sinon.match.object))
+			assert.isTrue(completeCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+				.and(sinon.match.has('detail', sinon.match.object
+					.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
+					.and(sinon.match.has('response', undefined))
+					.and(sinon.match.has('payload', undefined))
+					.and(sinon.match.has('error', sinon.match.truthy))
+					.and(sinon.match.has('options', sinon.match.object))
+				))
 			));
 		});
 	});
@@ -318,8 +346,10 @@ describe('makeRequest()', function () {
 
 			return request.then(() => {
 				assert.isTrue(beforeCallback.called);
-				assert.isTrue(beforeCallback.calledWith(sinon.match.object
-					.and(sinon.match.has('options', sinon.match.object))
+				assert.isTrue(beforeCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+					.and(sinon.match.has('detail', sinon.match.object
+						.and(sinon.match.has('options', sinon.match.object))
+					))
 				));
 			});
 		});
@@ -341,9 +371,11 @@ describe('makeRequest()', function () {
 
 			return request.then(() => {
 				assert.isTrue(beforeCallback.called);
-				assert.isTrue(beforeCallback.calledWith(sinon.match.object
-					.and(sinon.match.has('options', sinon.match.object
-						.and(sinon.match.has('customOption', 24))
+				assert.isTrue(beforeCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+					.and(sinon.match.has('detail', sinon.match.object
+						.and(sinon.match.has('options', sinon.match.object
+							.and(sinon.match.has('customOption', 24))
+						))
 					))
 				));
 			});

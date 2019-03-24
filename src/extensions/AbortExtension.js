@@ -23,7 +23,8 @@ export default class AbortExtension {
 		});
 	}
 
-	checkAbortable({element, options}) {
+	checkAbortable(event) {
+		const {element, options} = event.detail;
 		this.abortable = element
 			? element.getAttribute('data-naja-abort') !== 'off'
 			: options.abort !== false;
@@ -32,7 +33,8 @@ export default class AbortExtension {
 		options.abort = this.abortable;
 	}
 
-	saveAbortController({abortController}) {
+	saveAbortController(event) {
+		const {abortController} = event.detail;
 		this.abortController = abortController;
 	}
 

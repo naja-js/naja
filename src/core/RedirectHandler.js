@@ -2,8 +2,8 @@ export default class RedirectHandler {
 	constructor(naja) {
 		this.naja = naja;
 
-		naja.addEventListener('interaction', (evt) => {
-			const {element, options} = evt;
+		naja.addEventListener('interaction', (event) => {
+			const {element, options} = event.detail;
 			if ( ! element) {
 				return;
 			}
@@ -13,8 +13,8 @@ export default class RedirectHandler {
 			}
 		});
 
-		naja.addEventListener('success', (evt) => {
-			const {payload, options} = evt;
+		naja.addEventListener('success', (event) => {
+			const {payload, options} = event.detail;
 			if (payload.redirect) {
 				if ('forceRedirect' in payload) {
 					// eslint-disable-next-line no-console
@@ -25,7 +25,7 @@ export default class RedirectHandler {
 				}
 
 				this.makeRedirect(payload.redirect, payload.forceRedirect || options.forceRedirect, options);
-				evt.stopImmediatePropagation();
+				event.stopImmediatePropagation();
 			}
 		});
 
