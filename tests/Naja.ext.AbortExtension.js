@@ -9,19 +9,12 @@ describe('AbortExtension', function () {
 	fakeFetch();
 
 	const createKeyboardEvent = () => {
-		if (typeof(KeyboardEvent) === 'function') {
-			return new KeyboardEvent('keydown', {
-				bubbles: true,
-				cancelable: true,
-				key: 'Escape',
-				keyCode: 27,
-			});
-
-		} else {
-			const event = document.createEvent('KeyboardEvent');
-			event.initKeyboardEvent('keydown', true, true, document.defaultView, 'Escape', 27, '', '', false, '');
-			return event;
-		}
+		return new KeyboardEvent('keydown', {
+			bubbles: true,
+			cancelable: true,
+			key: 'Escape',
+			keyCode: 27,
+		});
 	};
 
 	it('aborts request on Esc', function () {
@@ -42,6 +35,8 @@ describe('AbortExtension', function () {
 		const evt = createKeyboardEvent();
 		if (evt.key === 'Escape' || evt.keyCode === 27) {
 			document.dispatchEvent(evt);
+		} else {
+			this.skip();
 		}
 
 		return request.catch((error) => {
@@ -71,6 +66,8 @@ describe('AbortExtension', function () {
 		const evt = createKeyboardEvent();
 		if (evt.key === 'Escape' || evt.keyCode === 27) {
 			document.dispatchEvent(evt);
+		} else {
+			this.skip();
 		}
 
 		return request;

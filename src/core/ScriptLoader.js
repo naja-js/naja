@@ -1,6 +1,7 @@
 export default class ScriptLoader {
 	constructor(naja) {
-		naja.addEventListener('success', ({payload}) => {
+		naja.addEventListener('success', (event) => {
+			const {payload} = event.detail;
 			if (payload.snippets) {
 				this.loadScripts(payload.snippets);
 			}

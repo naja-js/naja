@@ -34,9 +34,12 @@ describe('Naja.js', function () {
 
 			const defaultOptions = {answer: 42};
 			naja.initialize(defaultOptions);
+
 			assert.isTrue(initCallback.calledOnce);
-			assert.isTrue(initCallback.calledWith(sinon.match.object
-				.and(sinon.match.has('defaultOptions', defaultOptions))
+			assert.isTrue(initCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+				.and(sinon.match.has('detail', sinon.match.object
+					.and(sinon.match.has('defaultOptions', defaultOptions))
+				))
 			));
 		});
 	});
@@ -46,7 +49,7 @@ describe('Naja.js', function () {
 			const naja = mockNaja();
 			let initCalled = false;
 
-			naja.addEventListener('init', evt => initCalled = true);
+			naja.addEventListener('init', () => initCalled = true);
 			naja.initialize();
 
 			assert.isTrue(initCalled);
@@ -57,8 +60,8 @@ describe('Naja.js', function () {
 			let loadCalled = false;
 			let loadCalled2 = false;
 
-			naja.addEventListener('load', evt => { loadCalled = true; evt.stopImmediatePropagation(); });
-			naja.addEventListener('load', evt => loadCalled2 = true);
+			naja.addEventListener('load', (evt) => { loadCalled = true; evt.stopImmediatePropagation(); });
+			naja.addEventListener('load', () => loadCalled2 = true);
 			naja.initialize();
 
 			assert.isTrue(loadCalled);
@@ -69,7 +72,7 @@ describe('Naja.js', function () {
 			const naja = mockNaja();
 			assert.isTrue(naja.fireEvent('foo'));
 
-			naja.addEventListener('foo', evt => evt.preventDefault());
+			naja.addEventListener('foo', (evt) => evt.preventDefault());
 			assert.isFalse(naja.fireEvent('foo'));
 		});
 	});

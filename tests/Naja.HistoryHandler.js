@@ -1,6 +1,6 @@
 import mockNaja from './setup/mockNaja';
 import fakeFetch from './setup/fakeFetch';
-import cleanPopstateListener from "./setup/cleanPopstateListener";
+import cleanPopstateListener from './setup/cleanPopstateListener';
 import {assert} from 'chai';
 import sinon from 'sinon';
 
@@ -415,19 +415,11 @@ describe('HistoryHandler', function () {
 
 
 	const createPopStateEvent = (state) => {
-		if (typeof(PopStateEvent) === 'function') {
-			return new PopStateEvent('popstate', {
-				bubbles: true,
-				cancelable: true,
-				state,
-			});
-
-		} else {
-			// https://msdn.microsoft.com/en-us/library/dn705473(v=vs.85).aspx
-			const event = document.createEvent('PopStateEvent');
-			event.initPopStateEvent('popstate', true, true, state);
-			return event;
-		}
+		return new PopStateEvent('popstate', {
+			bubbles: true,
+			cancelable: true,
+			state,
+		});
 	};
 
 

@@ -216,9 +216,11 @@ describe('RedirectHandler', function () {
 			mock.verify();
 
 			assert.isTrue(redirectCallback.calledOnce);
-			assert.isTrue(redirectCallback.calledWith(sinon.match.object
-				.and(sinon.match.has('url', '/RedirectHandler/event/preventDefault'))
-				.and(sinon.match.has('isHardRedirect', true))
+			assert.isTrue(redirectCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+				.and(sinon.match.has('detail', sinon.match.object
+					.and(sinon.match.has('url', '/RedirectHandler/event/preventDefault'))
+					.and(sinon.match.has('isHardRedirect', true))
+				))
 			));
 		});
 
@@ -226,7 +228,7 @@ describe('RedirectHandler', function () {
 			const naja = mockNaja();
 			const redirectHandler = new RedirectHandler(naja);
 
-			const redirectCallback = sinon.spy((evt) => evt.setHardRedirect(true));
+			const redirectCallback = sinon.spy((event) => event.detail.setHardRedirect(true));
 			redirectHandler.addEventListener('redirect', redirectCallback);
 
 			const uiHandlerMock = sinon.mock(naja.uiHandler);
@@ -242,9 +244,11 @@ describe('RedirectHandler', function () {
 			uiHandlerMock.verify();
 
 			assert.isTrue(redirectCallback.calledOnce);
-			assert.isTrue(redirectCallback.calledWith(sinon.match.object
-				.and(sinon.match.has('url', '/RedirectHandler/event/setHardRedirect'))
-				.and(sinon.match.has('isHardRedirect', false))
+			assert.isTrue(redirectCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+				.and(sinon.match.has('detail', sinon.match.object
+					.and(sinon.match.has('url', '/RedirectHandler/event/setHardRedirect'))
+					.and(sinon.match.has('isHardRedirect', false))
+				))
 			));
 		});
 	});
