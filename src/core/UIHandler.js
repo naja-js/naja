@@ -82,7 +82,7 @@ export default class UIHandler {
 	clickElement(el, options = {}, evt) {
 		let method, url, data;
 
-		if ( ! this.naja.fireEvent('interaction', {element: el, originalEvent: evt, options})) {
+		if ( ! this.naja.dispatchEvent(new CustomEvent('interaction', {detail: {element: el, originalEvent: evt, options}}))) {
 			if (evt) {
 				evt.preventDefault();
 			}
@@ -121,7 +121,7 @@ export default class UIHandler {
 	}
 
 	submitForm(form, options = {}, evt) {
-		if ( ! this.naja.fireEvent('interaction', {element: form, originalEvent: evt, options})) {
+		if ( ! this.naja.dispatchEvent(new CustomEvent('interaction', {detail: {element: element, originalEvent: evt, options}}))) {
 			if (evt) {
 				evt.preventDefault();
 			}

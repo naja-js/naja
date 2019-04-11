@@ -44,23 +44,14 @@ export default class Naja extends EventTarget {
 		this.defaultOptions = defaultOptions;
 		this.extensions = this.extensions.map(([extensionClass, args]) => new extensionClass(this, ...args));
 
-		this.fireEvent('init', {defaultOptions});
+		this.dispatchEvent(new CustomEvent('init', {detail: {defaultOptions}}));
 		this.initialized = true;
 		this.load();
 	}
 
 
 	load() {
-		this.fireEvent('load');
-	}
-
-
-	fireEvent(type, detail = {}) {
-		const event = new CustomEvent(type, {
-			cancelable: true,
-			detail,
-		});
-		return this.dispatchEvent(event);
+		this.dispatchEvent(new CustomEvent('load'));
 	}
 
 
@@ -89,12 +80,12 @@ export default class Naja extends EventTarget {
 		// impersonate XHR so that Nette can detect isAjax()
 		request.headers.set('X-Requested-With', 'XMLHttpRequest');
 
-		if ( ! this.fireEvent('before', {request, method, url, data, options})) {
+		if ( ! this.dispatchEvent(new CustomEvent('before', {cancelable: true, detail: {request, method, url, data, options}}))) {
 			return {};
 		}
 
 		const promise = window.fetch(request);
-		this.fireEvent('start', {request, promise, abortController, options});
+		this.dispatchEvent(new CustomEvent('start', {detail: {request, promise, abortController, options}}));
 
 		let response, payload;
 
@@ -108,20 +99,20 @@ export default class Naja extends EventTarget {
 
 		} catch (error) {
 			if (error.name === 'AbortError') {
-				this.fireEvent('abort', {request, error, options});
-				this.fireEvent('complete', {request, response, payload: undefined, error, options});
+				this.dispatchEvent(new CustomEvent('abort', {detail: {request, error, options}}));
+				this.dispatchEvent(new CustomEvent('complete', {detail: {request, response, payload: undefined, error, options}}));
 				return {};
 			}
 
-			this.fireEvent('error', {request, response, error, options});
-			this.fireEvent('complete', {request, response, payload: undefined, error, options});
+			this.dispatchEvent(new CustomEvent('error', {detail: {request, response, error, options}}));
+			this.dispatchEvent(new CustomEvent('complete', {detail: {request, response, payload: undefined, error, options}}));
 			this.load();
 
 			throw error;
 		}
 
-		this.fireEvent('success', {request, response, payload, options});
-		this.fireEvent('complete', {request, response, payload, error: undefined, options});
+		this.dispatchEvent(new CustomEvent('success', {detail: {request, response, payload, options}}));
+		this.dispatchEvent(new CustomEvent('complete', {detail: {request, response, payload, error: undefined, options}}));
 		this.load();
 
 		return payload;
