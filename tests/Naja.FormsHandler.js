@@ -1,10 +1,10 @@
-import mockNaja from './setup/mockNaja';
+import {mockNaja} from './setup/mockNaja';
 import {assert} from 'chai';
 import netteForms from 'nette-forms';
 import sinon from 'sinon';
 
-import FormsHandler from '../src/core/FormsHandler';
-import SnippetHandler from '../src/core/SnippetHandler';
+import {FormsHandler} from '../src/core/FormsHandler';
+import {SnippetHandler} from '../src/core/SnippetHandler';
 
 
 describe('FormsHandler', function () {

@@ -1,4 +1,4 @@
-export default class FormsHandler {
+export class FormsHandler {
 	netteForms;
 
 	constructor(naja) {

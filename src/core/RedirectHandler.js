@@ -1,4 +1,4 @@
-export default class RedirectHandler extends EventTarget {
+export class RedirectHandler extends EventTarget {
 	constructor(naja) {
 		super();
 		this.naja = naja;

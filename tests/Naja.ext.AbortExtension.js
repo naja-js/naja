@@ -1,8 +1,8 @@
-import mockNaja from './setup/mockNaja';
-import fakeFetch from './setup/fakeFetch';
+import {mockNaja} from './setup/mockNaja';
+import {fakeFetch} from './setup/fakeFetch';
 import {assert} from 'chai';
 
-import AbortExtension from '../src/extensions/AbortExtension';
+import {AbortExtension} from '../src/extensions/AbortExtension';
 
 
 describe('AbortExtension', function () {
