@@ -1,12 +1,11 @@
-import UIHandler from './core/UIHandler';
-import FormsHandler from './core/FormsHandler';
-import RedirectHandler from './core/RedirectHandler';
-import SnippetHandler from './core/SnippetHandler';
-import HistoryHandler from './core/HistoryHandler';
-import ScriptLoader from './core/ScriptLoader';
+import {UIHandler} from './core/UIHandler';
+import {FormsHandler} from './core/FormsHandler';
+import {RedirectHandler} from './core/RedirectHandler';
+import {SnippetHandler} from './core/SnippetHandler';
+import {HistoryHandler} from './core/HistoryHandler';
+import {ScriptLoader} from './core/ScriptLoader';
 
-
-export default class Naja extends EventTarget {
+export class Naja extends EventTarget {
 	initialized = false;
 
 	uiHandler = null;
@@ -119,7 +118,7 @@ export default class Naja extends EventTarget {
 	}
 }
 
-class HttpError extends Error {
+export class HttpError extends Error {
 	constructor(response) {
 		const message = `HTTP ${response.status}: ${response.statusText}`;
 		super(message);

@@ -1,10 +1,10 @@
-import mockNaja from './setup/mockNaja';
-import fakeFetch from './setup/fakeFetch';
+import {mockNaja} from './setup/mockNaja';
+import {fakeFetch} from './setup/fakeFetch';
 import {assert} from 'chai';
 import sinon from 'sinon';
 
-import RedirectHandler from '../src/core/RedirectHandler';
-import UIHandler from '../src/core/UIHandler';
+import {RedirectHandler} from '../src/core/RedirectHandler';
+import {UIHandler} from '../src/core/UIHandler';
 
 
 describe('RedirectHandler', function () {

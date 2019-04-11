@@ -1,8 +1,8 @@
-import mockNaja from './setup/mockNaja';
-import fakeFetch from './setup/fakeFetch';
+import {mockNaja} from './setup/mockNaja';
+import {fakeFetch} from './setup/fakeFetch';
 import {assert} from 'chai';
 
-import UniqueExtension from '../src/extensions/UniqueExtension';
+import {UniqueExtension} from '../src/extensions/UniqueExtension';
 
 
 describe('UniqueExtension', function () {

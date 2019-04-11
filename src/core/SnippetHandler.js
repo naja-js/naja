@@ -1,4 +1,4 @@
-export default class SnippetHandler extends EventTarget {
+export class SnippetHandler extends EventTarget {
 	constructor(naja) {
 		super();
 		naja.addEventListener('success', (event) => {

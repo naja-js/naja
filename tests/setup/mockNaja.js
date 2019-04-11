@@ -1,4 +1,4 @@
-import Naja from '../../src/Naja';
+import {Naja} from '../../src/Naja';
 
 
 class UIHandlerMock {
@@ -24,7 +24,7 @@ class ScriptLoaderMock {
 }
 
 
-export default (mocks = {}) => {
+export const mockNaja = (mocks = {}) => {
 	return new Naja(
 		mocks.uiHandler || UIHandlerMock,
 		mocks.redirectHandler || RedirectHandlerMock,

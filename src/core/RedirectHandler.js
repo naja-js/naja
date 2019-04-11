@@ -1,4 +1,4 @@
-export default class RedirectHandler {
+export class RedirectHandler {
 	constructor(naja) {
 		this.naja = naja;
 

@@ -1,9 +1,9 @@
-import mockNaja from './setup/mockNaja';
+import {mockNaja} from './setup/mockNaja';
 import {assert} from 'chai';
 import sinon from 'sinon';
 
-import UIHandler from '../src/core/UIHandler';
-import SnippetHandler from '../src/core/SnippetHandler';
+import {UIHandler} from '../src/core/UIHandler';
+import {SnippetHandler} from '../src/core/SnippetHandler';
 
 
 describe('UIHandler', function () {

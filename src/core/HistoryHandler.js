@@ -1,4 +1,4 @@
-export default class HistoryHandler {
+export class HistoryHandler {
 	href = null;
 	uiCache = true;
 

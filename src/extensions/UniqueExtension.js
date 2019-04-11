@@ -1,4 +1,4 @@
-export default class UniqueExtension {
+export class UniqueExtension {
 	constructor(naja) {
 		naja.addEventListener('interaction', this.checkUniqueness.bind(this));
 		naja.addEventListener('start', this.abortPreviousRequest.bind(this));

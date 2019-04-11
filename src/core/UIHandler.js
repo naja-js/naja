@@ -1,6 +1,4 @@
-const matchesMethodName = 'matches' in Element.prototype ? 'matches' : 'msMatchesSelector';
-
-export default class UIHandler {
+export class UIHandler {
 	selector = '.ajax';
 	allowedOrigins = [];
 	handler;
