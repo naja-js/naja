@@ -1,9 +1,9 @@
-import mockNaja from './setup/mockNaja';
-import fakeFetch from './setup/fakeFetch';
+import {mockNaja} from './setup/mockNaja';
+import {fakeFetch} from './setup/fakeFetch';
 import {assert} from 'chai';
 import sinon from 'sinon';
 
-import SnippetHandler from '../src/core/SnippetHandler';
+import {SnippetHandler} from '../src/core/SnippetHandler';
 
 
 describe('SnippetHandler', function () {

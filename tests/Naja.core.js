@@ -1,5 +1,5 @@
-import Naja from '../src/Naja';
-import mockNaja from './setup/mockNaja';
+import {Naja} from '../src/Naja';
+import {mockNaja} from './setup/mockNaja';
 import {assert} from 'chai';
 import sinon from 'sinon';
 

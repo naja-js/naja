@@ -1,6 +1,6 @@
-import mockNaja from './setup/mockNaja';
-import fakeFetch from './setup/fakeFetch';
-import cleanPopstateListener from './setup/cleanPopstateListener';
+import {mockNaja} from './setup/mockNaja';
+import {fakeFetch} from './setup/fakeFetch';
+import {cleanPopstateListener} from './setup/cleanPopstateListener';
 import {assert} from 'chai';
 import sinon from 'sinon';
 

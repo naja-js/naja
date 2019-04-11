@@ -1,4 +1,4 @@
-export default class AbortExtension {
+export class AbortExtension {
 	constructor(naja) {
 		naja.addEventListener('init', this.initialize.bind(this));
 		naja.addEventListener('interaction', this.checkAbortable.bind(this));

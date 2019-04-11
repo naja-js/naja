@@ -1,12 +1,12 @@
-import mockNaja from './setup/mockNaja';
-import fakeFetch from './setup/fakeFetch';
-import cleanPopstateListener from './setup/cleanPopstateListener';
+import {mockNaja} from './setup/mockNaja';
+import {fakeFetch} from './setup/fakeFetch';
+import {cleanPopstateListener} from './setup/cleanPopstateListener';
 import {assert} from 'chai';
 import sinon from 'sinon';
 
-import SnippetHandler from '../src/core/SnippetHandler';
-import HistoryHandler from '../src/core/HistoryHandler';
-import UIHandler from '../src/core/UIHandler';
+import {SnippetHandler} from '../src/core/SnippetHandler';
+import {HistoryHandler} from '../src/core/HistoryHandler';
+import {UIHandler} from '../src/core/UIHandler';
 
 
 describe('HistoryHandler', function () {

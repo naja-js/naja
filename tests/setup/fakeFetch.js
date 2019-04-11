@@ -64,7 +64,7 @@ class Expectation {
 	}
 }
 
-export default () => {
+export const fakeFetch = () => {
 	beforeEach('mock fetch()', function () {
 		this.fetchMock = new FetchMock();
 	});
