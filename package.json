@@ -49,7 +49,7 @@
     "test-local": "NODE_ENV=development karma start karma.conf.js",
     "test": "NODE_ENV=development karma start karma.sauce.test.js",
     "coverage": "NODE_ENV=development karma start karma.sauce.coverage.js && codecov",
-    "lint": "NODE_ENV=development node_modules/.bin/eslint src"
+    "lint": "NODE_ENV=development eslint src"
   },
   "repository": {
     "type": "git",

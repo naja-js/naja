@@ -55,6 +55,10 @@ export class Naja extends EventTarget {
 
 
 	async makeRequest(method, url, data = null, options = {}) {
+		if (url instanceof URL) {
+			url = url.href;
+		}
+
 		options = {
 			...this.defaultOptions,
 			...options,
