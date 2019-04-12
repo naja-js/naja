@@ -36,6 +36,10 @@ export class RedirectHandler extends EventTarget {
 	}
 
 	makeRedirect(url, force, options = {}) {
+		if (url instanceof URL) {
+			url = url.href;
+		}
+
 		let isHardRedirect = force || ! this.naja.uiHandler.isUrlAllowed(url);
 		const canRedirect = this.dispatchEvent(new CustomEvent('redirect', {
 			cancelable: true,
