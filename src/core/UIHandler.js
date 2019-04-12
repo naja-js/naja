@@ -1,17 +1,11 @@
 export class UIHandler {
 	selector = '.ajax';
-	allowedOrigins = [];
-	handler;
+	allowedOrigins = [window.location.origin];
+	handler = this.handleUI.bind(this);
 
 	constructor(naja) {
 		this.naja = naja;
-
-		this.handler = this.handleUI.bind(this);
 		naja.addEventListener('init', this.initialize.bind(this));
-
-		// window.location.origin is not supported in IE 10
-		const origin = `${window.location.protocol}//${window.location.hostname}${window.location.port ? `:${window.location.port}` : ''}`;
-		this.allowedOrigins.push(origin);
 	}
 
 	initialize() {
@@ -43,7 +37,7 @@ export class UIHandler {
 			bindElement(elements.item(i));
 		}
 
-		if (element[matchesMethodName](selectors)) {
+		if (element.matches(selectors)) {
 			bindElement(element);
 		}
 
@@ -52,7 +46,7 @@ export class UIHandler {
 			form.addEventListener('submit', this.handler);
 		};
 
-		if (element[matchesMethodName](`form${this.selector}`)) {
+		if (element.matches(`form${this.selector}`)) {
 			bindForm(element);
 		}
 
@@ -62,22 +56,23 @@ export class UIHandler {
 		}
 	}
 
-	handleUI(evt) {
-		if (evt.altKey || evt.ctrlKey || evt.shiftKey || evt.metaKey || evt.button) {
+	handleUI(event) {
+		if (event.altKey || event.ctrlKey || event.shiftKey || event.metaKey || event.button) {
 			return;
 		}
 
-		const el = evt.currentTarget, options = {};
+		const element = event.currentTarget;
+		const options = {};
 
-		if (evt.type === 'submit') {
-			this.submitForm(el, options, evt);
+		if (event.type === 'submit') {
+			this.submitForm(element, options, event);
 
-		} else if (evt.type === 'click') {
-			this.clickElement(el, options, evt);
+		} else if (event.type === 'click') {
+			this.clickElement(element, options, event);
 		}
 	}
 
-	clickElement(el, options = {}, evt) {
+	clickElement(element, options = {}, event) {
 		let method, url, data;
 
 		if ( ! this.naja.dispatchEvent(new CustomEvent('interaction', {detail: {element: el, originalEvent: evt, options}}))) {
@@ -88,41 +83,41 @@ export class UIHandler {
 			return;
 		}
 
-		if (el.tagName.toLowerCase() === 'a') {
+		if (element.tagName === 'A') {
 			method = 'GET';
-			url = el.href;
+			url = element.href;
 			data = null;
 
-		} else if (el.tagName.toLowerCase() === 'input' || el.tagName.toLowerCase() === 'button') {
-			const {form} = el;
+		} else if (element.tagName === 'INPUT' || element.tagName === 'BUTTON') {
+			const form = element.form;
 			// eslint-disable-next-line no-nested-ternary,no-extra-parens
-			method = el.hasAttribute('formmethod') ? el.getAttribute('formmethod').toUpperCase() : (form.hasAttribute('method') ? form.getAttribute('method').toUpperCase() : 'GET');
-			url = el.getAttribute('formaction') || form.getAttribute('action') || window.location.pathname + window.location.search;
+			method = element.hasAttribute('formmethod') ? element.getAttribute('formmethod').toUpperCase() : (form.hasAttribute('method') ? form.getAttribute('method').toUpperCase() : 'GET');
+			url = element.getAttribute('formaction') || form.getAttribute('action') || window.location.pathname + window.location.search;
 			data = new FormData(form);
 
-			if (el.type === 'submit' || el.tagName.toLowerCase() === 'button') {
-				data.append(el.name, el.value || '');
+			if (element.type === 'submit' || element.tagName === 'BUTTON') {
+				data.append(element.name, element.value || '');
 
-			} else if (el.type === 'image') {
-				const coords = el.getBoundingClientRect();
-				data.append(`${el.name}.x`, Math.max(0, Math.floor(evt.pageX - coords.left)));
-				data.append(`${el.name}.y`, Math.max(0, Math.floor(evt.pageY - coords.top)));
+			} else if (element.type === 'image') {
+				const coords = element.getBoundingClientRect();
+				data.append(`${element.name}.x`, Math.max(0, Math.floor(event.pageX - coords.left)));
+				data.append(`${element.name}.y`, Math.max(0, Math.floor(event.pageY - coords.top)));
 			}
 		}
 
 		if (this.isUrlAllowed(url)) {
-			if (evt) {
-				evt.preventDefault();
+			if (event) {
+				event.preventDefault();
 			}
 
 			this.naja.makeRequest(method, url, data, options);
 		}
 	}
 
-	submitForm(form, options = {}, evt) {
-		if ( ! this.naja.dispatchEvent(new CustomEvent('interaction', {detail: {element: element, originalEvent: evt, options}}))) {
-			if (evt) {
-				evt.preventDefault();
+	submitForm(form, options = {}, event) {
+		if ( ! this.naja.dispatchEvent(new CustomEvent('interaction', {detail: {element: element, originalEvent: event, options}}))) {
+			if (event) {
+				event.preventDefault();
 			}
 
 			return;
@@ -133,8 +128,8 @@ export class UIHandler {
 		const data = new FormData(form);
 
 		if (this.isUrlAllowed(url)) {
-			if (evt) {
-				evt.preventDefault();
+			if (event) {
+				event.preventDefault();
 			}
 
 			this.naja.makeRequest(method, url, data, options);

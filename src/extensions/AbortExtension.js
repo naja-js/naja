@@ -11,10 +11,10 @@ export class AbortExtension {
 	abortable = true;
 	abortController = null;
 	initialize() {
-		document.addEventListener('keydown', (evt) => {
+		document.addEventListener('keydown', (event) => {
 			if (this.abortController !== null
-				&& ('key' in evt ? evt.key === 'Escape' : evt.keyCode === 27)
-				&& !(evt.ctrlKey || evt.shiftKey || evt.altKey || evt.metaKey)
+				&& ('key' in event ? event.key === 'Escape' : event.keyCode === 27)
+				&& !(event.ctrlKey || event.shiftKey || event.altKey || event.metaKey)
 				&& this.abortable
 			) {
 				this.abortController.abort();
