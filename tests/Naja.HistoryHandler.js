@@ -21,10 +21,6 @@ describe('HistoryHandler', function () {
 			.once();
 
 		mock.expects('addEventListener')
-			.withExactArgs('interaction', sinon.match.instanceOf(Function))
-			.once();
-
-		mock.expects('addEventListener')
 			.withExactArgs('before', sinon.match.instanceOf(Function))
 			.once();
 
@@ -193,7 +189,7 @@ describe('HistoryHandler', function () {
 
 	describe('configures mode properly on interaction', function () {
 		it('missing data-naja-history', () => {
-			const naja = mockNaja();
+			const naja = mockNaja({uiHandler: UIHandler});
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
 				.withExactArgs('GET', 'http://localhost:9876/foo', null, {})
@@ -207,14 +203,14 @@ describe('HistoryHandler', function () {
 			link.classList.add('ajax');
 			document.body.appendChild(link);
 
-			new UIHandler(naja).clickElement(link);
+			naja.uiHandler.clickElement(link);
 
 			mock.verify();
 			document.body.removeChild(link);
 		});
 
 		it('does not override naja.defaultOptions.history', function () {
-			const naja = mockNaja();
+			const naja = mockNaja({uiHandler: UIHandler});
 			const mock = sinon.mock(naja);
 
 			mock.expects('makeRequest')
@@ -230,14 +226,14 @@ describe('HistoryHandler', function () {
 			link.classList.add('ajax');
 			document.body.appendChild(link);
 
-			new UIHandler(naja).clickElement(link);
+			naja.uiHandler.clickElement(link);
 
 			mock.verify();
 			document.body.removeChild(link);
 		});
 
 		it('data-naja-history=replace', () => {
-			const naja = mockNaja();
+			const naja = mockNaja({uiHandler: UIHandler});
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
 				.withExactArgs('GET', 'http://localhost:9876/foo', null, {history: 'replace'})
@@ -252,14 +248,14 @@ describe('HistoryHandler', function () {
 			link.setAttribute('data-naja-history', 'replace');
 			document.body.appendChild(link);
 
-			new UIHandler(naja).clickElement(link);
+			naja.uiHandler.clickElement(link);
 
 			mock.verify();
 			document.body.removeChild(link);
 		});
 
 		it('data-naja-history=off', () => {
-			const naja = mockNaja();
+			const naja = mockNaja({uiHandler: UIHandler});
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
 				.withExactArgs('GET', 'http://localhost:9876/foo', null, {history: false})
@@ -274,7 +270,7 @@ describe('HistoryHandler', function () {
 			link.setAttribute('data-naja-history', 'off');
 			document.body.appendChild(link);
 
-			new UIHandler(naja).clickElement(link);
+			naja.uiHandler.clickElement(link);
 
 			mock.verify();
 			document.body.removeChild(link);

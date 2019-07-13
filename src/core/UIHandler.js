@@ -1,9 +1,10 @@
-export class UIHandler {
+export class UIHandler extends EventTarget {
 	selector = '.ajax';
 	allowedOrigins = [window.location.origin];
 	handler = this.handleUI.bind(this);
 
 	constructor(naja) {
+		super();
 		this.naja = naja;
 		naja.addEventListener('init', this.initialize.bind(this));
 	}
@@ -75,9 +76,9 @@ export class UIHandler {
 	clickElement(element, options = {}, event) {
 		let method, url, data;
 
-		if ( ! this.naja.dispatchEvent(new CustomEvent('interaction', {detail: {element: el, originalEvent: evt, options}}))) {
-			if (evt) {
-				evt.preventDefault();
+		if ( ! this.dispatchEvent(new CustomEvent('interaction', {cancelable: true, detail: {element: element, originalEvent: event, options}}))) {
+			if (event) {
+				event.preventDefault();
 			}
 
 			return;
@@ -115,7 +116,7 @@ export class UIHandler {
 	}
 
 	submitForm(form, options = {}, event) {
-		if ( ! this.naja.dispatchEvent(new CustomEvent('interaction', {detail: {element: element, originalEvent: event, options}}))) {
+		if ( ! this.dispatchEvent(new CustomEvent('interaction', {cancelable: true, detail: {element: form, originalEvent: event, options}}))) {
 			if (event) {
 				event.preventDefault();
 			}

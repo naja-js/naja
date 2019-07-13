@@ -1,14 +1,14 @@
 import {Naja} from '../../src/Naja';
 
 
-class UIHandlerMock {
+class UIHandlerMock extends EventTarget {
 	isUrlAllowed(url) {}
 }
 
 class RedirectHandlerMock extends EventTarget {
 }
 
-class SnippetHandlerMock {
+class SnippetHandlerMock extends EventTarget {
 	updateSnippets(snippets, forceReplace = false) {}
 }
 
