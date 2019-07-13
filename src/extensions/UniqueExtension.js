@@ -1,6 +1,6 @@
 export class UniqueExtension {
 	constructor(naja) {
-		naja.addEventListener('interaction', this.checkUniqueness.bind(this));
+		naja.uiHandler.addEventListener('interaction', this.checkUniqueness.bind(this));
 		naja.addEventListener('start', this.abortPreviousRequest.bind(this));
 		naja.addEventListener('complete', this.clearRequest.bind(this));
 	}

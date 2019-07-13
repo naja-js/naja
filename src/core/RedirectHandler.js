@@ -2,7 +2,7 @@ export class RedirectHandler {
 	constructor(naja) {
 		this.naja = naja;
 
-		naja.addEventListener('interaction', (event) => {
+		naja.uiHandler.addEventListener('interaction', (event) => {
 			const {element, options} = event.detail;
 			if ( ! element) {
 				return;

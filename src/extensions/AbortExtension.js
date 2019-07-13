@@ -1,7 +1,7 @@
 export class AbortExtension {
 	constructor(naja) {
+		naja.uiHandler.addEventListener('interaction', this.checkAbortable.bind(this));
 		naja.addEventListener('init', this.initialize.bind(this));
-		naja.addEventListener('interaction', this.checkAbortable.bind(this));
 		naja.addEventListener('before', this.checkAbortable.bind(this));
 		naja.addEventListener('start', this.saveAbortController.bind(this));
 		naja.addEventListener('complete', this.clearAbortController.bind(this));

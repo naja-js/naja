@@ -3,9 +3,8 @@ export class FormsHandler {
 
 	constructor(naja) {
 		this.naja = naja;
-
 		naja.addEventListener('init', this.initialize.bind(this));
-		naja.addEventListener('interaction', this.processForm.bind(this));
+		naja.uiHandler.addEventListener('interaction', this.processForm.bind(this));
 	}
 
 	initialize() {
