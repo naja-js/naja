@@ -6,9 +6,10 @@ export class HistoryHandler {
 		this.naja = naja;
 
 		naja.addEventListener('init', this.initialize.bind(this));
-		naja.addEventListener('interaction', this.configureMode.bind(this));
 		naja.addEventListener('before', this.saveUrl.bind(this));
 		naja.addEventListener('success', this.pushNewState.bind(this));
+
+		naja.uiHandler.addEventListener('interaction', this.configureMode.bind(this));
 
 		this.popStateHandler = this.handlePopState.bind(this);
 		this.historyAdapter = {

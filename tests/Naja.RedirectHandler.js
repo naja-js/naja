@@ -15,10 +15,6 @@ describe('RedirectHandler', function () {
 		const mock = sinon.mock(naja);
 
 		mock.expects('addEventListener')
-			.withExactArgs('interaction', sinon.match.instanceOf(Function))
-			.once();
-
-		mock.expects('addEventListener')
 			.withExactArgs('success', sinon.match.instanceOf(Function))
 			.once();
 
@@ -58,7 +54,7 @@ describe('RedirectHandler', function () {
 
 	describe('configures forceRedirect from data-naja-force-redirect', function () {
 		it('missing data-naja-force-redirect', () => {
-			const naja = mockNaja();
+			const naja = mockNaja({uiHandler: UIHandler});
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
 				.withExactArgs('GET', 'http://localhost:9876/foo', null, {})
@@ -71,14 +67,14 @@ describe('RedirectHandler', function () {
 			link.classList.add('ajax');
 			document.body.appendChild(link);
 
-			new UIHandler(naja).clickElement(link);
+			naja.uiHandler.clickElement(link);
 
 			mock.verify();
 			document.body.removeChild(link);
 		});
 
 		it('data-naja-force-redirect=true', () => {
-			const naja = mockNaja();
+			const naja = mockNaja({uiHandler: UIHandler});
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
 				.withExactArgs('GET', 'http://localhost:9876/foo', null, {forceRedirect: true})
@@ -92,14 +88,14 @@ describe('RedirectHandler', function () {
 			link.setAttribute('data-naja-force-redirect', 'on');
 			document.body.appendChild(link);
 
-			new UIHandler(naja).clickElement(link);
+			naja.uiHandler.clickElement(link);
 
 			mock.verify();
 			document.body.removeChild(link);
 		});
 
 		it('data-naja-force-redirect=off', () => {
-			const naja = mockNaja();
+			const naja = mockNaja({uiHandler: UIHandler});
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
 				.withExactArgs('GET', 'http://localhost:9876/foo', null, {forceRedirect: false})
@@ -113,7 +109,7 @@ describe('RedirectHandler', function () {
 			link.setAttribute('data-naja-force-redirect', 'off');
 			document.body.appendChild(link);
 
-			new UIHandler(naja).clickElement(link);
+			naja.uiHandler.clickElement(link);
 
 			mock.verify();
 			document.body.removeChild(link);

@@ -70,10 +70,10 @@ describe('Naja.js', function () {
 
 		it('should return false after evt.preventDefault() call', function () {
 			const naja = mockNaja();
-			assert.isTrue(naja.fireEvent('foo'));
+			assert.isTrue(naja.dispatchEvent(new CustomEvent('foo', {cancelable: true})));
 
 			naja.addEventListener('foo', (evt) => evt.preventDefault());
-			assert.isFalse(naja.fireEvent('foo'));
+			assert.isFalse(naja.dispatchEvent(new CustomEvent('foo', {cancelable: true})));
 		});
 	});
 

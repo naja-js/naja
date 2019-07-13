@@ -5,6 +5,7 @@ import sinon from 'sinon';
 
 import {FormsHandler} from '../src/core/FormsHandler';
 import {SnippetHandler} from '../src/core/SnippetHandler';
+import {UIHandler} from '../src/core/UIHandler';
 
 
 describe('FormsHandler', function () {
@@ -14,10 +15,6 @@ describe('FormsHandler', function () {
 
 		mock.expects('addEventListener')
 			.withExactArgs('init', sinon.match.instanceOf(Function))
-			.once();
-
-		mock.expects('addEventListener')
-			.withExactArgs('interaction', sinon.match.instanceOf(Function))
 			.once();
 
 		new FormsHandler(naja);
@@ -35,6 +32,7 @@ describe('FormsHandler', function () {
 		const naja = mockNaja({
 			formsHandler: FormsHandler,
 			snippetHandler: SnippetHandler,
+			uiHandler: UIHandler,
 		});
 		naja.initialize();
 
@@ -55,6 +53,7 @@ describe('FormsHandler', function () {
 		const naja = mockNaja({
 			formsHandler: FormsHandler,
 			snippetHandler: SnippetHandler,
+			uiHandler: UIHandler,
 		});
 		naja.initialize();
 
@@ -117,6 +116,7 @@ describe('FormsHandler', function () {
 		const naja = mockNaja({
 			formsHandler: FormsHandler,
 			snippetHandler: SnippetHandler,
+			uiHandler: UIHandler,
 		});
 		naja.formsHandler.netteForms = netteForms;
 		naja.initialize();

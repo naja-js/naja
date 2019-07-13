@@ -268,9 +268,8 @@ describe('UIHandler', function () {
 				.once();
 
 			const listener = sinon.spy();
-			naja.addEventListener('interaction', listener);
-
 			const handler = new UIHandler(naja);
+			handler.addEventListener('interaction', listener);
 
 			const evt = {
 				type: 'click',
@@ -291,13 +290,12 @@ describe('UIHandler', function () {
 
 		it('interaction event listener can abort request', function () {
 			const naja = mockNaja();
-			naja.addEventListener('interaction', (evt) => evt.preventDefault());
-
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
 				.never();
 
 			const handler = new UIHandler(naja);
+			handler.addEventListener('interaction', (evt) => evt.preventDefault());
 
 			const evt = {
 				type: 'click',
@@ -311,16 +309,15 @@ describe('UIHandler', function () {
 
 		it('interaction event listener can alter options', function () {
 			const naja = mockNaja();
-			naja.addEventListener('interaction', (event) => {
-				event.detail.options.foo = 42;
-			});
-
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
 				.withExactArgs('GET', 'http://localhost:9876/UIHandler/a', null, {foo: 42})
 				.once();
 
 			const handler = new UIHandler(naja);
+			handler.addEventListener('interaction', (event) => {
+				event.detail.options.foo = 42;
+			});
 
 			const evt = {
 				type: 'click',
@@ -453,13 +450,13 @@ describe('UIHandler', function () {
 				.withExactArgs('GET', 'http://localhost:9876/UIHandler/clickElement', null, {})
 				.once();
 
-			const listener = sinon.spy();
-			naja.addEventListener('interaction', listener);
-
 			const a = document.createElement('a');
 			a.href = '/UIHandler/clickElement';
 
+			const listener = sinon.spy();
 			const handler = new UIHandler(naja);
+			handler.addEventListener('interaction', listener);
+
 			handler.clickElement(a);
 
 			assert.isTrue(listener.calledWith(sinon.match.instanceOf(CustomEvent)
@@ -500,14 +497,14 @@ describe('UIHandler', function () {
 				.withExactArgs('POST', '/UIHandler/submitForm', sinon.match.instanceOf(FormData), {})
 				.once();
 
-			const listener = sinon.spy();
-			naja.addEventListener('interaction', listener);
-
 			const form = document.createElement('form');
 			form.method = 'POST';
 			form.action = '/UIHandler/submitForm';
 
+			const listener = sinon.spy();
 			const handler = new UIHandler(naja);
+			handler.addEventListener('interaction', listener);
+
 			handler.submitForm(form);
 
 			assert.isTrue(listener.calledWith(sinon.match.instanceOf(CustomEvent)
