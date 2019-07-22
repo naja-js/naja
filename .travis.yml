@@ -6,6 +6,7 @@ node_js:
 script:
   - yarn run lint
   - yarn run test
+  - yarn run test-types
   - yarn run coverage
   - yarn run build
 
