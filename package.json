@@ -10,6 +10,7 @@
   "author": "Jiří Pudil",
   "license": "MIT",
   "main": "dist/Naja.js",
+  "typings": "types/index.d.ts",
   "dependencies": {
     "event-target-shim": "^2.0.0",
     "object-assign": "^4.1.0",
@@ -44,6 +45,7 @@
     "nette-forms": "^2.4.2",
     "path": "^0.12.0",
     "sinon": "^2.3.5",
+    "typescript": "^3.5.3",
     "webpack": "^3.0.0",
     "webpack-dev-server": "^2.5.0"
   },
@@ -51,6 +53,7 @@
     "build": "NODE_ENV=production webpack --config webpack.config.js",
     "test-local": "karma start karma.conf.js",
     "test": "karma start karma.sauce.test.js",
+    "test-types": "tsc -p types/test",
     "coverage": "karma start karma.sauce.coverage.js && codecov",
     "lint": "node_modules/.bin/eslint src"
   },
