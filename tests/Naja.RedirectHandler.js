@@ -32,7 +32,7 @@ describe('RedirectHandler', function () {
 
 		const mock = sinon.mock(redirectHandler);
 		mock.expects('makeRedirect')
-			.withExactArgs('/RedirectHandler/redirect/redirectTo', true)
+			.withExactArgs('/RedirectHandler/redirect/redirectTo', true, sinon.match({}))
 			.once();
 
 		naja.makeRequest('GET', '/RedirectHandler/redirect').then(() => {
@@ -49,7 +49,7 @@ describe('RedirectHandler', function () {
 
 		const mock = sinon.mock(redirectHandler);
 		mock.expects('makeRedirect')
-			.withExactArgs('/RedirectHandler/redirect/redirectTo', true)
+			.withExactArgs('/RedirectHandler/redirect/redirectTo', true, sinon.match({forceRedirect: true}))
 			.once();
 
 		naja.makeRequest('GET', '/RedirectHandler/forceRedirect/options', null, {forceRedirect: true}).then(() => {
@@ -152,7 +152,7 @@ describe('RedirectHandler', function () {
 
 		const mock = sinon.mock(naja);
 		mock.expects('makeRequest')
-			.withExactArgs('GET', '/RedirectHandler/noForce')
+			.withExactArgs('GET', '/RedirectHandler/noForce', null, {})
 			.once();
 
 		redirectHandler.makeRedirect('/RedirectHandler/noForce', false);
@@ -179,7 +179,7 @@ describe('RedirectHandler', function () {
 
 		const mock = sinon.mock(naja);
 		mock.expects('makeRequest')
-			.withExactArgs('GET', 'http://localhost:9876/RedirectHandler/localUrl')
+			.withExactArgs('GET', 'http://localhost:9876/RedirectHandler/localUrl', null, {})
 			.once();
 
 		redirectHandler.makeRedirect('http://localhost:9876/RedirectHandler/localUrl', false);
