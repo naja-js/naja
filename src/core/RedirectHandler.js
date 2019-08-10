@@ -2,6 +2,17 @@ export default class RedirectHandler {
 	constructor(naja) {
 		this.naja = naja;
 
+		naja.addEventListener('interaction', (evt) => {
+			const {element, options} = evt;
+			if ( ! element) {
+				return;
+			}
+
+			if (element.hasAttribute('data-naja-force-redirect')) {
+				options.forceRedirect = element.getAttribute('data-naja-force-redirect') !== 'off';
+			}
+		});
+
 		naja.addEventListener('success', (evt) => {
 			const {response, options} = evt;
 			if (response.redirect) {

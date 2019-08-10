@@ -4,6 +4,7 @@ import {assert} from 'chai';
 import sinon from 'sinon';
 
 import RedirectHandler from '../src/core/RedirectHandler';
+import UIHandler from '../src/core/UIHandler';
 
 
 describe('RedirectHandler', function () {
@@ -12,6 +13,11 @@ describe('RedirectHandler', function () {
 	it('constructor()', function () {
 		const naja = mockNaja();
 		const mock = sinon.mock(naja);
+
+		mock.expects('addEventListener')
+			.withExactArgs('interaction', sinon.match.instanceOf(Function))
+			.once();
+
 		mock.expects('addEventListener')
 			.withExactArgs('success', sinon.match.instanceOf(Function))
 			.once();
@@ -52,6 +58,70 @@ describe('RedirectHandler', function () {
 		});
 
 		this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({redirect: '/RedirectHandler/redirect/redirectTo', forceRedirect: false}));
+	});
+
+	describe('configures forceRedirect from data-naja-force-redirect', function () {
+		it('missing data-naja-force-redirect', () => {
+			const naja = mockNaja();
+			const mock = sinon.mock(naja);
+			mock.expects('makeRequest')
+				.withExactArgs('GET', 'http://localhost:9876/foo', null, {})
+				.once();
+
+			new RedirectHandler(naja);
+
+			const link = document.createElement('a');
+			link.href = '/foo';
+			link.classList.add('ajax');
+			document.body.appendChild(link);
+
+			new UIHandler(naja).clickElement(link);
+
+			mock.verify();
+			document.body.removeChild(link);
+		});
+
+		it('data-naja-force-redirect=true', () => {
+			const naja = mockNaja();
+			const mock = sinon.mock(naja);
+			mock.expects('makeRequest')
+				.withExactArgs('GET', 'http://localhost:9876/foo', null, {forceRedirect: true})
+				.once();
+
+			new RedirectHandler(naja);
+
+			const link = document.createElement('a');
+			link.href = '/foo';
+			link.classList.add('ajax');
+			link.setAttribute('data-naja-force-redirect', 'on');
+			document.body.appendChild(link);
+
+			new UIHandler(naja).clickElement(link);
+
+			mock.verify();
+			document.body.removeChild(link);
+		});
+
+		it('data-naja-force-redirect=off', () => {
+			const naja = mockNaja();
+			const mock = sinon.mock(naja);
+			mock.expects('makeRequest')
+				.withExactArgs('GET', 'http://localhost:9876/foo', null, {forceRedirect: false})
+				.once();
+
+			new RedirectHandler(naja);
+
+			const link = document.createElement('a');
+			link.href = '/foo';
+			link.classList.add('ajax');
+			link.setAttribute('data-naja-force-redirect', 'off');
+			document.body.appendChild(link);
+
+			new UIHandler(naja).clickElement(link);
+
+			mock.verify();
+			document.body.removeChild(link);
+		});
 	});
 
 	it('stops event propagation', function (done) {
