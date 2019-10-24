@@ -11,7 +11,7 @@ module.exports = function(config) {
     'chrome-1': {
       base: 'SauceLabs',
       browserName: 'chrome',
-      platform: 'macOS 10.12',
+      platform: 'macOS 10.14',
       version: 'latest-1'
     },
     'firefox': {
@@ -23,7 +23,7 @@ module.exports = function(config) {
     'firefox-1': {
       base: 'SauceLabs',
       browserName: 'firefox',
-      platform: 'macOS 10.12',
+      platform: 'macOS 10.14',
       version: 'latest-1'
     },
 
@@ -52,33 +52,33 @@ module.exports = function(config) {
       version: '11.103'
     },
 
-    'safari10': {
+    'safari12': {
       base: 'SauceLabs',
       browserName: 'safari',
-      platform: 'OS X 10.11',
-      version: '10.0'
+      platform: 'macOS 10.14',
+      version: '12.0'
     },
-    'safari11': {
+    'safari13': {
       base: 'SauceLabs',
       browserName: 'safari',
-      platform: 'macOS 10.12',
-      version: '11.0'
+      platform: 'macOS 10.13',
+      version: '13.0'
     },
 
-    'ios10': {
-      base: 'SauceLabs',
-      browserName: 'Safari',
-      platformName: 'iOS',
-      platformVersion: '10.3',
-      deviceName: 'iPhone 7 Simulator',
-      idleTimeout: 120
-    },
     'ios11': {
       base: 'SauceLabs',
       browserName: 'Safari',
       platformName: 'iOS',
-      platformVersion: '11.0',
-      deviceName: 'iPhone 7 Simulator',
+      platformVersion: '11.3',
+      deviceName: 'iPhone X Simulator',
+      idleTimeout: 120
+    },
+    'ios12': {
+      base: 'SauceLabs',
+      browserName: 'Safari',
+      platformName: 'iOS',
+      platformVersion: '12.2',
+      deviceName: 'iPhone XR Simulator',
       idleTimeout: 120
     },
 
@@ -89,11 +89,11 @@ module.exports = function(config) {
       platformVersion: '5.1',
       deviceName: 'Android Emulator'
     },
-    'android71': {
+    'android9': {
       base: 'SauceLabs',
       browserName: 'Chrome',
       platformName: 'Android',
-      platformVersion: '7.1',
+      platformVersion: '8.0',
       deviceName: 'Android GoogleAPI Emulator'
     }
   };
