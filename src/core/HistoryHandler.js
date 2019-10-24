@@ -88,6 +88,14 @@ export default class HistoryHandler {
 			this.href = response.url;
 		}
 
+		if ('replaceHistory' in response) {
+			// eslint-disable-next-line no-console
+			console.warn(
+				'Support for `replaceHistory` key in response payload is deprecated and will be removed in Naja 2.0. '
+				+ 'Please use `options.history = "replace"` option or `data-naja-history="replace"` attribute.'
+			);
+		}
+
 		const method = response.replaceHistory || mode === 'replace' ? 'replaceState' : 'pushState';
 		const uiCache = options.historyUiCache === true || (options.historyUiCache !== false && this.uiCache); // eslint-disable-line no-extra-parens
 		this.historyAdapter[method](
