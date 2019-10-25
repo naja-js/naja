@@ -16,6 +16,7 @@ before_deploy:
 deploy:
   - provider: releases
     token: $GITHUB_API_TOKEN
+    draft: true
     cleanup: false
     file:
       - dist/Naja.js

@@ -1,0 +1,16 @@
+.git/
+.idea/
+coverage/
+node_modules/
+tests/
+.babelrc
+.eslintrc
+.gitignore
+.nycrc
+.travis.yml
+karma.conf.js
+karma.sauce.coverage.js
+karma.sauce.test.js
+pre-commit-build.sh
+webpack.config.js
+yarn.lock
