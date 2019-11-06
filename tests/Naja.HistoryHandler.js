@@ -116,36 +116,6 @@ describe('HistoryHandler', function () {
 		});
 	});
 
-	it('replaces the state after successful request if payload.replaceHistory', function () {
-		const naja = mockNaja({
-			snippetHandler: SnippetHandler,
-			historyHandler: HistoryHandler,
-		});
-		naja.initialize();
-		cleanPopstateListener(naja.historyHandler);
-
-		const el = document.createElement('div');
-		el.id = 'snippet-history-foo';
-		document.body.appendChild(el);
-
-		const mock = sinon.mock(naja.historyHandler.historyAdapter);
-		mock.expects('replaceState').withExactArgs({
-			href: '/HistoryHandler/replaceState',
-			title: '',
-			ui: {
-				'snippet-history-foo': 'foo'
-			},
-		}, '', '/HistoryHandler/replaceState').once();
-
-		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet-history-foo': 'foo'}, replaceHistory: true});
-		return naja.makeRequest('GET', '/HistoryHandler/replaceState').then(() => {
-			mock.verify();
-			mock.restore();
-
-			document.body.removeChild(el);
-		});
-	});
-
 	it('uses the url from payload if postGet is present', function () {
 		const naja = mockNaja({
 			snippetHandler: SnippetHandler,

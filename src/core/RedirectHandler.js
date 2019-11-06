@@ -17,15 +17,7 @@ export class RedirectHandler extends EventTarget {
 		naja.addEventListener('success', (event) => {
 			const {payload, options} = event.detail;
 			if (payload.redirect) {
-				if ('forceRedirect' in payload) {
-					// eslint-disable-next-line no-console
-					console.warn(
-						'Support for `forceRedirect` key in response payload is deprecated and will be removed in Naja 2.0. '
-						+ 'Please use `options.forceRedirect = true` option or `data-naja-force-redirect` attribute.'
-					);
-				}
-
-				this.makeRedirect(payload.redirect, payload.forceRedirect || options.forceRedirect, options);
+				this.makeRedirect(payload.redirect, options.forceRedirect, options);
 				event.stopImmediatePropagation();
 			}
 		});
