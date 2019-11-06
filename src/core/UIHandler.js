@@ -76,7 +76,7 @@ export class UIHandler extends EventTarget {
 	clickElement(element, options = {}, event) {
 		let method, url, data;
 
-		if ( ! this.dispatchEvent(new CustomEvent('interaction', {cancelable: true, detail: {element: element, originalEvent: event, options}}))) {
+		if ( ! this.dispatchEvent(new CustomEvent('interaction', {cancelable: true, detail: {element, originalEvent: event, options}}))) {
 			if (event) {
 				event.preventDefault();
 			}
@@ -90,7 +90,7 @@ export class UIHandler extends EventTarget {
 			data = null;
 
 		} else if (element.tagName === 'INPUT' || element.tagName === 'BUTTON') {
-			const form = element.form;
+			const {form} = element;
 			// eslint-disable-next-line no-nested-ternary,no-extra-parens
 			method = element.hasAttribute('formmethod') ? element.getAttribute('formmethod').toUpperCase() : (form.hasAttribute('method') ? form.getAttribute('method').toUpperCase() : 'GET');
 			url = element.getAttribute('formaction') || form.getAttribute('action') || window.location.pathname + window.location.search;
