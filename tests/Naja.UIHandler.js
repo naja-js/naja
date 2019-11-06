@@ -278,7 +278,8 @@ describe('UIHandler', function () {
 			};
 			handler.handleUI(evt);
 
-			assert.isTrue(listener.calledWith(sinon.match.instanceOf(CustomEvent)
+			assert.isTrue(listener.calledWith(
+				sinon.match((event) => event.constructor.name === 'CustomEvent')
 				.and(sinon.match.has('detail', sinon.match.object
 					.and(sinon.match.has('element', this.a))
 					.and(sinon.match.has('originalEvent', evt))
@@ -459,7 +460,8 @@ describe('UIHandler', function () {
 
 			handler.clickElement(a);
 
-			assert.isTrue(listener.calledWith(sinon.match.instanceOf(CustomEvent)
+			assert.isTrue(listener.calledWith(
+				sinon.match((event) => event.constructor.name === 'CustomEvent')
 				.and(sinon.match.has('detail', sinon.match.object
 					.and(sinon.match.has('element', a))
 					.and(sinon.match.has('originalEvent', undefined))
@@ -507,7 +509,8 @@ describe('UIHandler', function () {
 
 			handler.submitForm(form);
 
-			assert.isTrue(listener.calledWith(sinon.match.instanceOf(CustomEvent)
+			assert.isTrue(listener.calledWith(
+				sinon.match((event) => event.constructor.name === 'CustomEvent')
 				.and(sinon.match.has('detail', sinon.match.object
 					.and(sinon.match.has('element', form))
 					.and(sinon.match.has('originalEvent', undefined))
