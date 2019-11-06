@@ -36,7 +36,8 @@ describe('Naja.js', function () {
 			naja.initialize(defaultOptions);
 
 			assert.isTrue(initCallback.calledOnce);
-			assert.isTrue(initCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+			assert.isTrue(initCallback.calledWith(
+				sinon.match((event) => event.constructor.name === 'CustomEvent')
 				.and(sinon.match.has('detail', sinon.match.object
 					.and(sinon.match.has('defaultOptions', defaultOptions))
 				))
