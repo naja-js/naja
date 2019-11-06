@@ -18,6 +18,11 @@ describe('AbortExtension', function () {
 	};
 
 	it('aborts request on Esc', function () {
+		// older Safari doesn't play well with fakeFetch'd Request
+		if ( ! Request.prototype.hasOwnProperty('signal')) {
+			this.skip();
+		}
+
 		const naja = mockNaja();
 		const abortExtension = new AbortExtension(naja);
 		abortExtension.initialize();
@@ -45,6 +50,11 @@ describe('AbortExtension', function () {
 	});
 
 	it('does not abort non-abortable request', function () {
+		// older Safari doesn't play well with fakeFetch'd Request
+		if ( ! Request.prototype.hasOwnProperty('signal')) {
+			this.skip();
+		}
+
 		const naja = mockNaja();
 		const abortExtension = new AbortExtension(naja);
 		abortExtension.initialize();
