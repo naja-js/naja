@@ -168,7 +168,8 @@ describe('SnippetHandler', function () {
 		snippetHandler.updateSnippet(el, 'Bar', false);
 
 		assert.isTrue(beforeCallback.calledOnce);
-		assert.isTrue(beforeCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+		assert.isTrue(beforeCallback.calledWith(
+			sinon.match((event) => event.constructor.name === 'CustomEvent')
 			.and(sinon.match.has('detail', sinon.match.object
 				.and(sinon.match.has('snippet', el))
 				.and(sinon.match.has('content', sinon.match.string))
@@ -178,7 +179,8 @@ describe('SnippetHandler', function () {
 
 		assert.isTrue(afterCallback.calledOnce);
 		assert.isTrue(afterCallback.calledAfter(beforeCallback));
-		assert.isTrue(beforeCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+		assert.isTrue(beforeCallback.calledWith(
+			sinon.match((event) => event.constructor.name === 'CustomEvent')
 			.and(sinon.match.has('detail', sinon.match.object
 				.and(sinon.match.has('snippet', el))
 				.and(sinon.match.has('content', sinon.match.string))
@@ -205,7 +207,8 @@ describe('SnippetHandler', function () {
 		snippetHandler.updateSnippet(el, 'Bar', true);
 
 		assert.isTrue(beforeCallback.calledOnce);
-		assert.isTrue(beforeCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+		assert.isTrue(beforeCallback.calledWith(
+			sinon.match((event) => event.constructor.name === 'CustomEvent')
 			.and(sinon.match.has('detail', sinon.match.object
 				.and(sinon.match.has('snippet', el))
 				.and(sinon.match.has('content', sinon.match.string))
