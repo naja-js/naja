@@ -71,14 +71,14 @@ module.exports = (config) => {
       idleTimeout: 120
     },
 
-    'android51': {
+    'android6': {
       base: 'SauceLabs',
-      browserName: 'Browser',
+      browserName: 'Chrome',
       platformName: 'Android',
-      platformVersion: '5.1',
-      deviceName: 'Android Emulator'
+      platformVersion: '6.0',
+      deviceName: 'Android GoogleAPI Emulator'
     },
-    'android9': {
+    'android8': {
       base: 'SauceLabs',
       browserName: 'Chrome',
       platformName: 'Android',
@@ -101,7 +101,7 @@ module.exports = (config) => {
     rollupPreprocessor: {
       plugins: [
         babel({
-          exclude: /node_modules\/(?!event-target-shim)/,
+          exclude: /node_modules\/(?!event-target-shim|sinon)/,
           runtimeHelpers: true,
         }),
         resolve(),

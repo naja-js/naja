@@ -22,7 +22,7 @@ module.exports = (config) => {
     rollupPreprocessor: {
       plugins: [
         babel({
-          exclude: /node_modules\/(?!event-target-shim)/,
+          exclude: /node_modules\/(?!event-target-shim|sinon)/,
           runtimeHelpers: true,
         }),
         resolve(),
