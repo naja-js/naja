@@ -34,3 +34,5 @@ deploy:
 
 cache: yarn
 
+notifications:
+  email: false
