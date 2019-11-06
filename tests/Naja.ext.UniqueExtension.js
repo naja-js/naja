@@ -9,6 +9,11 @@ describe('UniqueExtension', function () {
 	fakeFetch();
 
 	it('aborts previous request', function () {
+		// older Safari doesn't play well with fakeFetch'd Request
+		if ( ! Request.prototype.hasOwnProperty('signal')) {
+			this.skip();
+		}
+
 		const naja = mockNaja();
 		new UniqueExtension(naja);
 
@@ -31,6 +36,11 @@ describe('UniqueExtension', function () {
 	});
 
 	it('does not abort request if disabled', function () {
+		// older Safari doesn't play well with fakeFetch'd Request
+		if ( ! Request.prototype.hasOwnProperty('signal')) {
+			this.skip();
+		}
+
 		const naja = mockNaja();
 		new UniqueExtension(naja);
 
