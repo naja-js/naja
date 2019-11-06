@@ -138,7 +138,7 @@ export class HttpError extends Error {
 		super(message);
 
 		this.name = this.constructor.name;
-		this.stack = (new Error(message)).stack;
+		this.stack = new Error(message).stack;
 		this.response = response;
 	}
 }
