@@ -14,7 +14,6 @@ export interface Payload {
 	snippets?: { [id: string]: string };
 
 	redirect?: string;
-	forceRedirect?: boolean;
 
 	postGet?: boolean;
 	url?: string;
