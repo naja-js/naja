@@ -14,8 +14,6 @@ It is written using modern-day JavaScript, but compiled into ES5 build that come
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/jiripudil.svg)](https://saucelabs.com/u/jiripudil)
 
-iOS builds might be grey, but please don't panic, iOS is fully supported. This is just Saucelabs not being able to setup the test environment for iOS within a generous limit of 2 minutes, causing the jobs to time out occasionally.
-
 
 ## Very quick start
 
