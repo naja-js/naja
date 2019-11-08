@@ -13,3 +13,5 @@ and import nette-forms into a different variable, you should configure the corre
 import netteForms from 'nette-forms';
 naja.formsHandler.netteForms = netteForms;
 ```
+
+?> The nette-forms reference is configurable in this way since version 1.5.0.
