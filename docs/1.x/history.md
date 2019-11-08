@@ -60,6 +60,8 @@ from storing the initial state on page load, and also disables the cache for all
 !> Disabling UI cache is an advanced technique that requires a solid understanding of how AJAX works in Nette and how
 Naja builds upon that. Most importantly, you have to make sure that not only signals but all actions are ajax-ready.
 
+?> Disabling UI cache for all snippets is possible since version 1.6.0.
+
 
 ## History mode
 
@@ -73,3 +75,5 @@ element.
 
 Similarly, you can keep a request off-the-record and not alter the browser's history at all by adding `history: false`
 to the options or `data-naja-history="off"` attribute to the `.ajax` element.
+
+?> The `history` mode option is available since version 1.1.0.
