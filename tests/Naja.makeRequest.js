@@ -187,6 +187,7 @@ describe('makeRequest()', function () {
 		return request.catch((error) => {
 			assert.isOk(error); // isOk = truthy
 			assert.equal(error.name, 'HttpError');
+			assert.instanceOf(error.response, Response);
 		});
 	});
 
