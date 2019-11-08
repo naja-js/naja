@@ -1,8 +1,7 @@
 # Default extensions
 
-Naja comes bundled with two handy extensions that are registered by default:
-
-?> You can also easily extend Naja's capabilities by [writing your own extensions](extensions-custom.md).
+Naja comes pre-packaged with two handy extensions (those are registered by default) and provides an API for you to
+implement [your own extensions](extensions-custom.md) with ease.
 
 
 ## AbortExtension

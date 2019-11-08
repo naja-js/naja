@@ -17,13 +17,6 @@ naja.uiHandler.selector = '';
 ```
 
 
-## Interaction event
-
-Whenever the user clicks a Naja-bound element, `UIHandler` dispatches the `interaction` event. The event contains the
-clicked element, the original UI event if there is one, and current request's `options` object that you can modify.
-The `interaction` event is cancelable, so if you call `preventDefault()` the request won't be dispatched.
-
-
 ## Allowed origins
 
 Note that if you change the selector to an opt-out (`:not(.synchronous)`, empty string, etc.), *all* links will become
@@ -37,6 +30,8 @@ naja.uiHandler.allowedOrigins.push('https://allowed.origin.com:4000');
 The current origin is allowed by default, i.e. it does not matter whether the `href` in the link points to a relative
 path or an absolute one.
 
+?> The custom selector feature and allowed origins check are available since version 1.1.0.
+
 
 ## Manual dispatch
 
@@ -49,7 +44,10 @@ naja.uiHandler.submitForm(form);
 ```
 
 Neither `element` nor `form` have to be bound to Naja via the configured selector. However, the aforementioned allowed
-origin rules still apply, and the `interaction` event is triggered with `originalEvent` set to undefined.
+origin rules still apply, and the `interaction` event (see [Writing extensions](extensions-custom.md)) is triggered
+with `originalEvent` set to undefined.
+
+?> The manual dispatch methods are available since version 1.4.0.
 
 
 ## Manual bind
@@ -63,3 +61,5 @@ naja.uiHandler.bindUI(element);
 
 The method searches the given `element` and its children for elements that match the configured selector and attaches
 the AJAX handler to them.
+
+?> The manual bind method is available since version 1.6.0.
