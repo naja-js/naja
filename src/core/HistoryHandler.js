@@ -18,7 +18,12 @@ export class HistoryHandler {
 		};
 	}
 
-	initialize() {
+	initialize(event) {
+		const {defaultOptions} = event.detail;
+		if ('history' in defaultOptions && 'uiCache' in defaultOptions.history) {
+			this.uiCache = defaultOptions.history.uiCache;
+		}
+
 		window.addEventListener('popstate', this.popStateHandler);
 		this.historyAdapter.replaceState(
 			this.buildState(window.location.href, this.uiCache),
@@ -136,7 +141,6 @@ export class HistoryHandler {
 	handleSnippets(snippets) {
 		this.naja.snippetHandler.updateSnippets(snippets, true);
 		this.naja.scriptLoader.loadScripts(snippets);
-		this.naja.load();
 	}
 
 	handleTitle(title) {
