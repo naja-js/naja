@@ -9,10 +9,25 @@ naja.makeRequest(method, url, data = null, options = {})
 - `method: string` is the request method, usually `GET` or `POST`. It is case-insensitive.
 - `url: string` is the target URL.
 - `data: ?mixed` can be array, object, string, `ArrayBuffer`, `Blob`, `FormData`, &hellip;
-- `options: ?Object` can be used to alter the behavior of some components or [extensions](extensions-custom.md).
+- `options: ?Object` can be used to alter the behavior of some components or [extensions](extensibility.md).
 
-The `makeRequest` method returns a Promise which either resolves to the `response` object containing the parsed response
-body, or is rejected with the thrown `error`.
+The `makeRequest` method returns a Promise which either resolves to an object containing the parsed response payload,
+or is rejected with the thrown error.
+
+Under the hood, Naja uses Fetch API, which only rejects the promise in case of a network error or a similar condition,
+not when the response yields a non-200 HTTP code. Naja alters this behaviour and rejects the promise with a `HttpError`
+in such case, which also exposes the `Response` for further inspection:
+
+```js
+import {HttpError} from 'naja';
+
+naja.makeRequest(method, url)
+    .catch((error) => {
+        if (error instanceof HttpError && error.response.status === 401) {
+            // ...
+        }
+    });
+```
 
 
 ## Options
@@ -22,21 +37,32 @@ The `options` object has multiple roles:
 1. It can contain various configuration directives that are further described in respective pages of the documentation.
 2. It is passed along in Naja's events, and thus [custom extensions](extensions-custom.md) can make use of the options
     system too.
-3. On top of that, it carries the options for the underlying AJAX library, [`qwest`](https://github.com/pyrsmk/qwest).
-    Please refer to its docs for reference.
+3. On top of that, it can carry options for the Fetch API request. These are expected in the `fetch` key.
 
 
 ### Default options
 
-You can also configure the default options for your extensions or Naja's core components via the `initialize` method:
+You can configure the default options for your extensions or Naja's core components via the `initialize` method:
 
 ```js
 naja.initialize({
 	history: false,
-	myCustomOption: 42
+	myCustomOption: 42,
+    fetch: {
+		credentials: 'same-origin',
+    },
 });
 ```
 
-?> The default options configuration through the `initialize()` method is available since version 1.6.0. Previously
-(since version 1.3.0), the default options could only be configured by directly modifying `naja.defaultOptions`; this
-way is now deprecated and will be removed in 2.0.0.
+Default options can later be changed by modifying Naja's `defaultOptions` attribute:
+
+```js
+naja.defaultOptions.myCustomOption = 41;
+```
+
+
+## Events
+
+Naja and some of its components dispatch various events during the lifecycle of the request and its processing.
+These allow for a great degree of extensibility; you can learn more about the dispatched events in the [Events
+reference](events.md)
