@@ -43,7 +43,7 @@ describe('HistoryHandler', function () {
 			ui: {},
 		}, '', 'http://localhost:9876/context.html').once();
 
-		historyHandler.initialize();
+		historyHandler.initialize(new CustomEvent('init', {detail: {defaultOptions: {}}}));
 		cleanPopstateListener(historyHandler);
 
 		mock.verify();
@@ -260,7 +260,7 @@ describe('HistoryHandler', function () {
 				ui: false,
 			}, 'new title', 'http://localhost:9876/context.html').once();
 
-			historyHandler.initialize();
+			historyHandler.initialize(new CustomEvent('init', {detail: {defaultOptions: {}}}));
 			cleanPopstateListener(historyHandler);
 
 			mock.verify();
