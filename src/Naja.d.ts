@@ -5,10 +5,10 @@ import {SnippetHandler} from './core/SnippetHandler';
 import {HistoryHandler} from './core/HistoryHandler';
 import {ScriptLoader} from './core/ScriptLoader';
 
-export type Options = {
+export interface Options {
 	fetch?: RequestInit;
 	[key: string]: any;
-};
+}
 
 export interface Payload {
 	snippets?: { [id: string]: string };
@@ -28,6 +28,8 @@ export declare class Naja extends EventTarget {
 	public readonly formsHandler: FormsHandler;
 	public readonly historyHandler: HistoryHandler;
 	public readonly scriptLoader: ScriptLoader;
+
+	public defaultOptions: Options;
 
 	public constructor();
 
