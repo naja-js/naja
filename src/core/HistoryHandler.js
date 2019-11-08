@@ -18,7 +18,12 @@ export class HistoryHandler {
 		};
 	}
 
-	initialize() {
+	initialize(event) {
+		const {defaultOptions} = event.detail;
+		if ('historyUiCache' in defaultOptions) {
+			this.uiCache = defaultOptions.historyUiCache;
+		}
+
 		window.addEventListener('popstate', this.popStateHandler);
 		this.historyAdapter.replaceState(
 			this.buildState(window.location.href, this.uiCache),
