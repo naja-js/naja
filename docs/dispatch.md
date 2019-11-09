@@ -15,15 +15,13 @@ The `makeRequest` method returns a Promise which either resolves to an object co
 or is rejected with the thrown error.
 
 Under the hood, Naja uses Fetch API, which only rejects the promise in case of a network error or a similar condition,
-not when the response yields a non-200 HTTP code. Naja alters this behaviour and rejects the promise with a `HttpError`
+not when the response yields a non-200 HTTP code. Naja alters this behaviour and rejects the promise with an `HttpError`
 in such case, which also exposes the `Response` for further inspection:
 
 ```js
-import {HttpError} from 'naja';
-
 naja.makeRequest(method, url)
     .catch((error) => {
-        if (error instanceof HttpError && error.response.status === 401) {
+        if (error.name === 'HttpError' && error.response.status === 401) {
             // ...
         }
     });
