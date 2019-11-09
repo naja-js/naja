@@ -55,6 +55,8 @@ describe('AbortExtension', function () {
 			this.skip();
 		}
 
+		this.timeout(4000);
+
 		const naja = mockNaja();
 		const abortExtension = new AbortExtension(naja);
 		abortExtension.initialize();
