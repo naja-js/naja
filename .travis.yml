@@ -15,9 +15,10 @@ before_deploy:
 
 deploy:
   - provider: releases
+    edge: true
     token: $GITHUB_API_TOKEN
     draft: true
-    cleanup: false
+    prerelease: true
     file:
       - dist/Naja.js
       - dist/Naja.js.map
@@ -25,9 +26,10 @@ deploy:
       tags: true
       repo: jiripudil/Naja
   - provider: npm
+    edge: true
+    tag: next
     email: naja@jiripudil.cz
-    api_token: $NPM_API_TOKEN
-    cleanup: false
+    api_key: $NPM_API_TOKEN
     on:
       tags: true
       repo: jiripudil/Naja
