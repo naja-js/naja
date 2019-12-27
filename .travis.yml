@@ -22,6 +22,8 @@ deploy:
     file:
       - dist/Naja.js
       - dist/Naja.js.map
+      - dist/Naja.min.js
+      - dist/Naja.min.js.map
     on:
       tags: true
       repo: jiripudil/Naja
