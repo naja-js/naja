@@ -23,8 +23,8 @@ Specifically, it dispatches the following events:
     - `originalEvent: ?Event`, the original UI event, or undefined if the request was dispatched [by hand](ui-binding.md),
     - `options: Object`, an empty object that can be populated with options based on the element's attributes.
 
-- **before:** This event is dispatched when the `XMLHttpRequest` object is created but not yet sent. At this point, you
-    can call the event's `preventDefault()` method to cancel the request. The event has the following properties:
+- **before:** This event is dispatched when the `XMLHttpRequest` object is created but not yet sent. The event has the
+    following properties:
     - `xhr: XMLHttpRequest`, the XHR object,
     - `method: string`, the requested HTTP method,
     - `url: string`, the requested URL,
@@ -36,7 +36,7 @@ Specifically, it dispatches the following events:
     - `xhr: XMLHttpRequest`, the XHR object.
 
 - **abort:** This event is dispatched if the request is aborted. Aborting the request does not trigger error handling
-    because it is not an error per se, but it might be useful to react to it. This event has the following properites:
+    because it is not an error per se, but it might be useful to react to it. This event has the following properties:
     - `xhr: XMLHttpRequest`, the aborted XHR object.
 
 - **success:** This event is dispatched when the request successfully finishes. It has the following properties:
