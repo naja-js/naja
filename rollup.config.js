@@ -42,7 +42,7 @@ export default [
 		input: 'src/index.js',
 		output: {
 			...output,
-			file: pkg.main,
+			file: pkg.unpkg,
 			format: 'umd',
 			name: 'naja',
 		},
@@ -59,7 +59,7 @@ export default [
 		input: 'src/index.js',
 		output: {
 			...output,
-			file: pkg.main.replace('.min', ''),
+			file: pkg.main,
 			format: 'umd',
 			name: 'naja',
 		},

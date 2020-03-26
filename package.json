@@ -9,7 +9,8 @@
   ],
   "author": "Jiří Pudil",
   "license": "MIT",
-  "main": "dist/Naja.min.js",
+  "main": "dist/Naja.js",
+  "unpkg": "dist/Naja.min.js",
   "module": "dist/Naja.esm.js",
   "types": "src/index.d.ts",
   "dependencies": {
