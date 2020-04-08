@@ -39,7 +39,7 @@ export declare class Naja extends EventTarget {
 	): void;
 
 	public initialize(
-		defaultOptions: Options,
+		defaultOptions?: Options,
 	): void;
 
 	public makeRequest(
