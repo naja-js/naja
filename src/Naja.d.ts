@@ -36,7 +36,7 @@ export declare class Naja extends EventTarget {
 	public registerExtension(extension: Extension): void;
 
 	public initialize(
-		defaultOptions: Options,
+		defaultOptions?: Options,
 	): void;
 
 	public makeRequest(
