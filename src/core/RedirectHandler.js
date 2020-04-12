@@ -1,3 +1,6 @@
+import objectAssign from 'object-assign';
+
+
 export default class RedirectHandler {
 	constructor(naja) {
 		this.naja = naja;
@@ -41,7 +44,11 @@ export default class RedirectHandler {
 			this.locationAdapter.assign(url);
 
 		} else {
-			this.naja.makeRequest('GET', url, null, options);
+			const redirectOptions = objectAssign({}, options, {
+				history: 'history' in options && ! options.history ? false : 'replace',
+			});
+
+			this.naja.makeRequest('GET', url, null, redirectOptions);
 		}
 	}
 }
