@@ -1,8 +1,10 @@
+import EventTarget from 'event-target-shim';
 import objectAssign from 'object-assign';
 
 
-export default class RedirectHandler {
+export default class RedirectHandler extends EventTarget {
 	constructor(naja) {
+		super();
 		this.naja = naja;
 
 		naja.addEventListener('interaction', (evt) => {
@@ -38,9 +40,22 @@ export default class RedirectHandler {
 	}
 
 	makeRedirect(url, force, options = {}) {
-		const hardRedirect = force || ! this.naja.uiHandler.isUrlAllowed(url);
+		let isHardRedirect = force || ! this.naja.uiHandler.isUrlAllowed(url);
+		const canRedirect = this.dispatchEvent({
+			type: 'redirect',
+			cancelable: true,
+			url,
+			isHardRedirect,
+			setHardRedirect(value) {
+				isHardRedirect = !!value;
+			},
+		});
 
-		if (hardRedirect) {
+		if ( ! canRedirect) {
+			return;
+		}
+
+		if (isHardRedirect) {
 			this.locationAdapter.assign(url);
 
 		} else {

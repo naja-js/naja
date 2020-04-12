@@ -259,4 +259,52 @@ describe('RedirectHandler', function () {
 			uiHandlerMock.verify();
 		});
 	});
+
+	describe('"redirect" event', function () {
+		it('can prevent redirection', function () {
+			const naja = mockNaja();
+			const redirectHandler = new RedirectHandler(naja);
+
+			const redirectCallback = sinon.spy((evt) => evt.preventDefault());
+			redirectHandler.addEventListener('redirect', redirectCallback);
+
+			const mock = sinon.mock(redirectHandler.locationAdapter);
+			mock.expects('assign').never();
+
+			redirectHandler.makeRedirect('/RedirectHandler/event/preventDefault', true);
+			mock.verify();
+
+			assert.isTrue(redirectCallback.calledOnce);
+			assert.isTrue(redirectCallback.calledWith(sinon.match.object
+				.and(sinon.match.has('url', '/RedirectHandler/event/preventDefault'))
+				.and(sinon.match.has('isHardRedirect', true))
+			));
+		});
+
+		it('can override hardRedirect settings', function () {
+			const naja = mockNaja();
+			const redirectHandler = new RedirectHandler(naja);
+
+			const redirectCallback = sinon.spy((evt) => evt.setHardRedirect(true));
+			redirectHandler.addEventListener('redirect', redirectCallback);
+
+			const uiHandlerMock = sinon.mock(naja.uiHandler);
+			uiHandlerMock.expects('isUrlAllowed').withExactArgs('/RedirectHandler/event/setHardRedirect').once().returns(true);
+
+			const mock = sinon.mock(redirectHandler.locationAdapter);
+			mock.expects('assign')
+				.withExactArgs('/RedirectHandler/event/setHardRedirect')
+				.once();
+
+			redirectHandler.makeRedirect('/RedirectHandler/event/setHardRedirect', false);
+			mock.verify();
+			uiHandlerMock.verify();
+
+			assert.isTrue(redirectCallback.calledOnce);
+			assert.isTrue(redirectCallback.calledWith(sinon.match.object
+				.and(sinon.match.has('url', '/RedirectHandler/event/setHardRedirect'))
+				.and(sinon.match.has('isHardRedirect', false))
+			));
+		});
+	});
 });
