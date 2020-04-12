@@ -2,6 +2,7 @@ import Naja from '../../src/Naja';
 
 
 class UIHandlerMock {
+	isUrlAllowed(url) {}
 }
 
 class RedirectHandlerMock {

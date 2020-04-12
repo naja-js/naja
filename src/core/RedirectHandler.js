@@ -35,10 +35,9 @@ export default class RedirectHandler {
 	}
 
 	makeRedirect(url, force, options = {}) {
-		// window.location.origin is not supported in IE 10
-		const origin = `${window.location.protocol}//${window.location.hostname}${window.location.port ? `:${window.location.port}` : ''}`;
-		const externalRedirect = /^https?/i.test(url) && ! new RegExp(`^${origin}`, 'i').test(url);
-		if (force || externalRedirect) {
+		const hardRedirect = force || ! this.naja.uiHandler.isUrlAllowed(url);
+
+		if (hardRedirect) {
 			this.locationAdapter.assign(url);
 
 		} else {

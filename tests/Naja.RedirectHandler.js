@@ -146,22 +146,12 @@ describe('RedirectHandler', function () {
 		this.requests.pop().respond(200, {'Content-Type': 'application/json'}, JSON.stringify({redirect: '/RedirectHandler/stopEventPropagation/redirectTo', forceRedirect: true}));
 	});
 
-	it('makes request if forceRedirect is false', function () {
-		const naja = mockNaja();
-		const redirectHandler = new RedirectHandler(naja);
-
-		const mock = sinon.mock(naja);
-		mock.expects('makeRequest')
-			.withExactArgs('GET', '/RedirectHandler/noForce', null, {})
-			.once();
-
-		redirectHandler.makeRedirect('/RedirectHandler/noForce', false);
-		mock.verify();
-	});
-
 	it('redirects if forceRedirect is true', function () {
 		const naja = mockNaja();
 		const redirectHandler = new RedirectHandler(naja);
+
+		const uiHandlerMock = sinon.mock(naja.uiHandler);
+		uiHandlerMock.expects('isUrlAllowed').never();
 
 		const mock = sinon.mock(redirectHandler.locationAdapter);
 		mock.expects('assign')
@@ -171,24 +161,39 @@ describe('RedirectHandler', function () {
 		redirectHandler.makeRedirect('/RedirectHandler/forceRedirect', true);
 		mock.verify();
 		mock.restore();
+		uiHandlerMock.verify();
+		uiHandlerMock.restore();
 	});
 
-	it('makes request if url is local', function () {
+	it('makes request if url is allowed', function () {
 		const naja = mockNaja();
 		const redirectHandler = new RedirectHandler(naja);
 
+		const uiHandlerMock = sinon.mock(naja.uiHandler);
+		uiHandlerMock.expects('isUrlAllowed')
+			.withExactArgs('http://localhost:9876/RedirectHandler/localUrl')
+			.once()
+			.returns(true);
+
 		const mock = sinon.mock(naja);
 		mock.expects('makeRequest')
-			.withExactArgs('GET', 'http://localhost:9876/RedirectHandler/localUrl', null, {})
+			.withExactArgs('GET', 'http://localhost:9876/RedirectHandler/localUrl', null, sinon.match({}))
 			.once();
 
 		redirectHandler.makeRedirect('http://localhost:9876/RedirectHandler/localUrl', false);
 		mock.verify();
+		uiHandlerMock.verify();
 	});
 
-	it('redirects if url is external', function () {
+	it('redirects if url is not allowed', function () {
 		const naja = mockNaja();
 		const redirectHandler = new RedirectHandler(naja);
+
+		const uiHandlerMock = sinon.mock(naja.uiHandler);
+		uiHandlerMock.expects('isUrlAllowed')
+			.withExactArgs('http://another-site.com/bar')
+			.once()
+			.returns(false);
 
 		const mock = sinon.mock(redirectHandler.locationAdapter);
 		mock.expects('assign')
@@ -198,5 +203,7 @@ describe('RedirectHandler', function () {
 		redirectHandler.makeRedirect('http://another-site.com/bar', false);
 		mock.verify();
 		mock.restore();
+		uiHandlerMock.verify();
+		uiHandlerMock.restore();
 	});
 });
