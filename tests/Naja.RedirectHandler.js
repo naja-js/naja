@@ -207,59 +207,6 @@ describe('RedirectHandler', function () {
 		uiHandlerMock.restore();
 	});
 
-	describe('overrides history settings', function () {
-		it('if options.history is undefined', function () {
-			const naja = mockNaja();
-			const redirectHandler = new RedirectHandler(naja);
-
-			const uiHandlerMock = sinon.mock(naja.uiHandler);
-			uiHandlerMock.expects('isUrlAllowed').withExactArgs('/RedirectHandler/history/undefined').once().returns(true);
-
-			const mock = sinon.mock(naja);
-			mock.expects('makeRequest')
-				.withExactArgs('GET', '/RedirectHandler/history/undefined', null, sinon.match({history: 'replace'}))
-				.once();
-
-			redirectHandler.makeRedirect('/RedirectHandler/history/undefined', false, {});
-			mock.verify();
-			uiHandlerMock.verify();
-		});
-
-		it('if options.history is true', function () {
-			const naja = mockNaja();
-			const redirectHandler = new RedirectHandler(naja);
-
-			const uiHandlerMock = sinon.mock(naja.uiHandler);
-			uiHandlerMock.expects('isUrlAllowed').withExactArgs('/RedirectHandler/history/true').once().returns(true);
-
-			const mock = sinon.mock(naja);
-			mock.expects('makeRequest')
-				.withExactArgs('GET', '/RedirectHandler/history/true', null, sinon.match({history: 'replace'}))
-				.once();
-
-			redirectHandler.makeRedirect('/RedirectHandler/history/true', false, {history: true});
-			mock.verify();
-			uiHandlerMock.verify();
-		});
-
-		it('NOT if options.history is false', function () {
-			const naja = mockNaja();
-			const redirectHandler = new RedirectHandler(naja);
-
-			const uiHandlerMock = sinon.mock(naja.uiHandler);
-			uiHandlerMock.expects('isUrlAllowed').withExactArgs('/RedirectHandler/history/false').once().returns(true);
-
-			const mock = sinon.mock(naja);
-			mock.expects('makeRequest')
-				.withExactArgs('GET', '/RedirectHandler/history/false', null, sinon.match({history: false}))
-				.once();
-
-			redirectHandler.makeRedirect('/RedirectHandler/history/false', false, {history: false});
-			mock.verify();
-			uiHandlerMock.verify();
-		});
-	});
-
 	describe('"redirect" event', function () {
 		it('can prevent redirection', function () {
 			const naja = mockNaja();

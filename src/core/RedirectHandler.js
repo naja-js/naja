@@ -1,5 +1,4 @@
 import EventTarget from 'event-target-shim';
-import objectAssign from 'object-assign';
 
 
 export default class RedirectHandler extends EventTarget {
@@ -59,11 +58,7 @@ export default class RedirectHandler extends EventTarget {
 			this.locationAdapter.assign(url);
 
 		} else {
-			const redirectOptions = objectAssign({}, options, {
-				history: 'history' in options && ! options.history ? false : 'replace',
-			});
-
-			this.naja.makeRequest('GET', url, null, redirectOptions);
+			this.naja.makeRequest('GET', url, null, options);
 		}
 	}
 }
