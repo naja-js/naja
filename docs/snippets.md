@@ -11,7 +11,8 @@ While Naja exposes various events in the request's lifecycle to provide a flexib
 sometimes a more granular approach is handy. You can therefore attach event listeners to two SnippetHandler's events:
 `beforeUpdate` and `afterUpdate`. Both are dispatched for each updated snippet: the former is dispatched right before
 the snippet's content is updated, the latter after that. Both give you access to the HTML element in `event.snippet`
-and the content from payload in `event.content`.
+and the content from payload in `event.content`, and both can tell you whether the snippet has been updated from cache
+after user navigation (e.g. going back in history), or as a result of an AJAX request to the server (`event.fromCache`).
 
 You can use them like this:
 
@@ -27,3 +28,5 @@ The `beforeUpdate` event listener might also prevent the snippet from updating b
 In such case, the `afterUpdate` event is not dispatched for that snippet.
 
 ?> The snippet update events are available since version 1.2.0.
+
+?> The `event.fromCache` flag is available since version 1.8.0.

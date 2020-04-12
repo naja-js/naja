@@ -79,7 +79,7 @@ describe('SnippetHandler', function () {
 		document.body.appendChild(el);
 
 		assert.equal(el.innerHTML, 'Foo');
-		snippetHandler.updateSnippet(el, 'Bar');
+		snippetHandler.updateSnippet(el, 'Bar', false);
 		assert.equal(el.innerHTML, 'Bar');
 		document.body.removeChild(el);
 	});
@@ -100,7 +100,7 @@ describe('SnippetHandler', function () {
 		assert.equal(titleEl.innerHTML, 'Foo');
 		assert.equal(document.title, 'Foo');
 
-		snippetHandler.updateSnippet(titleEl, 'Bar');
+		snippetHandler.updateSnippet(titleEl, 'Bar', false);
 
 		assert.equal(titleEl.innerHTML, 'Bar');
 		assert.equal(document.title, 'Bar');
@@ -117,7 +117,7 @@ describe('SnippetHandler', function () {
 		document.body.appendChild(el);
 
 		assert.equal(el.innerHTML, 'Foo');
-		snippetHandler.updateSnippet(el, 'prefix-');
+		snippetHandler.updateSnippet(el, 'prefix-', false);
 		assert.equal(el.innerHTML, 'prefix-Foo');
 		document.body.removeChild(el);
 	});
@@ -133,12 +133,12 @@ describe('SnippetHandler', function () {
 		document.body.appendChild(el);
 
 		assert.equal(el.innerHTML, 'Foo');
-		snippetHandler.updateSnippet(el, '-suffix');
+		snippetHandler.updateSnippet(el, '-suffix', false);
 		assert.equal(el.innerHTML, 'Foo-suffix');
 		document.body.removeChild(el);
 	});
 
-	it('updateSnippet() forceReplace', function () {
+	it('updateSnippet() fromCache', function () {
 		const naja = mockNaja();
 		const snippetHandler = new SnippetHandler(naja);
 
@@ -167,12 +167,13 @@ describe('SnippetHandler', function () {
 		el.id = 'snippet--foo';
 		el.innerHTML = 'Foo';
 		document.body.appendChild(el);
-		snippetHandler.updateSnippet(el, 'Bar');
+		snippetHandler.updateSnippet(el, 'Bar', false);
 
 		assert.isTrue(beforeCallback.calledOnce);
 		assert.isTrue(beforeCallback.calledWith(sinon.match.object
 			.and(sinon.match.has('snippet', el))
 			.and(sinon.match.has('content', sinon.match.string))
+			.and(sinon.match.has('fromCache', false))
 		));
 
 		assert.isTrue(afterCallback.calledOnce);
@@ -180,6 +181,7 @@ describe('SnippetHandler', function () {
 		assert.isTrue(beforeCallback.calledWith(sinon.match.object
 			.and(sinon.match.has('snippet', el))
 			.and(sinon.match.has('content', sinon.match.string))
+			.and(sinon.match.has('fromCache', false))
 		));
 
 		document.body.removeChild(el);
@@ -198,12 +200,13 @@ describe('SnippetHandler', function () {
 		el.id = 'snippet--foo';
 		el.innerHTML = 'Foo';
 		document.body.appendChild(el);
-		snippetHandler.updateSnippet(el, 'Bar');
+		snippetHandler.updateSnippet(el, 'Bar', true);
 
 		assert.isTrue(beforeCallback.calledOnce);
 		assert.isTrue(beforeCallback.calledWith(sinon.match.object
 			.and(sinon.match.has('snippet', el))
 			.and(sinon.match.has('content', sinon.match.string))
+			.and(sinon.match.has('fromCache', true))
 		));
 
 		assert.isFalse(afterCallback.called);

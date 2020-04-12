@@ -11,21 +11,22 @@ export default class SnippetHandler extends EventTarget {
 		});
 	}
 
-	updateSnippets(snippets, forceReplace = false) {
+	updateSnippets(snippets, fromCache = false) {
 		Object.keys(snippets).forEach((id) => {
 			const el = document.getElementById(id);
 			if (el) {
-				this.updateSnippet(el, snippets[id], forceReplace);
+				this.updateSnippet(el, snippets[id], fromCache);
 			}
 		});
 	}
 
-	updateSnippet(el, content, forceReplace) {
+	updateSnippet(el, content, fromCache) {
 		const canUpdate = this.dispatchEvent({
 			type: 'beforeUpdate',
 			cancelable: true,
 			snippet: el,
 			content,
+			fromCache,
 		});
 
 		if ( ! canUpdate) {
@@ -36,10 +37,10 @@ export default class SnippetHandler extends EventTarget {
 			document.title = content;
 
 		} else {
-			if ((el.hasAttribute('data-naja-snippet-prepend') || el.hasAttribute('data-ajax-prepend')) && ! forceReplace) {
+			if ((el.hasAttribute('data-naja-snippet-prepend') || el.hasAttribute('data-ajax-prepend')) && ! fromCache) {
 				el.insertAdjacentHTML('afterbegin', content);
 
-			} else if ((el.hasAttribute('data-naja-snippet-append') || el.hasAttribute('data-ajax-append')) && ! forceReplace) {
+			} else if ((el.hasAttribute('data-naja-snippet-append') || el.hasAttribute('data-ajax-append')) && ! fromCache) {
 				el.insertAdjacentHTML('beforeend', content);
 
 			} else {
@@ -52,6 +53,7 @@ export default class SnippetHandler extends EventTarget {
 			cancelable: true,
 			snippet: el,
 			content,
+			fromCache,
 		});
 	}
 }
