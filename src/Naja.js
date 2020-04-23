@@ -72,6 +72,10 @@ export default class Naja extends EventTarget {
 		};
 
 		options = objectAssign({}, defaultOptions, this.defaultOptions, options || {});
+		if (method === 'GET' && data instanceof FormData) {
+			options.dataType = 'definitelyNotPost'; // prevent qwest from doing any unfortunate transformation of data
+			data = Array.from(data, (pair) => pair.map(encodeURIComponent).join('=')).join('&');
+		}
 
 		let currentXhr;
 		const beforeCallback = (xhr) => {
