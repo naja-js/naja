@@ -96,8 +96,9 @@ export default class UIHandler {
 
 		} else if (el.tagName.toLowerCase() === 'input' || el.tagName.toLowerCase() === 'button') {
 			const {form} = el;
-			method = form.method ? form.method.toUpperCase() : 'GET';
-			url = form.action || window.location.pathname + window.location.search;
+			// eslint-disable-next-line no-nested-ternary,no-extra-parens
+			method = el.hasAttribute('formmethod') ? el.getAttribute('formmethod').toUpperCase() : (form.hasAttribute('method') ? form.getAttribute('method').toUpperCase() : 'GET');
+			url = el.getAttribute('formaction') || form.getAttribute('action') || window.location.pathname + window.location.search;
 			data = new FormData(form);
 
 			if (el.type === 'submit' || el.tagName.toLowerCase() === 'button') {
@@ -128,8 +129,8 @@ export default class UIHandler {
 			return;
 		}
 
-		const method = form.method ? form.method.toUpperCase() : 'GET';
-		const url = form.action || window.location.pathname + window.location.search;
+		const method = form.hasAttribute('method') ? form.getAttribute('method').toUpperCase() : 'GET';
+		const url = form.getAttribute('action') || window.location.pathname + window.location.search;
 		const data = new FormData(form);
 
 		if (this.isUrlAllowed(url)) {
