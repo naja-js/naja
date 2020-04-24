@@ -12,7 +12,7 @@ module.exports = (config) => {
     'chrome-1': {
       base: 'SauceLabs',
       browserName: 'chrome',
-      platform: 'macOS 10.14',
+      platform: 'macOS 10.15',
       version: 'latest-1'
     },
     'firefox': {
@@ -24,7 +24,7 @@ module.exports = (config) => {
     'firefox-1': {
       base: 'SauceLabs',
       browserName: 'firefox',
-      platform: 'macOS 10.14',
+      platform: 'macOS 10.15',
       version: 'latest-1'
     },
 
@@ -50,24 +50,24 @@ module.exports = (config) => {
     'safari13': {
       base: 'SauceLabs',
       browserName: 'safari',
-      platform: 'macOS 10.13',
+      platform: 'macOS 10.15',
       version: '13.0'
     },
 
-    'ios11': {
-      base: 'SauceLabs',
-      browserName: 'Safari',
-      platformName: 'iOS',
-      platformVersion: '11.3',
-      deviceName: 'iPhone X Simulator',
-      idleTimeout: 120
-    },
     'ios12': {
       base: 'SauceLabs',
       browserName: 'Safari',
       platformName: 'iOS',
-      platformVersion: '12.2',
+      platformVersion: '12.4',
       deviceName: 'iPhone XR Simulator',
+      idleTimeout: 120
+    },
+    'ios13': {
+      base: 'SauceLabs',
+      browserName: 'Safari',
+      platformName: 'iOS',
+      platformVersion: '13.2',
+      deviceName: 'iPhone 11 Simulator',
       idleTimeout: 120
     },
 
@@ -78,11 +78,11 @@ module.exports = (config) => {
       platformVersion: '6.0',
       deviceName: 'Android GoogleAPI Emulator'
     },
-    'android8': {
+    'android10': {
       base: 'SauceLabs',
       browserName: 'Chrome',
       platformName: 'Android',
-      platformVersion: '8.0',
+      platformVersion: '10.0',
       deviceName: 'Android GoogleAPI Emulator'
     }
   };
