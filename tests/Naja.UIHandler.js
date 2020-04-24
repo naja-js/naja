@@ -355,7 +355,7 @@ describe('UIHandler', function () {
 			const naja = mockNaja();
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
-				.withExactArgs('POST', 'http://localhost:9876/UIHandler/form', sinon.match.instanceOf(FormData), {})
+				.withExactArgs('POST', '/UIHandler/form', sinon.match.instanceOf(FormData), {})
 				.once();
 
 			const handler = new UIHandler(naja);
@@ -381,7 +381,7 @@ describe('UIHandler', function () {
 			});
 
 			mock.expects('makeRequest')
-				.withExactArgs('GET', 'http://localhost:9876/UIHandler/submit', sinon.match.instanceOf(FormData).and(containsSubmit), {})
+				.withExactArgs('GET', '/UIHandler/submit', sinon.match.instanceOf(FormData).and(containsSubmit), {})
 				.once();
 
 			const handler = new UIHandler(naja);
@@ -407,7 +407,7 @@ describe('UIHandler', function () {
 			});
 
 			mock.expects('makeRequest')
-				.withExactArgs('GET', 'http://localhost:9876/UIHandler/image', sinon.match.instanceOf(FormData).and(containsImage), {})
+				.withExactArgs('GET', '/UIHandler/image', sinon.match.instanceOf(FormData).and(containsImage), {})
 				.once();
 
 			const handler = new UIHandler(naja);
@@ -475,7 +475,7 @@ describe('UIHandler', function () {
 			const mock = sinon.mock(naja);
 
 			mock.expects('makeRequest')
-				.withExactArgs('POST', 'http://localhost:9876/UIHandler/submitForm', sinon.match.instanceOf(FormData), {})
+				.withExactArgs('POST', '/UIHandler/submitForm', sinon.match.instanceOf(FormData), {})
 				.once();
 
 			const form = document.createElement('form');
@@ -493,7 +493,7 @@ describe('UIHandler', function () {
 			const mock = sinon.mock(naja);
 
 			mock.expects('makeRequest')
-				.withExactArgs('POST', 'http://localhost:9876/UIHandler/submitForm', sinon.match.instanceOf(FormData), {})
+				.withExactArgs('POST', '/UIHandler/submitForm', sinon.match.instanceOf(FormData), {})
 				.once();
 
 			const listener = sinon.spy();
