@@ -1,7 +1,7 @@
 export class AbortExtension {
-	constructor(naja) {
+	initialize(naja) {
 		naja.uiHandler.addEventListener('interaction', this.checkAbortable.bind(this));
-		naja.addEventListener('init', this.initialize.bind(this));
+		naja.addEventListener('init', this.onInitialize.bind(this));
 		naja.addEventListener('before', this.checkAbortable.bind(this));
 		naja.addEventListener('start', this.saveAbortController.bind(this));
 		naja.addEventListener('complete', this.clearAbortController.bind(this));
@@ -10,7 +10,7 @@ export class AbortExtension {
 
 	abortable = true;
 	abortController = null;
-	initialize() {
+	onInitialize() {
 		document.addEventListener('keydown', (event) => {
 			if (this.abortController !== null
 				&& ('key' in event ? event.key === 'Escape' : event.keyCode === 27)

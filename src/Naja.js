@@ -30,8 +30,12 @@ export class Naja extends EventTarget {
 	}
 
 
-	registerExtension(extensionClass, ...args) {
-		this.extensions.push([extensionClass, args]);
+	registerExtension(extension) {
+		if (this.initialized) {
+			extension.initialize(this);
+		}
+
+		this.extensions.push(extension);
 	}
 
 
@@ -41,7 +45,7 @@ export class Naja extends EventTarget {
 		}
 
 		this.defaultOptions = defaultOptions;
-		this.extensions = this.extensions.map(([extensionClass, args]) => new extensionClass(this, ...args));
+		this.extensions.forEach((extension) => extension.initialize(this));
 
 		this.dispatchEvent(new CustomEvent('init', {detail: {defaultOptions}}));
 		this.initialized = true;

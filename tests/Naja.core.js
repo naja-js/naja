@@ -83,19 +83,36 @@ describe('Naja.js', function () {
 			const naja = mockNaja();
 
 			let initialized = false;
-			const extension = class {
-				constructor(naja, foo, bar) {
+			const Extension = class {
+				initialize(naja) {
 					initialized = true;
 					assert.instanceOf(naja, Naja);
-					assert.equal(42, foo);
-					assert.equal('42', bar);
 				}
 			};
 
-			naja.registerExtension(extension, 42, '42');
-			assert.equal(1, naja.extensions.length);
+			naja.registerExtension(new Extension());
+			assert.lengthOf(naja.extensions, 1);
 
 			naja.initialize();
+			assert.isTrue(initialized);
+		});
+
+		it('initializes extensions registered after initialization', function () {
+			const naja = mockNaja();
+
+			let initialized = false;
+			const extension = {
+				initialize(naja) {
+					initialized = true;
+					assert.instanceOf(naja, Naja);
+				}
+			};
+
+			naja.initialize();
+			assert.isFalse(initialized);
+
+			naja.registerExtension(extension);
+			assert.lengthOf(naja.extensions, 1);
 			assert.isTrue(initialized);
 		});
 	});
