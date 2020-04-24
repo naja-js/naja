@@ -6,8 +6,8 @@ import {UniqueExtension} from './extensions/UniqueExtension';
 
 
 const naja = new Naja();
-naja.registerExtension(AbortExtension);
-naja.registerExtension(UniqueExtension);
+naja.registerExtension(new AbortExtension());
+naja.registerExtension(new UniqueExtension());
 
 naja.HttpError = HttpError;
 

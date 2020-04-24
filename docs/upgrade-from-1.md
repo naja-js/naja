@@ -50,6 +50,61 @@ naja.addEventListener('before', (event) => {
 ```
 
 
+## Extensions API is refactored
+
+The extensions API in Naja 1.0 had been designed in a bit slapdash manner. Well, more like half-baked than designed.
+In Naja 2.0, the entry point of an [extensions](extensibility.md) has moved from its constructor to the `initialize()`
+method. That's where extensions receive the instance of Naja and where they should bind their event listeners. The
+extension can utilize its constructor however it needs, or not at all.
+
+As a result, you no longer register the extension's constructor and you no longer have to pass arguments through Naja.
+Extensions are registered as instances and initialized later by Naja through the `initialize()` method.
+
+Before:
+
+```js
+class LoaderExtension {
+    constructor(naja, loaderSelector) {
+        this.loader = document.querySelector(loaderSelector);
+        naja.addEventListener('start', () => { /* show this.loader */ });
+        naja.addEventListener('complete', () => { /* hide this.loader */ });
+    }
+}
+
+naja.registerExtension(LoaderExtension, '#loader');
+```
+
+After:
+
+```js
+class LoaderExtension {
+    constructor(loaderSelector) {
+        this.loader = document.querySelector(loaderSelector);
+    }
+
+    initialize(naja) {
+        naja.addEventListener('start', () => { /* show this.loader */ });
+        naja.addEventListener('complete', () => { /* hide this.loader */ });
+    }
+}
+
+naja.registerExtension(new LoaderExtension('#loaderSelector'));
+```
+
+As an added bonus, extensions no longer have to be "classes". Even a plain object is fine as long as it implements
+the `initialize()` method:
+
+```js
+const loggerExtension = {
+    initialize(naja) {
+        naja.addEventListener('complete', ({detail}) => console.log(detail.request, detail.response. detail.error));
+    }
+};
+
+naja.registerExtension(loggerExtension);
+```
+
+
 ## Options are no longer read from response payload
 
 Naja 1.7.0 has deprecated the support for reading some options from the response payload, namely `forceRedirect` and
