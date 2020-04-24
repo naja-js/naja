@@ -33,10 +33,7 @@ export declare class Naja extends EventTarget {
 
 	public constructor();
 
-	public registerExtension(
-		extensionClass: { new(naja: Naja, ...args: any[]): any },
-		...args: any[],
-	): void;
+	public registerExtension(extension: Extension): void;
 
 	public initialize(
 		defaultOptions: Options,
@@ -53,6 +50,10 @@ export declare class Naja extends EventTarget {
 	public addEventListener(type: string, listener: EventListenerOrEventListenerObject | null, options?: boolean | AddEventListenerOptions): void
 	public removeEventListener<K extends keyof NajaEventMap>(type: K, listener: (this: Naja, event: NajaEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
 	public removeEventListener(type: string, listener: EventListenerOrEventListenerObject | null, options?: boolean | AddEventListenerOptions): void
+}
+
+export interface Extension {
+	initialize(naja: Naja): void;
 }
 
 export declare class HttpError extends Error {

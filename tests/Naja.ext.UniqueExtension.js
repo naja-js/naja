@@ -15,7 +15,8 @@ describe('UniqueExtension', function () {
 		}
 
 		const naja = mockNaja();
-		new UniqueExtension(naja);
+		const uniqueExtension = new UniqueExtension();
+		uniqueExtension.initialize(naja);
 
 		this.fetchMock.when((request) => /first/.test(request.url))
 			.handler = (request) => new Promise((resolve, reject) => {
@@ -42,7 +43,8 @@ describe('UniqueExtension', function () {
 		}
 
 		const naja = mockNaja();
-		new UniqueExtension(naja);
+		const uniqueExtension = new UniqueExtension();
+		uniqueExtension.initialize(naja);
 
 		this.fetchMock.when()
 			.handler = (request) => new Promise((resolve, reject) => {

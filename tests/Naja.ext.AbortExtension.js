@@ -24,8 +24,9 @@ describe('AbortExtension', function () {
 		}
 
 		const naja = mockNaja();
-		const abortExtension = new AbortExtension(naja);
-		abortExtension.initialize();
+		const abortExtension = new AbortExtension();
+		abortExtension.initialize(naja);
+		abortExtension.onInitialize();
 
 		this.fetchMock.when()
 			.handler = (request) => new Promise((resolve, reject) => {
@@ -58,8 +59,9 @@ describe('AbortExtension', function () {
 		this.timeout(4000);
 
 		const naja = mockNaja();
-		const abortExtension = new AbortExtension(naja);
-		abortExtension.initialize();
+		const abortExtension = new AbortExtension();
+		abortExtension.initialize(naja);
+		abortExtension.onInitialize();
 
 		this.fetchMock.when()
 			.handler = (request) => new Promise((resolve, reject) => {
