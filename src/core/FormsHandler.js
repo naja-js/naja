@@ -37,7 +37,7 @@ export default class FormsHandler {
 		}
 
 		const netteForms = this.netteForms || window.Nette;
-		if ((element.tagName === 'form' || element.form) && netteForms && ! netteForms.validateForm(element)) {
+		if ((element.tagName === 'FORM' || element.form) && netteForms && ! netteForms.validateForm(element)) {
 			if (originalEvent) {
 				originalEvent.stopImmediatePropagation();
 				originalEvent.preventDefault();
