@@ -67,12 +67,14 @@ export class HistoryHandler {
 			return;
 		}
 
-		if (element.hasAttribute('data-naja-history')) {
-			options.history = this.constructor.normalizeMode(element.getAttribute('data-naja-history'));
+		if (element.hasAttribute('data-naja-history') || element.form?.hasAttribute('data-naja-history')) {
+			const value = element.getAttribute('data-naja-history') ?? element.form?.getAttribute('data-naja-history');
+			options.history = this.constructor.normalizeMode(value);
 		}
 
-		if (element.hasAttribute('data-naja-history-cache')) {
-			options.historyUiCache = element.getAttribute('data-naja-history-cache') !== 'off';
+		if (element.hasAttribute('data-naja-history-cache') || element.form?.hasAttribute('data-naja-history-nocache')) {
+			const value = element.getAttribute('data-naja-history-cache') ?? element.form?.getAttribute('data-naja-history-cache');
+			options.historyUiCache = value !== 'off';
 		}
 	}
 

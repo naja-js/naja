@@ -26,7 +26,7 @@ export class AbortExtension {
 	checkAbortable(event) {
 		const {element, options} = event.detail;
 		this.abortable = element
-			? element.getAttribute('data-naja-abort') !== 'off'
+			? (element.getAttribute('data-naja-abort') ?? element.form?.getAttribute('data-naja-abort')) !== 'off' // eslint-disable-line no-extra-parens
 			: options.abort !== false;
 
 		// propagate to options if called in interaction event
