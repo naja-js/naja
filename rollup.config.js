@@ -1,7 +1,7 @@
 const babel = require('rollup-plugin-babel');
 const commonjs = require('rollup-plugin-commonjs');
 const resolve = require('rollup-plugin-node-resolve');
-const {uglify} = require('rollup-plugin-uglify');
+const {terser} = require('rollup-plugin-terser');
 
 const pkg = require('./package.json');
 const output = {
@@ -51,7 +51,7 @@ export default [
 			babelPlugin,
 			resolve(),
 			commonjs(),
-			uglify(),
+			terser(),
 		],
 	},
 	{
