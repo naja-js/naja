@@ -23,7 +23,7 @@ $ npm install --save naja
 
 ```js
 import naja from 'naja';
-document.addEventListener('DOMContentLoaded', naja.initialize.bind(naja));
+document.addEventListener('DOMContentLoaded', () => naja.initialize());
 ```
 
 

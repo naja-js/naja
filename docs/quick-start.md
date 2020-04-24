@@ -23,7 +23,7 @@ Once you load `naja`, you need to initialize it. You should make sure this happe
 e.g. like this:
 
 ```js
-document.addEventListener('DOMContentLoaded', naja.initialize.bind(naja));
+document.addEventListener('DOMContentLoaded', () => naja.initialize());
 ```
 
 The `initialize()` method loads all Naja's core components plus all registered [extensions](extensions-custom.md).
