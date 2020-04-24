@@ -9,8 +9,9 @@ export class RedirectHandler extends EventTarget {
 				return;
 			}
 
-			if (element.hasAttribute('data-naja-force-redirect')) {
-				options.forceRedirect = element.getAttribute('data-naja-force-redirect') !== 'off';
+			if (element.hasAttribute('data-naja-force-redirect') || element.form?.hasAttribute('data-naja-force-redirect')) {
+				const value = element.getAttribute('data-naja-force-redirect') ?? element.form?.getAttribute('data-naja-force-redirect');
+				options.forceRedirect = value !== 'off';
 			}
 		});
 
