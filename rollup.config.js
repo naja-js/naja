@@ -21,7 +21,7 @@ const babelPlugin = babel({
 export default [
 	{
 		// ESM build for modern tools like webpack
-		input: 'src/index.js',
+		input: 'src/index.esm.js',
 		output: {
 			...output,
 			file: pkg.module,
