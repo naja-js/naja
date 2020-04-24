@@ -10,7 +10,7 @@ export class UniqueExtension {
 
 	checkUniqueness(event) {
 		const {element, options} = event.detail;
-		options.unique = element.getAttribute('data-naja-unique') !== 'off';
+		options.unique = (element.getAttribute('data-naja-unique') ?? element.form?.getAttribute('data-naja-unique')) !== 'off'; // eslint-disable-line no-extra-parens
 	}
 
 	abortPreviousRequest(event) {
