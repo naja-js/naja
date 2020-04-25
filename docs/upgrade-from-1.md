@@ -6,11 +6,16 @@ of the docs describes all of these changes and the way to upgrade.
 
 ## Naja 2.0 uses Fetch API
 
-The most notable change is that Naja now directly uses Fetch API to dispatch the requests. As a result, there is
-no longer an `XMLHttpRequest`, which led to a change in the contents of most of Naja's events: they no longer
-reference the `xhr`, and instead hold the `Request` instance, as well as the `Response` where possible.
+The most notable, and at the same time the most internal change is that Naja now directly uses Fetch API to dispatch
+the requests. As a result, there is no longer an `XMLHttpRequest`, which led to a change in the contents of most
+of Naja's events: they no longer reference the `xhr`, and instead hold the `Request` instance, as well as the `Response`
+where possible.
 
 Please refer to the [Events reference](events.md) for more information about the new events.
+
+!> Pay special attention to `success` and `complete` events. In 1.x, these events held the response payload
+in `event.response`. In 2.0, `event.detail.response` holds the Fetch API's `Response` instance, and the response
+payload is accessible via `event.detail.payload`.
 
 
 ## Interaction event has moved
@@ -53,7 +58,7 @@ naja.addEventListener('before', (event) => {
 ## Extensions API is refactored
 
 The extensions API in Naja 1.0 had been designed in a bit slapdash manner. Well, more like half-baked than designed.
-In Naja 2.0, the entry point of an [extensions](extensibility.md) has moved from its constructor to the `initialize()`
+In Naja 2.0, the entry point of an [extension](extensibility.md) has moved from its constructor to the `initialize()`
 method. That's where extensions receive the instance of Naja and where they should bind their event listeners. The
 extension can utilize its constructor however it needs, or not at all.
 
