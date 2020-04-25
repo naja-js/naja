@@ -197,7 +197,8 @@ describe('RedirectHandler', function () {
 			mock.verify();
 
 			assert.isTrue(redirectCallback.calledOnce);
-			assert.isTrue(redirectCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+			assert.isTrue(redirectCallback.calledWith(
+				sinon.match((event) => event.constructor.name === 'CustomEvent')
 				.and(sinon.match.has('detail', sinon.match.object
 					.and(sinon.match.has('url', '/RedirectHandler/event/preventDefault'))
 					.and(sinon.match.has('isHardRedirect', true))
@@ -225,7 +226,8 @@ describe('RedirectHandler', function () {
 			uiHandlerMock.verify();
 
 			assert.isTrue(redirectCallback.calledOnce);
-			assert.isTrue(redirectCallback.calledWith(sinon.match.instanceOf(CustomEvent)
+			assert.isTrue(redirectCallback.calledWith(
+				sinon.match((event) => event.constructor.name === 'CustomEvent')
 				.and(sinon.match.has('detail', sinon.match.object
 					.and(sinon.match.has('url', '/RedirectHandler/event/setHardRedirect'))
 					.and(sinon.match.has('isHardRedirect', false))
