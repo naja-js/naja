@@ -37,7 +37,7 @@
     "karma-firefox-launcher": "^1.2.0",
     "karma-mocha": "^2.0.0",
     "karma-rollup-preprocessor": "^7.0.2",
-    "karma-sauce-launcher": "^4.1.3",
+    "karma-sauce-launcher": "^1.2.0",
     "mocha": "^7.1.1",
     "nette-forms": "^3.0.3",
     "rollup": "^2.7.2",
