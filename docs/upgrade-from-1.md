@@ -18,7 +18,7 @@ in `event.response`. In 2.0, `event.detail.response` holds the Fetch API's `Resp
 payload is accessible via `event.detail.payload`.
 
 
-## Interaction event has moved
+## The interaction event has moved
 
 The `interaction` event has moved to where it belongs better, the UIHandler. Luckily, the migration path is quite
 straight-forward: just add `.uiHandler`. In other words, change this:
@@ -32,6 +32,39 @@ to this:
 ```js
 naja.uiHandler.addEventListener('interaction', interactionHandler);
 ```
+
+
+## The load event has been removed
+
+The `load` event has been removed because it didn't fit that nicely into the set of events that Naja dispatches during
+the request's lifecycle. Besides, it has already had better replacements for quite a long time.
+
+Probably its most dominant use case has been to reinitialize scripts after updating snippets, so that e.g. social media
+widgets from snippets would come alive. The SnippetHandler dispatches a pair of events for each updated snippet; you
+can use these to achieve the same behaviour, and possibly gain a little performance boost, because you can restrict
+the reinitialization only to the snippet and its subset of DOM.
+
+Consider the following example using [Twitter's JavaScript API](https://developer.twitter.com/en/docs/twitter-for-websites/javascript-api/guides/scripting-loading-and-initialization):
+
+Before:
+
+```js
+naja.addEventListener('load', () => {
+    twttr.widgets.load();
+});
+```
+
+After:
+
+```js
+naja.snippetHandler.addEventListener('afterUpdate', (event) => {
+    twttr.widgets.load(event.detail.snippet);
+});
+```
+
+For other use cases, the `load` event is dispatched during Naja's initialization – which can be replaced by the `init`
+event or by calling the code directly during initialization –, and then after every request, be it successful or not,
+which can be replaced by the `complete` event.
 
 
 ## All events are proper CustomEvents

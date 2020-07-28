@@ -49,12 +49,6 @@ export class Naja extends EventTarget {
 
 		this.dispatchEvent(new CustomEvent('init', {detail: {defaultOptions}}));
 		this.initialized = true;
-		this.load();
-	}
-
-
-	load() {
-		this.dispatchEvent(new CustomEvent('load'));
 	}
 
 
@@ -123,14 +117,12 @@ export class Naja extends EventTarget {
 
 			this.dispatchEvent(new CustomEvent('error', {detail: {request, response, error, options}}));
 			this.dispatchEvent(new CustomEvent('complete', {detail: {request, response, payload: undefined, error, options}}));
-			this.load();
 
 			throw error;
 		}
 
 		this.dispatchEvent(new CustomEvent('success', {detail: {request, response, payload, options}}));
 		this.dispatchEvent(new CustomEvent('complete', {detail: {request, response, payload, error: undefined, options}}));
-		this.load();
 
 		return payload;
 	}

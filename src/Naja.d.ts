@@ -61,7 +61,6 @@ export declare class HttpError extends Error {
 }
 
 export type InitEvent = CustomEvent<{defaultOptions: Options}>;
-export type LoadEvent = CustomEvent<never>;
 export type BeforeEvent = CustomEvent<{request: Request, method: string, url: string, data: any, options: Options}>;
 export type StartEvent = CustomEvent<{request: Request, promise: Promise<Response>, abortController: AbortController, options: Options}>;
 export type AbortEvent = CustomEvent<{request: Request, error: Error, options: Options}>;
@@ -71,7 +70,6 @@ export type CompleteEvent = CustomEvent<{request: Request, response: Response | 
 
 interface NajaEventMap {
 	"init": InitEvent;
-	"load": LoadEvent;
 	"before": BeforeEvent;
 	"start": StartEvent;
 	"abort": AbortEvent;

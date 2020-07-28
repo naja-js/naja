@@ -58,15 +58,15 @@ describe('Naja.js', function () {
 
 		it('should not call listener after evt.stopImmediatePropagation() call', function () {
 			const naja = mockNaja();
-			let loadCalled = false;
-			let loadCalled2 = false;
+			let initCalled = false;
+			let initCalled2 = false;
 
-			naja.addEventListener('load', (evt) => { loadCalled = true; evt.stopImmediatePropagation(); });
-			naja.addEventListener('load', () => loadCalled2 = true);
+			naja.addEventListener('init', (evt) => { initCalled = true; evt.stopImmediatePropagation(); });
+			naja.addEventListener('init', () => initCalled2 = true);
 			naja.initialize();
 
-			assert.isTrue(loadCalled);
-			assert.isFalse(loadCalled2);
+			assert.isTrue(initCalled);
+			assert.isFalse(initCalled2);
 		});
 
 		it('should return false after evt.preventDefault() call', function () {
