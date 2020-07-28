@@ -14,22 +14,18 @@
   "module": "dist/Naja.esm.js",
   "types": "src/index.d.ts",
   "dependencies": {
-    "@babel/runtime": "^7.7.1"
+    "abortcontroller-polyfill": "^1.4.0",
+    "event-target-shim": "^5.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.7.0",
     "@babel/plugin-proposal-class-properties": "^7.7.0",
-    "@babel/plugin-transform-runtime": "^7.6.2",
-    "@babel/polyfill": "^7.7.0",
     "@babel/preset-env": "^7.7.1",
-    "abortcontroller-polyfill": "^1.4.0",
     "babel-eslint": "^10.0.3",
     "babel-plugin-istanbul": "^6.0.0",
     "chai": "^4.2.0",
     "codecov": "^3.6.1",
-    "core-js": "^3.3.6",
     "eslint": "^6.6.0",
-    "event-target-shim": "^5.0.1",
     "karma": "^5.0.2",
     "karma-chrome-launcher": "^3.1.0",
     "karma-coverage": "^2.0.2",
