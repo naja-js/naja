@@ -94,15 +94,31 @@ to prevent the request from being dispatched. This event's `detail` has the foll
 This event is dispatched *before* updating the contents of each and every snippet. You can prevent the snippet from
 updating by calling the event's `preventDefault()` method.
 
+The event's `detail` has the following properties:
+
+- `snippet: Element`, the snippet element,
+- `content: string`, the new content from response payload,
+- `fromCache: boolean`, a flag telling whether the snippet is being updated from cache after user navigation through
+    history, or as a result of a request to the server,
+- `operation: 'update' | 'prepend' | 'append'`, the operation that is going to be done with the snippet and its new
+    content,
+- `changeOperation: (value: 'update' | 'prepend' | 'append') => void`, a method that can be called to override the
+    snippet update `operation`,
+- `options: Object`.
+
 ### afterUpdate
 
 This event is dispatched *after* updating the contents of each and every snippet. If the snippet update has been
 prevented by canceling the `beforeUpdate` event, this event is not dispatched for given snippet.
 
-Both these events have the same `detail` properties:
+The event's `detail` has the following properties:
 
 - `snippet: Element`, the snippet element,
-- `content: string`, the new content from response payload.
+- `content: string`, the new content from response payload,
+- `fromCache: boolean`, a flag telling whether the snippet is being updated from cache after user navigation through
+    history, or as a result of a request to the server,
+- `operation: 'update' | 'prepend' | 'append'`, the operation that has been done with the snippet and its new content, 
+- `options: Object`.
 
 
 ## RedirectHandler

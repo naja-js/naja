@@ -26,7 +26,7 @@ describe('SnippetHandler', function () {
 
 		const mock = sinon.mock(snippetHandler);
 		mock.expects('updateSnippets')
-			.withExactArgs({'snippet--foo': 'foo'})
+			.withExactArgs({'snippet--foo': 'foo'}, false, sinon.match.object)
 			.once();
 
 		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet--foo': 'foo'}});
@@ -49,11 +49,11 @@ describe('SnippetHandler', function () {
 
 		const mock = sinon.mock(snippetHandler);
 		mock.expects('updateSnippet')
-			.withExactArgs(snippet1, 'foo', false)
+			.withExactArgs(snippet1, 'foo', false, {})
 			.once();
 
 		mock.expects('updateSnippet')
-			.withExactArgs(snippet2, 'bar.baz', false)
+			.withExactArgs(snippet2, 'bar.baz', false, {})
 			.once();
 
 		snippetHandler.updateSnippets({
@@ -77,7 +77,7 @@ describe('SnippetHandler', function () {
 		document.body.appendChild(el);
 
 		assert.equal(el.innerHTML, 'Foo');
-		snippetHandler.updateSnippet(el, 'Bar', false);
+		snippetHandler.updateSnippet(el, 'Bar', false, {});
 		assert.equal(el.innerHTML, 'Bar');
 		document.body.removeChild(el);
 	});
@@ -98,7 +98,7 @@ describe('SnippetHandler', function () {
 		assert.equal(titleEl.innerHTML, 'Foo');
 		assert.equal(document.title, 'Foo');
 
-		snippetHandler.updateSnippet(titleEl, 'Bar', false);
+		snippetHandler.updateSnippet(titleEl, 'Bar', false, {});
 
 		assert.equal(titleEl.innerHTML, 'Bar');
 		assert.equal(document.title, 'Bar');
@@ -115,7 +115,7 @@ describe('SnippetHandler', function () {
 		document.body.appendChild(el);
 
 		assert.equal(el.innerHTML, 'Foo');
-		snippetHandler.updateSnippet(el, 'prefix-', false);
+		snippetHandler.updateSnippet(el, 'prefix-', false, {});
 		assert.equal(el.innerHTML, 'prefix-Foo');
 		document.body.removeChild(el);
 	});
@@ -131,7 +131,7 @@ describe('SnippetHandler', function () {
 		document.body.appendChild(el);
 
 		assert.equal(el.innerHTML, 'Foo');
-		snippetHandler.updateSnippet(el, '-suffix', false);
+		snippetHandler.updateSnippet(el, '-suffix', false, {});
 		assert.equal(el.innerHTML, 'Foo-suffix');
 		document.body.removeChild(el);
 	});
@@ -147,7 +147,7 @@ describe('SnippetHandler', function () {
 		document.body.appendChild(el);
 
 		assert.equal(el.innerHTML, 'Foo');
-		snippetHandler.updateSnippet(el, 'new content', true);
+		snippetHandler.updateSnippet(el, 'new content', true, {});
 		assert.equal(el.innerHTML, 'new content');
 		document.body.removeChild(el);
 	});
@@ -165,7 +165,7 @@ describe('SnippetHandler', function () {
 		el.id = 'snippet--foo';
 		el.innerHTML = 'Foo';
 		document.body.appendChild(el);
-		snippetHandler.updateSnippet(el, 'Bar', false);
+		snippetHandler.updateSnippet(el, 'Bar', false, {});
 
 		assert.isTrue(beforeCallback.calledOnce);
 		assert.isTrue(beforeCallback.calledWith(
@@ -174,6 +174,7 @@ describe('SnippetHandler', function () {
 				.and(sinon.match.has('snippet', el))
 				.and(sinon.match.has('content', sinon.match.string))
 				.and(sinon.match.has('fromCache', false))
+				.and(sinon.match.has('options', {}))
 			))
 		));
 
@@ -185,6 +186,7 @@ describe('SnippetHandler', function () {
 				.and(sinon.match.has('snippet', el))
 				.and(sinon.match.has('content', sinon.match.string))
 				.and(sinon.match.has('fromCache', false))
+				.and(sinon.match.has('options', {}))
 			))
 		));
 
@@ -204,7 +206,7 @@ describe('SnippetHandler', function () {
 		el.id = 'snippet--foo';
 		el.innerHTML = 'Foo';
 		document.body.appendChild(el);
-		snippetHandler.updateSnippet(el, 'Bar', true);
+		snippetHandler.updateSnippet(el, 'Bar', true, {});
 
 		assert.isTrue(beforeCallback.calledOnce);
 		assert.isTrue(beforeCallback.calledWith(
@@ -213,12 +215,32 @@ describe('SnippetHandler', function () {
 				.and(sinon.match.has('snippet', el))
 				.and(sinon.match.has('content', sinon.match.string))
 				.and(sinon.match.has('fromCache', true))
+				.and(sinon.match.has('options', {}))
 			))
 		));
 
 		assert.isFalse(afterCallback.called);
 
 		assert.equal(el.innerHTML, 'Foo');
+		document.body.removeChild(el);
+	});
+
+	it('updateSnippet() beforeUpdate event can change the operation', function () {
+		const naja = mockNaja();
+		const snippetHandler = new SnippetHandler(naja);
+
+		const operation = sinon.spy();
+		snippetHandler.addEventListener('beforeUpdate', (evt) => evt.detail.changeOperation(operation));
+
+		const el = document.createElement('div');
+		el.id = 'snippet--foo';
+		el.innerHTML = 'Foo';
+		document.body.appendChild(el);
+		snippetHandler.updateSnippet(el, 'Bar', false, {});
+
+		assert.isTrue(operation.calledOnce);
+		assert.isTrue(operation.calledWith(el, 'Bar'));
+
 		document.body.removeChild(el);
 	});
 });
