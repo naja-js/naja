@@ -15,11 +15,6 @@ so that you can access DOM elements in the listener. The `init` event's `detail`
 
 - `defaultOptions: Object`, an object holding the default options passed to `naja.initialize()` method.
 
-### load
-
-This event is dispatched after `init` and then after every request, be it successful or not. It can be used to reload
-things, re-add event listeners, etc. It has no properties.
-
 ### before
 
 This event is dispatched when the `Request` is created but not yet sent. At this point, you can call the event's
@@ -43,7 +38,7 @@ This event is dispatched right after the request is sent. Its `detail` holds the
 ### abort
 
 This event is dispatched if the request is aborted. Aborting the request does not trigger error handling because
-it is not an error per se, but it might be useful to react to it. This event's `detail` has the following properites:
+it is not an error per se, but it might be useful to react to it. This event's `detail` has the following properties:
     
 - `request: Request`, the aborted request object,
 - `error: AbortError`, the abort error instance,

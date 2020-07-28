@@ -14,14 +14,12 @@ describe('makeRequest()', function () {
 		cleanPopstateListener(naja.historyHandler);
 		sinon.stub(naja.historyHandler.historyAdapter);
 
-		const loadCallback = sinon.spy();
 		const beforeCallback = sinon.spy();
 		const startCallback = sinon.spy();
 		const successCallback = sinon.spy();
 		const errorCallback = sinon.spy();
 		const completeCallback = sinon.spy();
 
-		naja.addEventListener('load', loadCallback);
 		naja.addEventListener('before', beforeCallback);
 		naja.addEventListener('start', startCallback);
 		naja.addEventListener('success', successCallback);
@@ -70,7 +68,6 @@ describe('makeRequest()', function () {
 			));
 
 			assert.isTrue(completeCallback.called);
-			assert.isTrue(completeCallback.calledBefore(loadCallback));
 			assert.isTrue(completeCallback.calledWith(
 				sinon.match((event) => event.constructor.name === 'CustomEvent')
 				.and(sinon.match.has('detail', sinon.match.object
@@ -82,7 +79,6 @@ describe('makeRequest()', function () {
 				))
 			));
 
-			assert.isTrue(loadCallback.called);
 			assert.isFalse(errorCallback.called);
 		});
 	});
@@ -104,14 +100,12 @@ describe('makeRequest()', function () {
 		naja.initialize();
 		cleanPopstateListener(naja.historyHandler);
 
-		const loadCallback = sinon.spy();
 		const beforeCallback = sinon.spy();
 		const startCallback = sinon.spy();
 		const successCallback = sinon.spy();
 		const errorCallback = sinon.spy();
 		const completeCallback = sinon.spy();
 
-		naja.addEventListener('load', loadCallback);
 		naja.addEventListener('before', beforeCallback);
 		naja.addEventListener('start', startCallback);
 		naja.addEventListener('success', successCallback);
@@ -158,7 +152,6 @@ describe('makeRequest()', function () {
 			));
 
 			assert.isTrue(completeCallback.called);
-			assert.isTrue(completeCallback.calledBefore(loadCallback));
 			assert.isTrue(completeCallback.calledWith(
 				sinon.match((event) => event.constructor.name === 'CustomEvent')
 				.and(sinon.match.has('detail', sinon.match.object
@@ -170,7 +163,6 @@ describe('makeRequest()', function () {
 				))
 			));
 
-			assert.isTrue(loadCallback.called);
 			assert.isFalse(successCallback.called);
 		});
 	});
@@ -196,14 +188,12 @@ describe('makeRequest()', function () {
 		naja.initialize();
 		cleanPopstateListener(naja.historyHandler);
 
-		const loadCallback = sinon.spy();
 		const beforeCallback = sinon.spy();
 		const startCallback = sinon.spy();
 		const successCallback = sinon.spy();
 		const errorCallback = sinon.spy();
 		const completeCallback = sinon.spy();
 
-		naja.addEventListener('load', loadCallback);
 		naja.addEventListener('before', beforeCallback);
 		naja.addEventListener('start', startCallback);
 		naja.addEventListener('success', successCallback);
@@ -252,7 +242,6 @@ describe('makeRequest()', function () {
 			));
 
 			assert.isTrue(completeCallback.called);
-			assert.isTrue(completeCallback.calledBefore(loadCallback));
 			assert.isTrue(completeCallback.calledWith(
 				sinon.match((event) => event.constructor.name === 'CustomEvent')
 				.and(sinon.match.has('detail', sinon.match.object
@@ -264,7 +253,6 @@ describe('makeRequest()', function () {
 				))
 			));
 
-			assert.isTrue(loadCallback.called);
 			assert.isFalse(successCallback.called);
 		});
 	});
