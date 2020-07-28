@@ -10,10 +10,6 @@
 
 Naja is a full-featured JS client-side AJAX library for Nette Framework.
 
-It is written using modern-day JavaScript, but compiled into an ES5 build that comes bundled with a few polyfills and thus should work on all modern browsers:
-
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/jiripudil.svg)](https://saucelabs.com/u/jiripudil)
-
 
 ## Very quick start
 
