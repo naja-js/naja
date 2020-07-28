@@ -6,6 +6,8 @@ import {HistoryHandler} from './core/HistoryHandler';
 import {ScriptLoader} from './core/ScriptLoader';
 
 export class Naja extends EventTarget {
+	VERSION = 2;
+
 	initialized = false;
 
 	uiHandler = null;
