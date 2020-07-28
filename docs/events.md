@@ -133,4 +133,5 @@ The `redirect` event's `detail` has the following properties:
 
 - `url: string`, the target URL,
 - `isHardRedirect: boolean`, a flag telling whether the redirect is going to be a hard one,
-- `setHardRedirect: (value: boolean) => void`, a method which can be called to override the hard redirect flag.
+- `setHardRedirect: (value: boolean) => void`, a method which can be called to override the hard redirect flag,
+- `options: Object`.
