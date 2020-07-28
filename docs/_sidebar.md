@@ -1,6 +1,7 @@
 - [Home](/)
 
 - [Upgrading from 1.x](upgrade-from-1.md)
+- [Supported releases](support.md)
 
 - Using Naja
     - [Quick start](quick-start.md)
