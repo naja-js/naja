@@ -165,3 +165,22 @@ In theory, it *might* be possible to make Naja 2.0 work on IE by including polyf
 - [CustomEvent](https://www.npmjs.com/package/custom-event).
 
 Note that this list might not be complete.
+
+
+## Considerations for third-party extensions authors
+
+If you develop and maintain your own extension for Naja and distribute it as an open-source software, probably the best
+thing to do is to bump the required version of Naja in your extension's `package.json` and release a new version that
+supports Naja 2.0 only.
+
+If you for some reason need or want to support both versions of Naja and don't want to maintain two versions at once,
+you can list both version ranges of Naja in your extension's `package.json` (for example like this: `^1.0 || ^2.0`)
+and write code in a way that detects the version of Naja and uses the appropriate available APIs based on the version.
+
+To facilitate this, Naja as of 2.0 exposes its version number in a field named `VERSION`:
+
+```js
+if (naja.VERSION >= 2) {
+    // we have >=2.0
+}
+```

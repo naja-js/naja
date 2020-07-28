@@ -9,5 +9,5 @@ const naja = new Naja();
 naja.registerExtension(new AbortExtension());
 naja.registerExtension(new UniqueExtension());
 
-export {HttpError} from './Naja';
+export {Naja, HttpError} from './Naja';
 export default naja;

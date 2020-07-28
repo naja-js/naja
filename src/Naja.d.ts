@@ -22,6 +22,8 @@ export interface Payload {
 }
 
 export declare class Naja extends EventTarget {
+	public readonly VERSION: number;
+
 	public readonly uiHandler: UIHandler;
 	public readonly redirectHandler: RedirectHandler;
 	public readonly snippetHandler: SnippetHandler;
