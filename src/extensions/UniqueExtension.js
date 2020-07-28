@@ -6,23 +6,24 @@ export class UniqueExtension {
 	}
 
 
-	previousAbortController = null;
+	abortControllers = new Map();
 
 	checkUniqueness(event) {
 		const {element, options} = event.detail;
-		options.unique = (element.getAttribute('data-naja-unique') ?? element.form?.getAttribute('data-naja-unique')) !== 'off'; // eslint-disable-line no-extra-parens
+		const unique = element.getAttribute('data-naja-unique') ?? element.form?.getAttribute('data-naja-unique');
+		options.unique = unique === 'off' ? false : unique ?? 'default';
 	}
 
 	abortPreviousRequest(event) {
 		const {abortController, options} = event.detail;
-		if (this.previousAbortController !== null && options.unique !== false) {
-			this.previousAbortController.abort();
+		if (options.unique !== false) {
+			this.abortControllers.get(options.unique)?.abort();
+			this.abortControllers.set(options.unique, abortController);
 		}
-
-		this.previousAbortController = abortController;
 	}
 
-	clearRequest() {
-		this.previousAbortController = null;
+	clearRequest(event) {
+		const {options} = event.detail;
+		this.abortControllers.delete(options.unique);
 	}
 }
