@@ -20,6 +20,12 @@
       maxLevel: 4,
       subMaxLevel: 2,
       ga: 'UA-36513963-3',
+      plugins: [
+        (hook) => {
+          const supportFooter = '?> Did not find your answer? [Ask for help](https://github.com/jiripudil/Naja/issues/new?template=Support_Question.md) on Github.';
+          hook.beforeEach((content) => `${content}\n---\n${supportFooter}`);
+        },
+      ],
     };
   </script>
   <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
