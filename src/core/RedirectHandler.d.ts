@@ -1,3 +1,5 @@
+import {Options} from '../Naja';
+
 export interface LocationAdapter {
 	assign(url: string): void;
 }
@@ -12,4 +14,4 @@ export declare class RedirectHandler extends EventTarget {
 	public removeEventListener(type: string, listener: EventListenerOrEventListenerObject | null, options?: boolean | AddEventListenerOptions): void
 }
 
-export type RedirectEvent = CustomEvent<{url: string, isHardRedirect: boolean, setHardRedirect: (value: boolean) => void}>;
+export type RedirectEvent = CustomEvent<{url: string, isHardRedirect: boolean, setHardRedirect: (value: boolean) => void, options: Options}>;

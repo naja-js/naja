@@ -42,6 +42,7 @@ export class RedirectHandler extends EventTarget {
 				setHardRedirect(value) {
 					isHardRedirect = !!value;
 				},
+				options,
 			},
 		}));
 
