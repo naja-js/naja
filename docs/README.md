@@ -1,6 +1,6 @@
 # Naja
 
-[![Build Status](https://img.shields.io/travis/jiripudil/Naja.svg)](https://travis-ci.org/jiripudil/Naja)
+[![Build Status](https://img.shields.io/github/workflow/status/jiripudil/Naja/Test)](https://github.com/jiripudil/Naja/actions?query=workflow%3ATest)
 [![Code Coverage](https://img.shields.io/codecov/c/github/jiripudil/Naja.svg)](https://codecov.io/gh/jiripudil/Naja)
 [![npm version](https://img.shields.io/npm/v/naja.svg)](https://npmjs.com/package/naja)
 [![npm monthly downloads](https://img.shields.io/npm/dm/naja.svg)](https://npmjs.com/package/naja)
@@ -11,6 +11,4 @@
 
 Naja is a full-featured JS client-side AJAX library for Nette Framework.
 
-It is written using modern-day JavaScript, but compiled into a bundle that works in all modern browsers:
-
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/jiripudil.svg)](https://saucelabs.com/u/jiripudil)
+It is written using modern-day JavaScript, but compiled into a bundle that works in all modern browsers.

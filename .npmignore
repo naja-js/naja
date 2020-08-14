@@ -1,4 +1,5 @@
 .git/
+.github/
 .idea/
 coverage/
 node_modules/
@@ -8,10 +9,8 @@ tests/
 .gitignore
 .npmignore
 .nycrc
-.travis.yml
 babel.config.js
 karma.conf.js
-karma.sauce.coverage.js
-karma.sauce.test.js
+karma.playwright.js
 rollup.config.js
 yarn.lock
