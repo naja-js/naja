@@ -1,6 +1,6 @@
-var babel = require('rollup-plugin-babel');
-var commonjs = require('rollup-plugin-commonjs');
-var resolve = require('rollup-plugin-node-resolve');
+const babel = require('rollup-plugin-babel');
+const commonjs = require('rollup-plugin-commonjs');
+const resolve = require('rollup-plugin-node-resolve');
 
 module.exports = (config) => {
   config.set({
@@ -36,16 +36,22 @@ module.exports = (config) => {
 
     reporters: ['dots', 'coverage-istanbul'],
     coverageIstanbulReporter: {
-      reports: ['text-summary', 'html', 'lcovonly'],
+      reports: ['text-summary', 'lcovonly'],
     },
 
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
-    autoWatch: true,
-    singleRun: false,
+    autoWatch: !process.env.CI,
+    singleRun: !!process.env.CI,
 
-    browsers: ['Chrome', 'Firefox'],
+    plugins: [
+      'karma-*',
+      require('./karma.playwright'),
+    ],
+    browsers: process.env.CI
+      ? ['Chromium', 'Firefox', 'WebKit']
+      : ['Chromium'],
     concurrency: Infinity,
   });
 };

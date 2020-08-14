@@ -1,0 +1,28 @@
+name: Test
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        env:
+          cache-name: yarn-cache
+        with:
+          path: ~/.yarn-cache
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '12.x'
+      - uses: microsoft/playwright-github-action@v1
+      - run: yarn install --frozen-lockfile
+      - run: yarn lint
+      - run: yarn test
+      - uses: codecov/codecov-action@v1
