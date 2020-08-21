@@ -21,8 +21,8 @@ jobs:
             ${{ runner.os }}-
       - uses: crazy-max/ghaction-import-gpg@v2
         env:
-          GPG_PRIVATE_KEY: ${{ secrets.SIGNING_KEY }}
-          PASSPHRASE: ${{ secrets.SIGNING_KEY_PASSPHRASE }}
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+          PASSPHRASE: ${{ secrets.GPG_SIGNING_KEY_PASSPHRASE }}
       - uses: actions/setup-node@v2-beta
         with:
           node-version: '12.x'
