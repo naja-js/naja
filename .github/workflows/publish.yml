@@ -124,6 +124,6 @@ jobs:
         with:
           node-version: '12.x'
           registry-url: 'https://registry.npmjs.org'
-      - run: yarn publish --tag next # todo remove "--tag next" when stable
+      - run: npm publish --tag next # todo remove "--tag next" when stable
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
