@@ -100,10 +100,10 @@ The event's `detail` has the following properties:
 - `content: string`, the new content from response payload,
 - `fromCache: boolean`, a flag telling whether the snippet is being updated from cache after user navigation through
     history, or as a result of a request to the server,
-- `operation: 'update' | 'prepend' | 'append'`, the operation that is going to be done with the snippet and its new
-    content,
-- `changeOperation: (value: 'update' | 'prepend' | 'append') => void`, a method that can be called to override the
-    snippet update `operation`,
+- `operation: (snippet: Element, content: string) => void`, the operation that is going to be done with the snippet
+    and its new content,
+- `changeOperation: (operation: (snippet: Element, content: string) => void) => void`, a method that can be called
+    to override the snippet update `operation`,
 - `options: Object`.
 
 ### afterUpdate
@@ -117,7 +117,8 @@ The event's `detail` has the following properties:
 - `content: string`, the new content from response payload,
 - `fromCache: boolean`, a flag telling whether the snippet is being updated from cache after user navigation through
     history, or as a result of a request to the server,
-- `operation: 'update' | 'prepend' | 'append'`, the operation that has been done with the snippet and its new content, 
+- `operation: (snippet: Element, content: string) => void`, the operation that has been done with the snippet and
+    its new content, 
 - `options: Object`.
 
 
