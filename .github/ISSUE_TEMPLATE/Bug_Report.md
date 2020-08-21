@@ -6,7 +6,7 @@ labels: bug
 
 # Bug Report
 
-> Before reporting an issue please check that you are using the latest supported version of Naja!
+> Before reporting an issue please check that you are using the latest [supported version](https://naja.js.org/#/support) of Naja!
 >
 > Please describe your problem here. Explain how you expect Naja to behave in the given situation, and how
 > Naja actually behaves.
