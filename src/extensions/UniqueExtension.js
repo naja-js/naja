@@ -23,7 +23,9 @@ export class UniqueExtension {
 	}
 
 	clearRequest(event) {
-		const {options} = event.detail;
-		this.abortControllers.delete(options.unique);
+		const {request, options} = event.detail;
+		if ( ! request.signal.aborted) {
+			this.abortControllers.delete(options.unique);
+		}
 	}
 }
