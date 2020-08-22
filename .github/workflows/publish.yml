@@ -55,7 +55,6 @@ jobs:
           release_name: ${{ github.ref }}
           body: '--- TODO ---'
           draft: true
-          prerelease: true # todo remove when stable
 
       - uses: actions/upload-release-asset@v1
         env:
@@ -124,6 +123,6 @@ jobs:
         with:
           node-version: '12.x'
           registry-url: 'https://registry.npmjs.org'
-      - run: npm publish --tag next # todo remove "--tag next" when stable
+      - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
