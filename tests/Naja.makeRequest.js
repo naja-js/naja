@@ -335,6 +335,24 @@ describe('makeRequest()', function () {
 		});
 	});
 
+	it('should submit GET FormData in URL', function () {
+		const naja = mockNaja();
+		naja.initialize();
+		cleanPopstateListener(naja.historyHandler);
+
+		const formData = new FormData();
+		formData.append('foo', 'bar');
+		formData.append('baz', '42');
+
+		this.fetchMock.when((request) => request.url === 'http://localhost:9876/makeRequest/getFormData?foo=bar&baz=42')
+			.respond(200, {'Content-Type': 'application/json'}, {answer: 42});
+
+		const request = naja.makeRequest('GET', '/makeRequest/getFormData', formData);
+		return request.then((payload) => {
+			assert.deepEqual(payload, {answer: 42});
+		})
+	});
+
 	describe('options', function () {
 		it('should be set to default options', function () {
 			const naja = mockNaja();
