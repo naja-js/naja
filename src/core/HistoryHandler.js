@@ -20,8 +20,8 @@ export class HistoryHandler {
 
 	initialize(event) {
 		const {defaultOptions} = event.detail;
-		if ('history' in defaultOptions && 'uiCache' in defaultOptions.history) {
-			this.uiCache = defaultOptions.history.uiCache;
+		if ('historyUiCache' in defaultOptions) {
+			this.uiCache = defaultOptions.historyUiCache;
 		}
 
 		window.addEventListener('popstate', this.popStateHandler);
