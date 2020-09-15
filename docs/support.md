@@ -9,10 +9,7 @@ The 2.x version currently **has NO specified end-of-life date,** and as such wil
 major release is necessary, in which case the end-of-life window for 2.x will be announced well in advance.
 
 
-## Naja 1.x
+## <del>Naja 1.x</del>
 
-The 1.x version of Naja is **fully supported until September 9, 2020,** which closes the third year since the initial
-release of stable 1.0.0. Until this date, Naja will continue to receive fixes for bugs and security issues which will
-be released as patches within the last minor version range of 1.8. However, no new features will be implemented in 1.x.
-
-After September 9, 2020, Naja 1.x will NOT receive any further support.
+The 1.x version of Naja is **no longer supported** as of September 10, 2020. It is recommended for all users to upgrade
+to the latest 2.x version. Please refer to the [migration guide](upgrade-from-1.md) for instructions.
