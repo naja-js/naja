@@ -1,9 +1,10 @@
-const babel = require('rollup-plugin-babel');
-const commonjs = require('rollup-plugin-commonjs');
-const resolve = require('rollup-plugin-node-resolve');
-const {terser} = require('rollup-plugin-terser');
+import babel from '@rollup/plugin-babel';
+import commonjs from '@rollup/plugin-commonjs';
+import resolve from '@rollup/plugin-node-resolve';
+import {terser} from 'rollup-plugin-terser';
+import path from 'path';
 
-const pkg = require('./package.json');
+import pkg from './package.json';
 const output = {
 	banner: `/*\n * Naja.js\n * ${pkg.version}\n *\n * by Jiří Pudil <https://jiripudil.cz>\n */`,
 	sourcemap: true,
@@ -15,7 +16,7 @@ const babelPlugin = babel({
 		'src/**',
 		'node_modules/event-target-shim/**',
 	],
-	runtimeHelpers: true,
+	babelHelpers: 'runtime',
 });
 
 export default [
@@ -28,13 +29,14 @@ export default [
 			format: 'esm',
 		},
 		external: [
+			/@babel\/runtime/,
 			...Object.keys(pkg.dependencies || {}),
 			...Object.keys(pkg.peerDependencies || {}),
 		],
 		plugins: [
-			babelPlugin,
 			resolve(),
 			commonjs(),
+			babelPlugin,
 		],
 	},
 	{
@@ -48,9 +50,9 @@ export default [
 		},
 		external: Object.keys(pkg.peerDependencies || {}),
 		plugins: [
-			babelPlugin,
 			resolve(),
 			commonjs(),
+			babelPlugin,
 			terser(),
 		],
 	},
@@ -65,9 +67,9 @@ export default [
 		},
 		external: Object.keys(pkg.peerDependencies || {}),
 		plugins: [
-			babelPlugin,
 			resolve(),
 			commonjs(),
+			babelPlugin,
 		],
 	},
 ];

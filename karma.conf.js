@@ -1,6 +1,6 @@
-const babel = require('rollup-plugin-babel');
-const commonjs = require('rollup-plugin-commonjs');
-const resolve = require('rollup-plugin-node-resolve');
+const {babel} = require('@rollup/plugin-babel');
+const commonjs = require('@rollup/plugin-commonjs');
+const {nodeResolve} = require('@rollup/plugin-node-resolve');
 
 module.exports = (config) => {
   config.set({
@@ -16,15 +16,11 @@ module.exports = (config) => {
     },
     rollupPreprocessor: {
       plugins: [
+        nodeResolve(),
+        commonjs(),
         babel({
           exclude: /node_modules\/(?!event-target-shim)/,
-          runtimeHelpers: true,
-        }),
-        resolve(),
-        commonjs({
-          namedExports: {
-            'node_modules/chai/index.js': ['assert'],
-          },
+          babelHelpers: 'runtime',
         }),
       ],
       output: {
