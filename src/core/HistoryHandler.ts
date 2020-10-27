@@ -1,26 +1,43 @@
+import {BeforeEvent, InitEvent, Naja, SuccessEvent} from '../Naja';
+import {InteractionEvent} from './UIHandler';
+
+declare module '../Naja' {
+	interface Options {
+		history?: HistoryMode;
+		historyUiCache?: boolean;
+	}
+}
+
+export interface HistoryAdapter {
+	replaceState(data: any, title: string, url: string): void;
+	pushState(data: any, title: string, url: string): void;
+}
+
+export type HistoryMode = boolean | 'replace';
+
 export class HistoryHandler {
-	href = null;
-	uiCache = true;
+	private href: string | null = null;
+	public popStateHandler = this.handlePopState.bind(this);
 
-	constructor(naja) {
-		this.naja = naja;
+	public uiCache: boolean = true;
+	public historyAdapter: HistoryAdapter;
 
+	public constructor(private readonly naja: Naja) {
 		naja.addEventListener('init', this.initialize.bind(this));
 		naja.addEventListener('before', this.saveUrl.bind(this));
 		naja.addEventListener('success', this.pushNewState.bind(this));
 
 		naja.uiHandler.addEventListener('interaction', this.configureMode.bind(this));
 
-		this.popStateHandler = this.handlePopState.bind(this);
 		this.historyAdapter = {
 			replaceState: (data, title, url) => window.history.replaceState(data, title, url),
 			pushState: (data, title, url) => window.history.pushState(data, title, url),
 		};
 	}
 
-	initialize(event) {
+	private initialize(event: InitEvent): void {
 		const {defaultOptions} = event.detail;
-		if ('historyUiCache' in defaultOptions) {
+		if ('historyUiCache' in defaultOptions && defaultOptions.historyUiCache !== undefined) {
 			this.uiCache = defaultOptions.historyUiCache;
 		}
 
@@ -32,7 +49,7 @@ export class HistoryHandler {
 		);
 	}
 
-	handlePopState(e) {
+	private handlePopState(e: PopStateEvent): void {
 		if ( ! e.state) {
 			return;
 		}
@@ -54,12 +71,12 @@ export class HistoryHandler {
 		}
 	}
 
-	saveUrl(event) {
+	private saveUrl(event: BeforeEvent): void {
 		const {url} = event.detail;
 		this.href = url;
 	}
 
-	configureMode(event) {
+	private configureMode(event: InteractionEvent): void {
 		const {element, options} = event.detail;
 
 		// propagate mode to options
@@ -67,18 +84,18 @@ export class HistoryHandler {
 			return;
 		}
 
-		if (element.hasAttribute('data-naja-history') || element.form?.hasAttribute('data-naja-history')) {
-			const value = element.getAttribute('data-naja-history') ?? element.form?.getAttribute('data-naja-history');
-			options.history = this.constructor.normalizeMode(value);
+		if (element.hasAttribute('data-naja-history') || (element as HTMLInputElement).form?.hasAttribute('data-naja-history')) {
+			const value = element.getAttribute('data-naja-history') ?? (element as HTMLInputElement).form?.getAttribute('data-naja-history');
+			options.history = HistoryHandler.normalizeMode(value);
 		}
 
-		if (element.hasAttribute('data-naja-history-cache') || element.form?.hasAttribute('data-naja-history-nocache')) {
-			const value = element.getAttribute('data-naja-history-cache') ?? element.form?.getAttribute('data-naja-history-cache');
+		if (element.hasAttribute('data-naja-history-cache') || (element as HTMLInputElement).form?.hasAttribute('data-naja-history-nocache')) {
+			const value = element.getAttribute('data-naja-history-cache') ?? (element as HTMLInputElement).form?.getAttribute('data-naja-history-cache');
 			options.historyUiCache = value !== 'off';
 		}
 	}
 
-	static normalizeMode(mode) {
+	public static normalizeMode(mode: string | boolean | null | undefined): HistoryMode {
 		if (mode === 'off' || mode === false) {
 			return false;
 
@@ -89,9 +106,9 @@ export class HistoryHandler {
 		return true;
 	}
 
-	pushNewState(event) {
+	private pushNewState(event: SuccessEvent): void {
 		const {payload, options} = event.detail;
-		const mode = this.constructor.normalizeMode(options.history);
+		const mode = HistoryHandler.normalizeMode(options.history);
 		if (mode === false) {
 			return;
 		}
@@ -103,16 +120,16 @@ export class HistoryHandler {
 		const method = mode === 'replace' ? 'replaceState' : 'pushState';
 		const uiCache = options.historyUiCache === true || (options.historyUiCache !== false && this.uiCache); // eslint-disable-line no-extra-parens
 		this.historyAdapter[method](
-			this.buildState(this.href, uiCache),
+			this.buildState(this.href!, uiCache),
 			window.document.title,
-			this.href,
+			this.href!,
 		);
 
 		this.href = null;
 	}
 
-	buildState(href, uiCache) {
-		const state = {
+	private buildState(href: string, uiCache: boolean): any {
+		const state: any = {
 			href,
 		};
 
@@ -127,8 +144,8 @@ export class HistoryHandler {
 		return state;
 	}
 
-	findSnippets() {
-		const result = {};
+	private findSnippets(): Record<string, string> {
+		const result: Record<string, string> = {};
 		const snippets = window.document.querySelectorAll('[id^="snippet-"]');
 		for (let i = 0; i < snippets.length; i++) {
 			const snippet = snippets.item(i);
@@ -140,12 +157,12 @@ export class HistoryHandler {
 		return result;
 	}
 
-	handleSnippets(snippets) {
+	private handleSnippets(snippets: Record<string, string>): void {
 		this.naja.snippetHandler.updateSnippets(snippets, true);
 		this.naja.scriptLoader.loadScripts(snippets);
 	}
 
-	handleTitle(title) {
+	private handleTitle(title: string): void {
 		window.document.title = title;
 	}
 }

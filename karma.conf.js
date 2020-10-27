@@ -1,6 +1,7 @@
 const {babel} = require('@rollup/plugin-babel');
 const commonjs = require('@rollup/plugin-commonjs');
 const {nodeResolve} = require('@rollup/plugin-node-resolve');
+const typescript = require('@rollup/plugin-typescript');
 
 module.exports = (config) => {
   config.set({
@@ -18,6 +19,7 @@ module.exports = (config) => {
       plugins: [
         nodeResolve(),
         commonjs(),
+        typescript(),
         babel({
           exclude: /node_modules\/(?!event-target-shim)/,
           babelHelpers: 'runtime',

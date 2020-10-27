@@ -1,0 +1,17 @@
+{
+	"compilerOptions": {
+		"target": "ES2017",
+		"module": "ES2015",
+		"moduleResolution": "node",
+		"esModuleInterop": true,
+
+		"strict": true,
+		"alwaysStrict": true,
+
+		"rootDir": "src/",
+		"sourceMap": true
+	},
+	"exclude": [
+		"node_modules"
+	]
+}
