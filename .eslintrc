@@ -1,11 +1,22 @@
 {
-	"parser": "babel-eslint",
+	"root": true,
+	"parser": "@typescript-eslint/parser",
+	"plugins": [
+		"@typescript-eslint"
+	],
 	"env": {
 		"browser": true,
 		"es6": true
 	},
-	"extends": "eslint:recommended",
+	"extends": [
+		"eslint:recommended",
+		"plugin:@typescript-eslint/eslint-recommended",
+		"plugin:@typescript-eslint/recommended"
+	],
 	"rules": {
+		"@typescript-eslint/no-explicit-any": "off",
+		"@typescript-eslint/no-inferrable-types": "off",
+		"@typescript-eslint/no-non-null-assertion": "off",
 		"array-bracket-spacing": "error",
 		"arrow-body-style": "error",
 		"arrow-parens": "error",
@@ -34,7 +45,7 @@
 		"no-array-constructor": "error",
 		"no-empty-function": "error",
 		"no-extra-bind": "error",
-		"no-extra-parens": ["error", "all"],
+		"no-extra-parens": "off",
 		"no-implicit-globals": "error",
 		"no-multi-spaces": "error",
 		"no-nested-ternary": "error",

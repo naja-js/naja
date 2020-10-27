@@ -1,13 +1,15 @@
-export class FormsHandler {
-	netteForms;
+import {Naja} from '../Naja';
+import {InteractionEvent} from './UIHandler';
 
-	constructor(naja) {
-		this.naja = naja;
+export class FormsHandler {
+	public netteForms: any;
+
+	public constructor(private readonly naja: Naja) {
 		naja.addEventListener('init', this.initialize.bind(this));
 		naja.uiHandler.addEventListener('interaction', this.processForm.bind(this));
 	}
 
-	initialize() {
+	private initialize(): void {
 		this.initForms(window.document.body);
 		this.naja.snippetHandler.addEventListener('afterUpdate', (event) => {
 			const {snippet} = event.detail;
@@ -15,8 +17,8 @@ export class FormsHandler {
 		});
 	}
 
-	initForms(element) {
-		const netteForms = this.netteForms || window.Nette;
+	private initForms(element: Element): void {
+		const netteForms = this.netteForms || (window as any).Nette;
 		if (netteForms) {
 			if (element.tagName === 'form') {
 				netteForms.initForm(element);
@@ -29,15 +31,16 @@ export class FormsHandler {
 		}
 	}
 
-	processForm(event) {
+	private processForm(event: InteractionEvent): void {
 		const {element, originalEvent} = event.detail;
 
-		if (element.form) {
-			element.form['nette-submittedBy'] = element;
+		const inputElement = element as HTMLInputElement;
+		if (inputElement.form !== null) {
+			inputElement.form['nette-submittedBy'] = element;
 		}
 
-		const netteForms = this.netteForms || window.Nette;
-		if ((element.tagName === 'FORM' || element.form) && netteForms && ! netteForms.validateForm(element)) {
+		const netteForms = this.netteForms || (window as any).Nette;
+		if ((element.tagName === 'FORM' || (element as HTMLInputElement).form) && netteForms && ! netteForms.validateForm(element)) {
 			if (originalEvent) {
 				originalEvent.stopImmediatePropagation();
 				originalEvent.preventDefault();

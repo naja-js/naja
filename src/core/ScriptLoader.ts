@@ -1,5 +1,7 @@
+import {Naja} from '../Naja';
+
 export class ScriptLoader {
-	constructor(naja) {
+	public constructor(naja: Naja) {
 		naja.addEventListener('success', (event) => {
 			const {payload} = event.detail;
 			if (payload.snippets) {
@@ -8,7 +10,7 @@ export class ScriptLoader {
 		});
 	}
 
-	loadScripts(snippets) {
+	public loadScripts(snippets: Record<string, string>): void {
 		Object.keys(snippets).forEach((id) => {
 			const content = snippets[id];
 			if ( ! /<script/i.test(content)) {
@@ -28,12 +30,12 @@ export class ScriptLoader {
 					const attrs = script.attributes;
 					for (let j = 0; j < attrs.length; j++) {
 						const attrName = attrs[j].name;
-						scriptEl[attrName] = attrs[j].value;
+						scriptEl.setAttribute(attrName, attrs[j].value);
 					}
 				}
 
 				window.document.head.appendChild(scriptEl)
-					.parentNode.removeChild(scriptEl);
+					.parentNode!.removeChild(scriptEl);
 			}
 		});
 	}

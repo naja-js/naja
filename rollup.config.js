@@ -1,6 +1,7 @@
 import babel from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
+import typescript from '@rollup/plugin-typescript';
 import {terser} from 'rollup-plugin-terser';
 import path from 'path';
 
@@ -22,7 +23,7 @@ const babelPlugin = babel({
 export default [
 	{
 		// ESM build for modern tools like webpack
-		input: 'src/index.esm.js',
+		input: 'src/index.esm.ts',
 		output: {
 			...output,
 			file: pkg.module,
@@ -36,12 +37,35 @@ export default [
 		plugins: [
 			resolve(),
 			commonjs(),
+			typescript(),
 			babelPlugin,
 		],
 	},
 	{
+		// type declaration files for ESM build
+		input: 'src/index.esm.ts',
+		output: {
+			...output,
+			dir: path.dirname(pkg.module),
+			format: 'esm',
+		},
+		external: [
+			/@babel\/runtime/,
+			...Object.keys(pkg.dependencies || {}),
+			...Object.keys(pkg.peerDependencies || {}),
+		],
+		plugins: [
+			typescript({
+				include: ['src/**/*.ts'],
+				declaration: true,
+				declarationDir: path.dirname(pkg.module),
+				emitDeclarationOnly: true,
+			}),
+		],
+	},
+	{
 		// minified
-		input: 'src/index.js',
+		input: 'src/index.ts',
 		output: {
 			...output,
 			file: pkg.unpkg,
@@ -52,13 +76,14 @@ export default [
 		plugins: [
 			resolve(),
 			commonjs(),
+			typescript(),
 			babelPlugin,
 			terser(),
 		],
 	},
 	{
 		// non-minified
-		input: 'src/index.js',
+		input: 'src/index.ts',
 		output: {
 			...output,
 			file: pkg.main,
@@ -69,6 +94,7 @@ export default [
 		plugins: [
 			resolve(),
 			commonjs(),
+			typescript(),
 			babelPlugin,
 		],
 	},

@@ -1,5 +1,10 @@
+import {Naja, Options} from '../Naja';
+import {TypedEventListener} from '../utils';
+
+type SnippetUpdateOperation = (snippet: Element, content: string) => void;
+
 export class SnippetHandler extends EventTarget {
-	op = {
+	public readonly op: Record<'replace' | 'prepend' | 'append', SnippetUpdateOperation> = {
 		replace: (snippet, content) => {
 			snippet.innerHTML = content;
 		},
@@ -7,7 +12,7 @@ export class SnippetHandler extends EventTarget {
 		append: (snippet, content) => snippet.insertAdjacentHTML('beforeend', content),
 	};
 
-	constructor(naja) {
+	public constructor(private readonly naja: Naja) {
 		super();
 		naja.addEventListener('success', (event) => {
 			const {options, payload} = event.detail;
@@ -17,7 +22,7 @@ export class SnippetHandler extends EventTarget {
 		});
 	}
 
-	updateSnippets(snippets, fromCache = false, options = {}) {
+	public updateSnippets(snippets: Record<string, string>, fromCache = false, options: Options = {}): void {
 		Object.keys(snippets).forEach((id) => {
 			const snippet = document.getElementById(id);
 			if (snippet) {
@@ -26,7 +31,7 @@ export class SnippetHandler extends EventTarget {
 		});
 	}
 
-	updateSnippet(snippet, content, fromCache, options) {
+	public updateSnippet(snippet: HTMLElement, content: string, fromCache: boolean, options: Options): void {
 		let operation = this.op.replace;
 		if ((snippet.hasAttribute('data-naja-snippet-prepend') || snippet.hasAttribute('data-ajax-prepend')) && ! fromCache) {
 			operation = this.op.prepend;
@@ -41,7 +46,7 @@ export class SnippetHandler extends EventTarget {
 				content,
 				fromCache,
 				operation,
-				changeOperation(value) {
+				changeOperation(value: SnippetUpdateOperation) {
 					operation = value;
 				},
 				options,
@@ -69,4 +74,15 @@ export class SnippetHandler extends EventTarget {
 			},
 		}));
 	}
+
+	declare public addEventListener: <K extends keyof SnippetHandlerEventMap>(type: K, listener: TypedEventListener<SnippetHandler, SnippetHandlerEventMap[K]>, options?: boolean | AddEventListenerOptions) => void;
+	declare public removeEventListener: <K extends keyof SnippetHandlerEventMap>(type: K, listener: TypedEventListener<SnippetHandler, SnippetHandlerEventMap[K]>, options?: boolean | AddEventListenerOptions) => void;
+}
+
+export type BeforeUpdateEvent = CustomEvent<{snippet: Element, content: string, fromCache: boolean, operation: SnippetUpdateOperation, changeOperation: (value: SnippetUpdateOperation) => void, options: Options}>;
+export type AfterUpdateEvent = CustomEvent<{snippet: Element, content: string, fromCache: boolean, operation: SnippetUpdateOperation, options: Options}>;
+
+interface SnippetHandlerEventMap {
+	beforeUpdate: BeforeUpdateEvent;
+	afterUpdate: AfterUpdateEvent;
 }

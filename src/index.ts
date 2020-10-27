@@ -9,7 +9,7 @@ const naja = new Naja();
 naja.registerExtension(new AbortExtension());
 naja.registerExtension(new UniqueExtension());
 
-naja.Naja = Naja;
-naja.HttpError = HttpError;
+(naja as any).Naja = Naja;
+(naja as any).HttpError = HttpError;
 
 export default naja;

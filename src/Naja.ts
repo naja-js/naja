@@ -4,24 +4,45 @@ import {RedirectHandler} from './core/RedirectHandler';
 import {SnippetHandler} from './core/SnippetHandler';
 import {HistoryHandler} from './core/HistoryHandler';
 import {ScriptLoader} from './core/ScriptLoader';
+import {TypedEventListener} from './utils';
+
+export interface Options extends Record<string, any> {
+	fetch?: RequestInit;
+}
+
+export interface Payload extends Record<string, any> {
+	snippets?: Record<string, string>;
+
+	redirect?: string;
+
+	postGet?: boolean;
+	url?: string;
+}
 
 export class Naja extends EventTarget {
-	VERSION = 2;
+	public readonly VERSION: number = 2;
 
-	initialized = false;
+	private initialized: boolean = false;
 
-	uiHandler = null;
-	redirectHandler = null;
-	snippetHandler = null;
-	formsHandler = null;
-	historyHandler = null;
-	scriptLoader = null;
-	extensions = [];
+	public readonly uiHandler: UIHandler;
+	public readonly redirectHandler: RedirectHandler;
+	public readonly snippetHandler: SnippetHandler;
+	public readonly formsHandler: FormsHandler;
+	public readonly historyHandler: HistoryHandler;
+	public readonly scriptLoader: ScriptLoader;
+	private readonly extensions: Extension[] = [];
 
-	defaultOptions = {};
+	public defaultOptions: Options = {};
 
 
-	constructor(uiHandler, redirectHandler, snippetHandler, formsHandler, historyHandler, scriptLoader) {
+	public constructor(
+		uiHandler?: { new(naja: Naja): UIHandler },
+		redirectHandler?: { new(naja: Naja): RedirectHandler },
+		snippetHandler?: { new(naja: Naja): SnippetHandler },
+		formsHandler?: { new(naja: Naja): FormsHandler },
+		historyHandler?: { new(naja: Naja): HistoryHandler },
+		scriptLoader?: { new(naja: Naja): ScriptLoader },
+	) {
 		super();
 		this.uiHandler = uiHandler ? new uiHandler(this) : new UIHandler(this);
 		this.redirectHandler = redirectHandler ? new redirectHandler(this) : new RedirectHandler(this);
@@ -32,7 +53,7 @@ export class Naja extends EventTarget {
 	}
 
 
-	registerExtension(extension) {
+	public registerExtension(extension: Extension): void {
 		if (this.initialized) {
 			extension.initialize(this);
 		}
@@ -41,7 +62,7 @@ export class Naja extends EventTarget {
 	}
 
 
-	initialize(defaultOptions = {}) {
+	public initialize(defaultOptions: Options = {}): void {
 		if (this.initialized) {
 			throw new Error('Cannot initialize Naja, it is already initialized.');
 		}
@@ -54,7 +75,12 @@ export class Naja extends EventTarget {
 	}
 
 
-	async makeRequest(method, url, data = null, options = {}) {
+	public async makeRequest(
+		method: string,
+		url: string | URL,
+		data: any | null = null,
+		options: Options = {},
+	): Promise<Payload> {
 		if (url instanceof URL) {
 			url = url.href;
 		}
@@ -71,7 +97,7 @@ export class Naja extends EventTarget {
 		if (method.toUpperCase() === 'GET' && data instanceof FormData) {
 			const urlObject = new URL(url, location.href);
 			for (const [key, value] of data) {
-				urlObject.searchParams.append(key, value);
+				urlObject.searchParams.append(key, String(value));
 			}
 
 			url = urlObject.toString();
@@ -83,7 +109,7 @@ export class Naja extends EventTarget {
 			credentials: 'same-origin',
 			...options.fetch,
 			method,
-			headers: new Headers(options.fetch.headers || {}),
+			headers: new Headers(options.fetch!.headers || {}),
 			body: data !== null && Object.getPrototypeOf(data) === Object.prototype
 				? new URLSearchParams(data)
 				: data,
@@ -128,10 +154,19 @@ export class Naja extends EventTarget {
 
 		return payload;
 	}
+
+	declare public addEventListener: <K extends keyof NajaEventMap>(type: K, listener: TypedEventListener<Naja, NajaEventMap[K]>, options?: boolean | AddEventListenerOptions) => void;
+	declare public removeEventListener: <K extends keyof NajaEventMap>(type: K, listener: TypedEventListener<Naja, NajaEventMap[K]>, options?: boolean | AddEventListenerOptions) => void;
+}
+
+export interface Extension {
+	initialize(naja: Naja): void;
 }
 
 export class HttpError extends Error {
-	constructor(response) {
+	public readonly response: Response;
+
+	constructor(response: Response) {
 		const message = `HTTP ${response.status}: ${response.statusText}`;
 		super(message);
 
@@ -139,4 +174,22 @@ export class HttpError extends Error {
 		this.stack = new Error(message).stack;
 		this.response = response;
 	}
+}
+
+export type InitEvent = CustomEvent<{defaultOptions: Options}>;
+export type BeforeEvent = CustomEvent<{request: Request, method: string, url: string, data: any, options: Options}>;
+export type StartEvent = CustomEvent<{request: Request, promise: Promise<Response>, abortController: AbortController, options: Options}>;
+export type AbortEvent = CustomEvent<{request: Request, error: Error, options: Options}>;
+export type SuccessEvent = CustomEvent<{request: Request, response: Response, payload: Payload, options: Options}>;
+export type ErrorEvent = CustomEvent<{request: Request, response: Response | undefined, error: Error, options: Options}>;
+export type CompleteEvent = CustomEvent<{request: Request, response: Response | undefined, error: Error | undefined, payload: Payload | undefined, options: Options}>;
+
+interface NajaEventMap {
+	init: InitEvent;
+	before: BeforeEvent;
+	start: StartEvent;
+	abort: AbortEvent;
+	success: SuccessEvent;
+	error: ErrorEvent;
+	complete: CompleteEvent;
 }

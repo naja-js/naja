@@ -1,15 +1,17 @@
-export class UIHandler extends EventTarget {
-	selector = '.ajax';
-	allowedOrigins = [window.location.origin];
-	handler = this.handleUI.bind(this);
+import {Naja, Options} from '../Naja';
+import {assert, TypedEventListener} from '../utils';
 
-	constructor(naja) {
+export class UIHandler extends EventTarget {
+	public selector: string = '.ajax';
+	public allowedOrigins: (string | URL)[] = [window.location.origin];
+	private handler = this.handleUI.bind(this);
+
+	public constructor(private readonly naja: Naja) {
 		super();
-		this.naja = naja;
 		naja.addEventListener('init', this.initialize.bind(this));
 	}
 
-	initialize() {
+	private initialize(): void {
 		this.bindUI(window.document.body);
 		this.naja.snippetHandler.addEventListener('afterUpdate', (event) => {
 			const {snippet} = event.detail;
@@ -17,7 +19,7 @@ export class UIHandler extends EventTarget {
 		});
 	}
 
-	bindUI(element) {
+	public bindUI(element: Element): void {
 		const selectors = [
 			`a${this.selector}`,
 			`input[type="submit"]${this.selector}`,
@@ -28,7 +30,7 @@ export class UIHandler extends EventTarget {
 			`form${this.selector} button[type="submit"]`,
 		].join(', ');
 
-		const bindElement = (element) => {
+		const bindElement = (element: Element) => {
 			element.removeEventListener('click', this.handler);
 			element.addEventListener('click', this.handler);
 		};
@@ -42,39 +44,40 @@ export class UIHandler extends EventTarget {
 			bindElement(element);
 		}
 
-		const bindForm = (form) => {
+		const bindForm = (form: HTMLFormElement) => {
 			form.removeEventListener('submit', this.handler);
 			form.addEventListener('submit', this.handler);
 		};
 
 		if (element.matches(`form${this.selector}`)) {
-			bindForm(element);
+			bindForm(element as HTMLFormElement);
 		}
 
 		const forms = element.querySelectorAll(`form${this.selector}`);
 		for (let i = 0; i < forms.length; i++) {
-			bindForm(forms.item(i));
+			bindForm(forms.item(i) as HTMLFormElement);
 		}
 	}
 
-	handleUI(event) {
-		if (event.altKey || event.ctrlKey || event.shiftKey || event.metaKey || event.button) {
+	private handleUI(event: Event | MouseEvent): void {
+		const mouseEvent = event as MouseEvent;
+		if (mouseEvent.altKey || mouseEvent.ctrlKey || mouseEvent.shiftKey || mouseEvent.metaKey || mouseEvent.button) {
 			return;
 		}
 
 		const element = event.currentTarget;
-		const options = {};
+		const options: Options = {};
 
 		if (event.type === 'submit') {
-			this.submitForm(element, options, event);
+			this.submitForm(element as HTMLFormElement, options, event);
 
 		} else if (event.type === 'click') {
-			this.clickElement(element, options, event);
+			this.clickElement(element as HTMLElement, options, mouseEvent);
 		}
 	}
 
-	clickElement(element, options = {}, event) {
-		let method, url, data;
+	public clickElement(element: HTMLElement, options: Options = {}, event?: MouseEvent): void {
+		let method: string = 'GET', url: string = '', data: any;
 
 		if ( ! this.dispatchEvent(new CustomEvent('interaction', {cancelable: true, detail: {element, originalEvent: event, options}}))) {
 			if (event) {
@@ -85,24 +88,28 @@ export class UIHandler extends EventTarget {
 		}
 
 		if (element.tagName === 'A') {
+			assert(element instanceof HTMLAnchorElement);
+
 			method = 'GET';
 			url = element.href;
 			data = null;
 
 		} else if (element.tagName === 'INPUT' || element.tagName === 'BUTTON') {
+			assert(element instanceof HTMLInputElement);
+
 			const {form} = element;
 			// eslint-disable-next-line no-nested-ternary,no-extra-parens
-			method = element.hasAttribute('formmethod') ? element.getAttribute('formmethod').toUpperCase() : (form.hasAttribute('method') ? form.getAttribute('method').toUpperCase() : 'GET');
-			url = element.getAttribute('formaction') || form.getAttribute('action') || window.location.pathname + window.location.search;
-			data = new FormData(form);
+			method = element.getAttribute('formmethod')?.toUpperCase() ?? form?.getAttribute('method')?.toUpperCase() ?? 'GET';
+			url = element.getAttribute('formaction') ?? form?.getAttribute('action') ?? window.location.pathname + window.location.search;
+			data = new FormData(form ?? undefined);
 
 			if (element.type === 'submit' || element.tagName === 'BUTTON') {
 				data.append(element.name, element.value || '');
 
 			} else if (element.type === 'image') {
 				const coords = element.getBoundingClientRect();
-				data.append(`${element.name}.x`, Math.max(0, Math.floor(event.pageX - coords.left)));
-				data.append(`${element.name}.y`, Math.max(0, Math.floor(event.pageY - coords.top)));
+				data.append(`${element.name}.x`, Math.max(0, Math.floor(event !== undefined ? event.pageX - coords.left : 0)));
+				data.append(`${element.name}.y`, Math.max(0, Math.floor(event !== undefined ? event.pageY - coords.top : 0)));
 			}
 		}
 
@@ -115,7 +122,7 @@ export class UIHandler extends EventTarget {
 		}
 	}
 
-	submitForm(form, options = {}, event) {
+	public submitForm(form: HTMLFormElement, options: Options = {}, event?: Event): void {
 		if ( ! this.dispatchEvent(new CustomEvent('interaction', {cancelable: true, detail: {element: form, originalEvent: event, options}}))) {
 			if (event) {
 				event.preventDefault();
@@ -124,8 +131,8 @@ export class UIHandler extends EventTarget {
 			return;
 		}
 
-		const method = form.hasAttribute('method') ? form.getAttribute('method').toUpperCase() : 'GET';
-		const url = form.getAttribute('action') || window.location.pathname + window.location.search;
+		const method = form.getAttribute('method')?.toUpperCase() ?? 'GET';
+		const url = form.getAttribute('action') ?? window.location.pathname + window.location.search;
 		const data = new FormData(form);
 
 		if (this.isUrlAllowed(url)) {
@@ -137,7 +144,7 @@ export class UIHandler extends EventTarget {
 		}
 	}
 
-	isUrlAllowed(url) {
+	public isUrlAllowed(url: string): boolean {
 		// ignore non-URL URIs (javascript:, data:, ...)
 		if (/^(?!https?)[^:/?#]+:/i.test(url)) {
 			return false;
@@ -145,4 +152,9 @@ export class UIHandler extends EventTarget {
 
 		return ! /^https?/i.test(url) || this.allowedOrigins.some((origin) => new RegExp(`^${origin}`, 'i').test(url));
 	}
+
+	declare public addEventListener: (type: 'interaction', listener: TypedEventListener<UIHandler, InteractionEvent>, options?: boolean | AddEventListenerOptions) => void;
+	declare public removeEventListener: (type: 'interaction', listener: TypedEventListener<UIHandler, InteractionEvent>, options?: boolean | AddEventListenerOptions) => void;
 }
+
+export type InteractionEvent = CustomEvent<{element: Element, originalEvent?: Event, options: Options}>;
