@@ -25,7 +25,7 @@ jobs:
           PASSPHRASE: ${{ secrets.GPG_SIGNING_KEY_PASSPHRASE }}
       - uses: actions/setup-node@v2-beta
         with:
-          node-version: '12.x'
+          node-version: '14.x'
       - run: yarn install --frozen-lockfile
       - run: yarn build
       - run: |
@@ -121,7 +121,7 @@ jobs:
           path: dist/
       - uses: actions/setup-node@v2-beta
         with:
-          node-version: '12.x'
+          node-version: '14.x'
           registry-url: 'https://registry.npmjs.org'
       - run: npm publish
         env:
