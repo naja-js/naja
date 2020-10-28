@@ -22,7 +22,7 @@ jobs:
             ${{ runner.os }}-
       - uses: actions/setup-node@v2-beta
         with:
-          node-version: '12.x'
+          node-version: '14.x'
       - uses: microsoft/playwright-github-action@v1
       - run: yarn install --frozen-lockfile
       - run: yarn lint
