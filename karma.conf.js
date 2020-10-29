@@ -1,7 +1,6 @@
 const {babel} = require('@rollup/plugin-babel');
 const commonjs = require('@rollup/plugin-commonjs');
 const {nodeResolve} = require('@rollup/plugin-node-resolve');
-const typescript = require('@rollup/plugin-typescript');
 
 module.exports = (config) => {
   config.set({
@@ -13,16 +12,36 @@ module.exports = (config) => {
     ],
 
     preprocessors: {
-      'tests/index.js': ['rollup']
+      'tests/index.js': ['rollup'],
     },
     rollupPreprocessor: {
       plugins: [
-        nodeResolve(),
+        nodeResolve({
+          extensions: ['.js', '.ts'],
+        }),
         commonjs(),
-        typescript(),
         babel({
           exclude: /node_modules\/(?!event-target-shim)/,
           babelHelpers: 'runtime',
+          extensions: ['.js', '.ts'],
+          presets: [
+            ['@babel/preset-typescript', {
+              allowDeclareFields: true,
+            }],
+            '@babel/preset-env',
+          ],
+          plugins: [
+            '@babel/plugin-transform-runtime',
+            ['babel-plugin-istanbul', {
+              include: [
+                'src/**/*.ts',
+              ],
+              exclude: [
+                'node_modules/**',
+                'tests/**/*.js',
+              ],
+            }],
+          ],
         }),
       ],
       output: {
@@ -34,7 +53,7 @@ module.exports = (config) => {
 
     reporters: ['dots', 'coverage-istanbul'],
     coverageIstanbulReporter: {
-      reports: ['text-summary', 'lcovonly'],
+      reports: ['text-summary', 'lcovonly', 'html'],
     },
 
     port: 9876,
