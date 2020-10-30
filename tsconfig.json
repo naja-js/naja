@@ -9,7 +9,9 @@
 		"alwaysStrict": true,
 
 		"rootDir": "src/",
-		"sourceMap": true
+		"sourceMap": true,
+
+		"noEmitOnError": true
 	},
 	"exclude": [
 		"node_modules"
