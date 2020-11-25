@@ -20,7 +20,7 @@ so that you can access DOM elements in the listener. The `init` event's `detail`
 This event is dispatched when the `Request` is created but not yet sent. At this point, you can call the event's
 `preventDefault()` method to cancel the request. The events `detail` holds the following properties:
 
-- `request: Request`, the XHR object,
+- `request: Request`, the Fetch API request object,
 - `method: string`, the requested HTTP method,
 - `url: string`, the requested URL,
 - `data: mixed`, the data to be sent along with the request,
@@ -83,7 +83,7 @@ using manual dispatch (see more in [UI binding](ui-binding.md)). This event's `p
 to prevent the request from being dispatched. This event's `detail` has the following properties:
 
 - `element: HTMLElement`, the element the user interacted with,
-- `originalEvent: ?Event`, the original UI event, or `undefined` if the request was dispatched [by hand](ui-binding.md),
+- `originalEvent: ?Event`, the original UI event, or `undefined` if the interaction was triggered [by hand](ui-binding.md),
 - `options: Object`, an empty object that can be populated with options based on the element's attributes.
 
 
