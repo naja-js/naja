@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: ❓ Support Question
+    url: https://github.com/jiripudil/Naja/discussions/new?category=support
+    about: I am stuck and need help with Naja. 👉 Please ask for help in Discussions.
