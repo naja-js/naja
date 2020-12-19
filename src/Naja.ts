@@ -94,9 +94,11 @@ export class Naja extends EventTarget {
 			},
 		};
 
-		if (method.toUpperCase() === 'GET' && data instanceof FormData) {
+		const isDataPojo = data !== null && Object.getPrototypeOf(data) === Object.prototype;
+		if (['GET', 'HEAD'].includes(method.toUpperCase()) && (data instanceof FormData || isDataPojo)) {
 			const urlObject = new URL(url, location.href);
-			for (const [key, value] of data) {
+			const iterableData = isDataPojo ? Object.entries(data) : data;
+			for (const [key, value] of iterableData) {
 				urlObject.searchParams.append(key, String(value));
 			}
 
@@ -110,7 +112,7 @@ export class Naja extends EventTarget {
 			...options.fetch,
 			method,
 			headers: new Headers(options.fetch!.headers || {}),
-			body: data !== null && Object.getPrototypeOf(data) === Object.prototype
+			body: data !== null && isDataPojo
 				? new URLSearchParams(data)
 				: data,
 			signal: abortController.signal,
