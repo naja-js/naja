@@ -350,7 +350,26 @@ describe('makeRequest()', function () {
 		const request = naja.makeRequest('GET', '/makeRequest/getFormData', formData);
 		return request.then((payload) => {
 			assert.deepEqual(payload, {answer: 42});
-		})
+		});
+	});
+
+	it('should submit GET POJO in URL', function () {
+		const naja = mockNaja();
+		naja.initialize();
+		cleanPopstateListener(naja.historyHandler);
+
+		const data = {
+			foo: 'bar',
+			baz: 42,
+		};
+
+		this.fetchMock.when((request) => request.url === 'http://localhost:9876/makeRequest/getPOJO?foo=bar&baz=42')
+			.respond(200, {'Content-Type': 'application/json'}, {answer: 42});
+
+		const request = naja.makeRequest('GET', '/makeRequest/getPOJO', data);
+		return request.then((payload) => {
+			assert.deepEqual(payload, {answer: 42});
+		});
 	});
 
 	describe('options', function () {
