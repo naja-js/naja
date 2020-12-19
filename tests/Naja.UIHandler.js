@@ -430,17 +430,22 @@ describe('UIHandler', function () {
 			const naja = mockNaja();
 			const mock = sinon.mock(naja);
 
+			const expectedResult = {answer: 42};
+
 			mock.expects('makeRequest')
 				.withExactArgs('GET', 'http://localhost:9876/UIHandler/clickElement', null, {})
-				.once();
+				.once()
+				.returns(Promise.resolve(expectedResult));
 
 			const a = document.createElement('a');
 			a.href = '/UIHandler/clickElement';
 
 			const handler = new UIHandler(naja);
-			handler.clickElement(a);
-
-			mock.verify();
+			return handler.clickElement(a)
+				.then((result) => {
+					assert.deepEqual(result, expectedResult);
+					mock.verify();
+				});
 		});
 
 		it('triggers interaction event', function () {
@@ -477,18 +482,23 @@ describe('UIHandler', function () {
 			const naja = mockNaja();
 			const mock = sinon.mock(naja);
 
+			const expectedResult = {answer: 42};
+
 			mock.expects('makeRequest')
 				.withExactArgs('POST', '/UIHandler/submitForm', sinon.match.instanceOf(FormData), {})
-				.once();
+				.once()
+				.returns(Promise.resolve(expectedResult));
 
 			const form = document.createElement('form');
 			form.method = 'POST';
 			form.action = '/UIHandler/submitForm';
 
 			const handler = new UIHandler(naja);
-			handler.submitForm(form);
-
-			mock.verify();
+			return handler.submitForm(form)
+				.then((result) => {
+					assert.deepEqual(result, expectedResult);
+					mock.verify();
+				});
 		});
 
 		it('triggers interaction event', function () {
