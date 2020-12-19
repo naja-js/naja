@@ -51,6 +51,8 @@ naja.uiHandler.submitForm(form);
 Neither `element` nor `form` have to be bound to Naja via the configured selector. However, the aforementioned allowed
 origin rules still apply, and the `interaction` event is triggered with `originalEvent` set to undefined.
 
+Since Naja 2.1.0, these methods return the promise from the underlying call to `naja.makeRequest()`.
+
 
 ## Manual bind
 

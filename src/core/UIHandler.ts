@@ -1,4 +1,4 @@
-import {Naja, Options} from '../Naja';
+import {Naja, Options, Payload} from '../Naja';
 import {assert, TypedEventListener} from '../utils';
 
 export class UIHandler extends EventTarget {
@@ -76,15 +76,12 @@ export class UIHandler extends EventTarget {
 		}
 	}
 
-	public clickElement(element: HTMLElement, options: Options = {}, event?: MouseEvent): void {
+	public async clickElement(element: HTMLElement, options: Options = {}, event?: MouseEvent): Promise<Payload> {
 		let method: string = 'GET', url: string = '', data: any;
 
 		if ( ! this.dispatchEvent(new CustomEvent('interaction', {cancelable: true, detail: {element, originalEvent: event, options}}))) {
-			if (event) {
-				event.preventDefault();
-			}
-
-			return;
+			event?.preventDefault();
+			return {};
 		}
 
 		if (element.tagName === 'A') {
@@ -113,35 +110,30 @@ export class UIHandler extends EventTarget {
 			}
 		}
 
-		if (this.isUrlAllowed(url)) {
-			if (event) {
-				event.preventDefault();
-			}
-
-			this.naja.makeRequest(method, url, data, options);
+		if ( ! this.isUrlAllowed(url)) {
+			throw new Error(`Cannot dispatch async request, URL is not allowed: ${url}`);
 		}
+
+		event?.preventDefault();
+		return this.naja.makeRequest(method, url, data, options);
 	}
 
-	public submitForm(form: HTMLFormElement, options: Options = {}, event?: Event): void {
+	public async submitForm(form: HTMLFormElement, options: Options = {}, event?: Event): Promise<Payload> {
 		if ( ! this.dispatchEvent(new CustomEvent('interaction', {cancelable: true, detail: {element: form, originalEvent: event, options}}))) {
-			if (event) {
-				event.preventDefault();
-			}
-
-			return;
+			event?.preventDefault();
+			return {};
 		}
 
 		const method = form.getAttribute('method')?.toUpperCase() ?? 'GET';
 		const url = form.getAttribute('action') ?? window.location.pathname + window.location.search;
 		const data = new FormData(form);
 
-		if (this.isUrlAllowed(url)) {
-			if (event) {
-				event.preventDefault();
-			}
-
-			this.naja.makeRequest(method, url, data, options);
+		if ( ! this.isUrlAllowed(url)) {
+			throw new Error(`Cannot dispatch async request, URL is not allowed: ${url}`);
 		}
+
+		event?.preventDefault();
+		return this.naja.makeRequest(method, url, data, options);
 	}
 
 	public isUrlAllowed(url: string): boolean {
