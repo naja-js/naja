@@ -102,6 +102,39 @@ describe('FormsHandler', function () {
 		mock.restore();
 	});
 
+	it('does not process non-form interactions', function () {
+		const mock = sinon.mock(window.Nette);
+		mock.expects('validateForm').never();
+
+		const element = document.createElement('a');
+
+		const originalEvent = {
+			stopImmediatePropagation: sinon.spy(),
+			preventDefault: sinon.spy(),
+		};
+
+		const evt = new CustomEvent('interaction', {
+			detail: {
+				element,
+				originalEvent,
+			},
+		});
+
+		sinon.spy(evt, 'preventDefault');
+
+		const naja = mockNaja();
+		const formsHandler = new FormsHandler(naja);
+		formsHandler.processForm(evt);
+
+		assert.isUndefined(element.form);
+		assert.isFalse(originalEvent.stopImmediatePropagation.called);
+		assert.isFalse(originalEvent.preventDefault.called);
+		assert.isFalse(evt.preventDefault.called);
+
+		mock.verify();
+		mock.restore();
+	});
+
 	it('accepts local netteForms reference', () => {
 		sinon.spy(window.Nette, 'initForm');
 		const mock = sinon.mock(netteForms);
