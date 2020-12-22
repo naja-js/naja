@@ -35,7 +35,7 @@ export class FormsHandler {
 		const {element, originalEvent} = event.detail;
 
 		const inputElement = element as HTMLInputElement;
-		if (inputElement.form !== null) {
+		if (inputElement.form !== undefined && inputElement.form !== null) {
 			inputElement.form['nette-submittedBy'] = element;
 		}
 
