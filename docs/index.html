@@ -19,17 +19,40 @@
       auto2top: true,
       maxLevel: 4,
       subMaxLevel: 2,
-      ga: 'UA-36513963-3',
       plugins: [
+        // add link to support to footer on every page
         (hook) => {
           const supportFooter = '?> Did not find your answer? [Ask for help](https://github.com/jiripudil/Naja/discussions/new?category=support) on Github.';
           hook.beforeEach((content) => `${content}\n---\n${supportFooter}`);
+        },
+
+        // GA4
+        (hook) => {
+          // append gtag script
+          const script = document.createElement('script');
+          script.async = true;
+          script.src = 'https://www.googletagmanager.com/gtag/js?id=G-HWKP64QVTF';
+          document.body.appendChild(script);
+
+          // configure measurement
+          window.dataLayer = window.dataLayer || [];
+          window.gtag = function(){dataLayer.push(arguments);}
+          window.gtag('js', new Date());
+          window.gtag('config', 'G-HWKP64QVTF', {
+            send_page_view: false,
+          });
+
+          // setup sending page_views
+          hook.beforeEach(() => {
+            window.gtag('event', 'page_view', {
+              page_path: location.hash,
+            });
+          });
         },
       ],
     };
   </script>
   <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
-  <script src="//unpkg.com/docsify/lib/plugins/ga.min.js"></script>
   <script src="//unpkg.com/docsify-pagination/dist/docsify-pagination.min.js"></script>
   <script src="//unpkg.com/prismjs/components/prism-bash.min.js"></script>
   <script src="//unpkg.com/prismjs/components/prism-php.min.js"></script>
