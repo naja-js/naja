@@ -68,11 +68,16 @@ export class UIHandler extends EventTarget {
 		const element = event.currentTarget;
 		const options: Options = {};
 
+		const ignoreErrors = () => {
+			// don't reject the promise in case of an error as developers have no way of handling the rejection
+			// in this situation; errors should be handled in `naja.addEventListener('error', errorHandler)`
+		};
+
 		if (event.type === 'submit') {
-			this.submitForm(element as HTMLFormElement, options, event);
+			this.submitForm(element as HTMLFormElement, options, event).catch(ignoreErrors);
 
 		} else if (event.type === 'click') {
-			this.clickElement(element as HTMLElement, options, mouseEvent);
+			this.clickElement(element as HTMLElement, options, mouseEvent).catch(ignoreErrors);
 		}
 	}
 

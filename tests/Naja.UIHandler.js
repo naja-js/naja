@@ -330,6 +330,26 @@ describe('UIHandler', function () {
 			mock.verify();
 		});
 
+		it('failed request should not cause unhandled rejection', function () {
+			const naja = mockNaja();
+			const mock = sinon.mock(naja);
+			mock.expects('makeRequest')
+				.withExactArgs('GET', 'http://localhost:9876/UIHandler/a', null, {})
+				.once()
+				.returns(Promise.reject(new Error()));
+
+			const handler = new UIHandler(naja);
+
+			const evt = {
+				type: 'click',
+				currentTarget: this.a,
+				preventDefault: () => undefined,
+			};
+			handler.handleUI(evt);
+
+			mock.verify();
+		});
+
 		it('a.ajax', function () {
 			const naja = mockNaja();
 			const mock = sinon.mock(naja);
