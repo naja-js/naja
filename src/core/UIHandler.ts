@@ -97,7 +97,7 @@ export class UIHandler extends EventTarget {
 			data = null;
 
 		} else if (element.tagName === 'INPUT' || element.tagName === 'BUTTON') {
-			assert(element instanceof HTMLInputElement);
+			assert(element instanceof HTMLInputElement || element instanceof HTMLButtonElement);
 
 			const {form} = element;
 			// eslint-disable-next-line no-nested-ternary,no-extra-parens
