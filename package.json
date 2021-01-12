@@ -13,7 +13,7 @@
   "main": "dist/Naja.js",
   "unpkg": "dist/Naja.min.js",
   "module": "dist/Naja.esm.js",
-  "types": "src/index.esm.d.ts",
+  "types": "dist/index.esm.d.ts",
   "dependencies": {
     "@babel/runtime": "^7.12.5",
     "abortcontroller-polyfill": "^1.5.0",
