@@ -99,6 +99,12 @@ export class Naja extends EventTarget {
 			const urlObject = new URL(url, location.href);
 			const iterableData = isDataPojo ? Object.entries(data) : data;
 			for (const [key, value] of iterableData) {
+				if (value instanceof Array) {
+					value.map((item: string) => {
+						urlObject.searchParams.append(`${key}[]`, item);
+					});
+					continue;
+				}
 				urlObject.searchParams.append(key, String(value));
 			}
 
