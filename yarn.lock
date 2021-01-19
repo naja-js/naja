@@ -3174,9 +3174,9 @@ negotiator@0.6.2:
   integrity sha512-hZXc7K2e+PgeI1eDBe/10Ard4ekbfrrqG8Ep+8Jmf4JID2bNg7NvCPOZN+kfF574pFQI7mum2AUqDidoKqcTOw==
 
 nette-forms@^3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/nette-forms/-/nette-forms-3.1.0.tgz#e80ec74cab1168d54e34e190a309c21ea02b9f17"
-  integrity sha512-K1IblX11qJ7qIdIJDez2Leold9eswnibL375piyUPLk1VIXJGEPNYhz9x+6DXM/pl+NRw5vbza4lmXDcqGmEjQ==
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/nette-forms/-/nette-forms-3.2.0.tgz#3bf24cbc7015c0ec3c371d5a7f246c06128e8b04"
+  integrity sha512-LBypZ9iBiYajqZc9X53ioqdZAQXTYhKXkErbAXlzJTwstRFJBkHQcgS48UzUIdT0S3YZZJHM7tIya9dCDS23VQ==
 
 nise@^4.0.4:
   version "4.0.4"
