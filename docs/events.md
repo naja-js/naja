@@ -18,12 +18,12 @@ so that you can access DOM elements in the listener. The `init` event's `detail`
 ### before
 
 This event is dispatched when the `Request` is created but not yet sent. At this point, you can call the event's
-`preventDefault()` method to cancel the request. The events `detail` holds the following properties:
+`preventDefault()` method to cancel the request. The event's `detail` holds the following properties:
 
 - `request: Request`, the Fetch API request object,
 - `method: string`, the requested HTTP method,
 - `url: string`, the requested URL,
-- `data: mixed`, the data to be sent along with the request,
+- `data: any`, the data to be sent along with the request,
 - `options: Object`.
 
 ### start
