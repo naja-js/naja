@@ -69,12 +69,12 @@ describe('HistoryHandler', function () {
 
 		const mock = sinon.mock(naja.historyHandler.historyAdapter);
 		mock.expects('pushState').withExactArgs({
-			href: '/HistoryHandler/pushState',
+			href: 'http://localhost:9876/HistoryHandler/pushState',
 			title: '',
 			ui: {
 				'snippet-history-foo': 'foo'
 			},
-		}, '', '/HistoryHandler/pushState').once();
+		}, '', 'http://localhost:9876/HistoryHandler/pushState').once();
 
 		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet-history-foo': 'foo'}});
 		return naja.makeRequest('GET', '/HistoryHandler/pushState').then(() => {
@@ -100,12 +100,12 @@ describe('HistoryHandler', function () {
 
 		const mock = sinon.mock(naja.historyHandler.historyAdapter);
 		mock.expects('replaceState').withExactArgs({
-			href: '/HistoryHandler/replaceState',
+			href: 'http://localhost:9876/HistoryHandler/replaceState',
 			title: '',
 			ui: {
 				'snippet-history-foo': 'foo'
 			},
-		}, '', '/HistoryHandler/replaceState').once();
+		}, '', 'http://localhost:9876/HistoryHandler/replaceState').once();
 
 		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet-history-foo': 'foo'}});
 		return naja.makeRequest('GET', '/HistoryHandler/replaceState', null, {history: 'replace'}).then(() => {
@@ -281,9 +281,9 @@ describe('HistoryHandler', function () {
 
 			const mock = sinon.mock(naja.historyHandler.historyAdapter);
 			mock.expects('pushState').withExactArgs({
-				href: '/HistoryHandler/pushStateWithoutCache',
+				href: 'http://localhost:9876/HistoryHandler/pushStateWithoutCache',
 				ui: false,
-			}, 'new title', '/HistoryHandler/pushStateWithoutCache').once();
+			}, 'new title', 'http://localhost:9876/HistoryHandler/pushStateWithoutCache').once();
 
 			this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet-history-foo': 'foo'}});
 			return naja.makeRequest('GET', '/HistoryHandler/pushStateWithoutCache').then(() => {
@@ -307,9 +307,9 @@ describe('HistoryHandler', function () {
 
 			const mock = sinon.mock(naja.historyHandler.historyAdapter);
 			mock.expects('pushState').withExactArgs({
-				href: '/HistoryHandler/pushStateWithoutCacheOption',
+				href: 'http://localhost:9876/HistoryHandler/pushStateWithoutCacheOption',
 				ui: false,
-			}, 'new title', '/HistoryHandler/pushStateWithoutCacheOption').once();
+			}, 'new title', 'http://localhost:9876/HistoryHandler/pushStateWithoutCacheOption').once();
 
 			this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet-history-foo': 'foo'}});
 			return naja.makeRequest('GET', '/HistoryHandler/pushStateWithoutCacheOption', null, {historyUiCache: false}).then(() => {
@@ -335,12 +335,12 @@ describe('HistoryHandler', function () {
 
 			const mock = sinon.mock(naja.historyHandler.historyAdapter);
 			mock.expects('pushState').withExactArgs({
-				href: '/HistoryHandler/pushStateWithCache',
+				href: 'http://localhost:9876/HistoryHandler/pushStateWithCache',
 				title: 'new title',
 				ui: {
 					'snippet-history-foo': 'foo'
 				},
-			}, 'new title', '/HistoryHandler/pushStateWithCache').once();
+			}, 'new title', 'http://localhost:9876/HistoryHandler/pushStateWithCache').once();
 
 			this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet-history-foo': 'foo'}});
 			return naja.makeRequest('GET', '/HistoryHandler/pushStateWithCache', null, {historyUiCache: true}).then(() => {

@@ -361,14 +361,50 @@ describe('makeRequest()', function () {
 		const data = {
 			foo: 'bar',
 			baz: 42,
+			qux: [
+				{
+					bar: 'baz',
+					baz: 'qux',
+				},
+				'foo',
+			],
 		};
 
-		this.fetchMock.when((request) => request.url === 'http://localhost:9876/makeRequest/getPOJO?foo=bar&baz=42')
+		this.fetchMock.when((request) => request.url === 'http://localhost:9876/makeRequest/getPOJO?foo=bar&baz=42&qux%5B0%5D%5Bbar%5D=baz&qux%5B0%5D%5Bbaz%5D=qux&qux%5B1%5D=foo')
 			.respond(200, {'Content-Type': 'application/json'}, {answer: 42});
 
 		const request = naja.makeRequest('GET', '/makeRequest/getPOJO', data);
 		return request.then((payload) => {
 			assert.deepEqual(payload, {answer: 42});
+		});
+	});
+
+	it('should transform POST POJO', function () {
+		const naja = mockNaja();
+		naja.initialize();
+		cleanPopstateListener(naja.historyHandler);
+
+		const data = {
+			foo: 'bar',
+			baz: 42,
+			qux: [
+				{
+					bar: 'baz',
+					baz: 'qux',
+				},
+				'foo',
+			],
+		};
+
+		this.fetchMock.when((request) => request.url === 'http://localhost:9876/makeRequest/postPOJO')
+			.handler = async (request) => new Response(
+				JSON.stringify({request: await request.text()}),
+				{status: 200},
+			);
+
+		const request = naja.makeRequest('POST', '/makeRequest/postPOJO', data);
+		return request.then((payload) => {
+			assert.deepEqual(payload, {request: 'foo=bar&baz=42&qux%5B0%5D%5Bbar%5D=baz&qux%5B0%5D%5Bbaz%5D=qux&qux%5B1%5D=foo'});
 		});
 	});
 

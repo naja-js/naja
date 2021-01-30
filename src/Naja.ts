@@ -81,8 +81,9 @@ export class Naja extends EventTarget {
 		data: any | null = null,
 		options: Options = {},
 	): Promise<Payload> {
-		if (url instanceof URL) {
-			url = url.href;
+		// normalize url to instanceof URL
+		if (typeof url === 'string') {
+			url = new URL(url, location.href);
 		}
 
 		options = {
@@ -94,34 +95,23 @@ export class Naja extends EventTarget {
 			},
 		};
 
-		const isDataPojo = data !== null && Object.getPrototypeOf(data) === Object.prototype;
-		if (['GET', 'HEAD'].includes(method.toUpperCase()) && (data instanceof FormData || isDataPojo)) {
-			const urlObject = new URL(url, location.href);
-			const iterableData = isDataPojo ? Object.entries(data) : data;
-			for (const [key, value] of iterableData) {
-				urlObject.searchParams.append(key, String(value));
-			}
-
-			url = urlObject.toString();
-			data = null;
-		}
+		const headers = new Headers(options.fetch!.headers || {});
+		const body = this.transformData(url, method, data);
 
 		const abortController = new AbortController();
-		const request = new Request(url, {
+		const request = new Request(url.toString(), {
 			credentials: 'same-origin',
 			...options.fetch,
 			method,
-			headers: new Headers(options.fetch!.headers || {}),
-			body: data !== null && isDataPojo
-				? new URLSearchParams(data)
-				: data,
+			headers,
+			body,
 			signal: abortController.signal,
 		});
 
 		// impersonate XHR so that Nette can detect isAjax()
 		request.headers.set('X-Requested-With', 'XMLHttpRequest');
 
-		if ( ! this.dispatchEvent(new CustomEvent('before', {cancelable: true, detail: {request, method, url, data, options}}))) {
+		if ( ! this.dispatchEvent(new CustomEvent('before', {cancelable: true, detail: {request, method, url: url.toString(), data, options}}))) {
 			return {};
 		}
 
@@ -155,6 +145,53 @@ export class Naja extends EventTarget {
 		this.dispatchEvent(new CustomEvent('complete', {detail: {request, response, payload, error: undefined, options}}));
 
 		return payload;
+	}
+
+	private appendToQueryString(searchParams: URLSearchParams, key: string, value: any): void {
+		if (Array.isArray(value)) {
+			let index = 0;
+			for (const subvalue of value) {
+				this.appendToQueryString(searchParams, `${key}[${index++}]`, subvalue);
+			}
+
+		} else if (value !== null && Object.getPrototypeOf(value) === Object.prototype) {
+			for (const [subkey, subvalue] of Object.entries(value)) {
+				this.appendToQueryString(searchParams, `${key}[${subkey}]`, subvalue);
+			}
+
+		} else {
+			searchParams.append(key, String(value));
+		}
+	}
+
+	private transformData(url: URL, method: string, data: any): BodyInit | null {
+		const isGet = ['GET', 'HEAD'].includes(method.toUpperCase());
+
+		// sending a form via GET -> serialize FormData into URL and return empty request body
+		if (isGet && data instanceof FormData) {
+			for (const [key, value] of data) {
+				url.searchParams.append(key, String(value));
+			}
+
+			return null;
+		}
+
+		// sending a POJO -> serialize it recursively into URLSearchParams
+		const isDataPojo = data !== null && Object.getPrototypeOf(data) === Object.prototype;
+		if (isDataPojo) {
+			// for GET requests, append values to URL and return empty request body
+			// otherwise build `new URLSearchParams()` to act as the request body
+			const transformedData = isGet ? url.searchParams : new URLSearchParams();
+			for (const [key, value] of Object.entries(data)) {
+				this.appendToQueryString(transformedData, key, value);
+			}
+
+			return isGet
+				? null
+				: transformedData;
+		}
+
+		return data;
 	}
 
 	declare public addEventListener: <K extends keyof NajaEventMap>(type: K, listener: TypedEventListener<Naja, NajaEventMap[K]>, options?: boolean | AddEventListenerOptions) => void;
