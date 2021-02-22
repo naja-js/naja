@@ -360,6 +360,7 @@ describe('makeRequest()', function () {
 
 		const data = {
 			foo: 'bar',
+			bar: null,
 			baz: 42,
 			qux: [
 				{
@@ -367,6 +368,7 @@ describe('makeRequest()', function () {
 					baz: 'qux',
 				},
 				'foo',
+				undefined,
 			],
 		};
 
@@ -386,6 +388,7 @@ describe('makeRequest()', function () {
 
 		const data = {
 			foo: 'bar',
+			bar: null,
 			baz: 42,
 			qux: [
 				{
@@ -393,6 +396,7 @@ describe('makeRequest()', function () {
 					baz: 'qux',
 				},
 				'foo',
+				undefined,
 			],
 		};
 

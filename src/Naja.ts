@@ -148,13 +148,17 @@ export class Naja extends EventTarget {
 	}
 
 	private appendToQueryString(searchParams: URLSearchParams, key: string, value: any): void {
+		if (value === null || value === undefined) {
+			return;
+		}
+
 		if (Array.isArray(value)) {
 			let index = 0;
 			for (const subvalue of value) {
 				this.appendToQueryString(searchParams, `${key}[${index++}]`, subvalue);
 			}
 
-		} else if (value !== null && Object.getPrototypeOf(value) === Object.prototype) {
+		} else if (Object.getPrototypeOf(value) === Object.prototype) {
 			for (const [subkey, subvalue] of Object.entries(value)) {
 				this.appendToQueryString(searchParams, `${key}[${subkey}]`, subvalue);
 			}
@@ -170,7 +174,9 @@ export class Naja extends EventTarget {
 		// sending a form via GET -> serialize FormData into URL and return empty request body
 		if (isGet && data instanceof FormData) {
 			for (const [key, value] of data) {
-				url.searchParams.append(key, String(value));
+				if (value !== null && value !== undefined) {
+					url.searchParams.append(key, String(value));
+				}
 			}
 
 			return null;
