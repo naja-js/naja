@@ -1,4 +1,4 @@
-# ![Naja.js](docs/naja_type.png)
+# Naja
 
 [![Build Status](https://img.shields.io/github/workflow/status/jiripudil/Naja/Test)](https://github.com/jiripudil/Naja/actions?query=workflow%3ATest)
 [![Code Coverage](https://img.shields.io/codecov/c/github/jiripudil/Naja.svg)](https://codecov.io/gh/jiripudil/Naja)
