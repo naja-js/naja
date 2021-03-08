@@ -32,7 +32,7 @@ export class RedirectHandler extends EventTarget {
 		naja.addEventListener('success', (event) => {
 			const {payload, options} = event.detail;
 			if (payload.redirect) {
-				this.makeRedirect(payload.redirect, options.forceRedirect ?? false, options);
+				this.makeRedirect(payload.redirect, (options.forceRedirect ?? false) || (payload.forceRedirect ?? false), options);
 				event.stopImmediatePropagation();
 			}
 		});

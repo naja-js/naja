@@ -14,6 +14,7 @@ export interface Payload extends Record<string, any> {
 	snippets?: Record<string, string>;
 
 	redirect?: string;
+	forceRedirect?: boolean;
 
 	postGet?: boolean;
 	url?: string;
