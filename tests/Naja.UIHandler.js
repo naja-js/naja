@@ -182,6 +182,33 @@ describe('UIHandler', function () {
 			document.body.removeChild(voidLink);
 		});
 
+		it('request for a relative URL should be dispatched', function () {
+			const naja = mockNaja();
+			const mock = sinon.mock(naja);
+			mock.expects('makeRequest')
+				.withExactArgs('GET', 'http://localhost:9876/UIHandler/relative', null, {})
+				.once();
+
+			const handler = new UIHandler(naja);
+
+			const externalLink = document.createElement('a');
+			externalLink.href = '/UIHandler/relative';
+			externalLink.classList.add('ajax');
+			document.body.appendChild(externalLink);
+
+			const preventDefault = sinon.spy();
+			const evt = {
+				type: 'click',
+				currentTarget: externalLink,
+				preventDefault,
+			};
+			handler.handleUI(evt);
+
+			mock.verify();
+			assert.isTrue(preventDefault.called);
+			document.body.removeChild(externalLink);
+		});
+
 		it('request for an absolute URL with same origin should be dispatched', function () {
 			const naja = mockNaja();
 			const mock = sinon.mock(naja);
@@ -221,6 +248,34 @@ describe('UIHandler', function () {
 
 			const externalLink = document.createElement('a');
 			externalLink.href = 'http://another-site.com/foo';
+			externalLink.classList.add('ajax');
+			document.body.appendChild(externalLink);
+
+			const preventDefault = sinon.spy();
+			const evt = {
+				type: 'click',
+				currentTarget: externalLink,
+				preventDefault,
+			};
+			handler.handleUI(evt);
+
+			mock.verify();
+			assert.isTrue(preventDefault.called);
+			document.body.removeChild(externalLink);
+		});
+
+		it('request for a protocol-relative external URL with allowed origin should be dispatched', function () {
+			const naja = mockNaja();
+			const mock = sinon.mock(naja);
+			mock.expects('makeRequest')
+				.withExactArgs('GET', 'http://another-site.com/foo', null, {})
+				.once();
+
+			const handler = new UIHandler(naja);
+			handler.allowedOrigins.push('http://another-site.com');
+
+			const externalLink = document.createElement('a');
+			externalLink.href = '//another-site.com/foo';
 			externalLink.classList.add('ajax');
 			document.body.appendChild(externalLink);
 

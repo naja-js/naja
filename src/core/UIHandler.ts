@@ -142,12 +142,14 @@ export class UIHandler extends EventTarget {
 	}
 
 	public isUrlAllowed(url: string): boolean {
-		// ignore non-URL URIs (javascript:, data:, ...)
-		if (/^(?!https?)[^:/?#]+:/i.test(url)) {
+		const urlObject = new URL(url, location.href);
+
+		// ignore non-URL URIs (javascript:, data:, mailto:, ...)
+		if (urlObject.origin === 'null') {
 			return false;
 		}
 
-		return ! /^https?/i.test(url) || this.allowedOrigins.some((origin) => new RegExp(`^${origin}`, 'i').test(url));
+		return this.allowedOrigins.includes(urlObject.origin);
 	}
 
 	declare public addEventListener: (type: 'interaction', listener: TypedEventListener<UIHandler, InteractionEvent>, options?: boolean | AddEventListenerOptions) => void;
