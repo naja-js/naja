@@ -200,8 +200,8 @@ export class Naja extends EventTarget {
 		return data;
 	}
 
-	declare public addEventListener: <K extends keyof NajaEventMap>(type: K, listener: TypedEventListener<Naja, NajaEventMap[K]>, options?: boolean | AddEventListenerOptions) => void;
-	declare public removeEventListener: <K extends keyof NajaEventMap>(type: K, listener: TypedEventListener<Naja, NajaEventMap[K]>, options?: boolean | AddEventListenerOptions) => void;
+	declare public addEventListener: <K extends keyof NajaEventMap | string>(type: K, listener: TypedEventListener<Naja, K extends keyof NajaEventMap ? NajaEventMap[K] : CustomEvent>, options?: boolean | AddEventListenerOptions) => void;
+	declare public removeEventListener: <K extends keyof NajaEventMap | string>(type: K, listener: TypedEventListener<Naja, K extends keyof NajaEventMap ? NajaEventMap[K] : CustomEvent>, options?: boolean | AddEventListenerOptions) => void;
 }
 
 export interface Extension {

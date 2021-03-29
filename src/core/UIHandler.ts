@@ -152,8 +152,12 @@ export class UIHandler extends EventTarget {
 		return this.allowedOrigins.includes(urlObject.origin);
 	}
 
-	declare public addEventListener: (type: 'interaction', listener: TypedEventListener<UIHandler, InteractionEvent>, options?: boolean | AddEventListenerOptions) => void;
-	declare public removeEventListener: (type: 'interaction', listener: TypedEventListener<UIHandler, InteractionEvent>, options?: boolean | AddEventListenerOptions) => void;
+	declare public addEventListener: <K extends keyof UIHandlerEventMap | string>(type: K, listener: TypedEventListener<UIHandler, K extends keyof UIHandlerEventMap ? UIHandlerEventMap[K] : CustomEvent>, options?: boolean | AddEventListenerOptions) => void;
+	declare public removeEventListener: <K extends keyof UIHandlerEventMap | string>(type: K, listener: TypedEventListener<UIHandler, K extends keyof UIHandlerEventMap ? UIHandlerEventMap[K] : CustomEvent>, options?: boolean | AddEventListenerOptions) => void;
 }
 
 export type InteractionEvent = CustomEvent<{element: Element, originalEvent?: Event, options: Options}>;
+
+interface UIHandlerEventMap {
+	interaction: InteractionEvent;
+}

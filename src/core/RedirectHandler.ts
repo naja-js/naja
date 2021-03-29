@@ -72,8 +72,12 @@ export class RedirectHandler extends EventTarget {
 		}
 	}
 
-	declare public addEventListener: (type: 'redirect', listener: TypedEventListener<RedirectHandler, RedirectEvent>, options?: boolean | AddEventListenerOptions) => void;
-	declare public removeEventListener: (type: 'redirect', listener: TypedEventListener<RedirectHandler, RedirectEvent>, options?: boolean | AddEventListenerOptions) => void;
+	declare public addEventListener: <K extends keyof RedirectHandlerEventMap | string>(type: K, listener: TypedEventListener<RedirectHandler, K extends keyof RedirectHandlerEventMap ? RedirectHandlerEventMap[K] : CustomEvent>, options?: boolean | AddEventListenerOptions) => void;
+	declare public removeEventListener: <K extends keyof RedirectHandlerEventMap | string>(type: K, listener: TypedEventListener<RedirectHandler, K extends keyof RedirectHandlerEventMap ? RedirectHandlerEventMap[K] : CustomEvent>, options?: boolean | AddEventListenerOptions) => void;
 }
 
 export type RedirectEvent = CustomEvent<{url: string, isHardRedirect: boolean, setHardRedirect: (value: boolean) => void, options: Options}>;
+
+interface RedirectHandlerEventMap {
+	redirect: RedirectEvent;
+}

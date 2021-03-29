@@ -75,8 +75,8 @@ export class SnippetHandler extends EventTarget {
 		}));
 	}
 
-	declare public addEventListener: <K extends keyof SnippetHandlerEventMap>(type: K, listener: TypedEventListener<SnippetHandler, SnippetHandlerEventMap[K]>, options?: boolean | AddEventListenerOptions) => void;
-	declare public removeEventListener: <K extends keyof SnippetHandlerEventMap>(type: K, listener: TypedEventListener<SnippetHandler, SnippetHandlerEventMap[K]>, options?: boolean | AddEventListenerOptions) => void;
+	declare public addEventListener: <K extends keyof SnippetHandlerEventMap | string>(type: K, listener: TypedEventListener<SnippetHandler, K extends keyof SnippetHandlerEventMap ? SnippetHandlerEventMap[K] : CustomEvent>, options?: boolean | AddEventListenerOptions) => void;
+	declare public removeEventListener: <K extends keyof SnippetHandlerEventMap | string>(type: K, listener: TypedEventListener<SnippetHandler, K extends keyof SnippetHandlerEventMap ? SnippetHandlerEventMap[K] : CustomEvent>, options?: boolean | AddEventListenerOptions) => void;
 }
 
 export type BeforeUpdateEvent = CustomEvent<{snippet: Element, content: string, fromCache: boolean, operation: SnippetUpdateOperation, changeOperation: (value: SnippetUpdateOperation) => void, options: Options}>;
