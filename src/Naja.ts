@@ -111,6 +111,9 @@ export class Naja extends EventTarget {
 		// impersonate XHR so that Nette can detect isAjax()
 		request.headers.set('X-Requested-With', 'XMLHttpRequest');
 
+		// hint the server that Naja expects response to be JSON
+		request.headers.set('Accept', 'application/json');
+
 		if ( ! this.dispatchEvent(new CustomEvent('before', {cancelable: true, detail: {request, method, url: url.toString(), data, options}}))) {
 			return {};
 		}
