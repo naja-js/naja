@@ -412,6 +412,29 @@ describe('makeRequest()', function () {
 		});
 	});
 
+	it('should transform top-level array', function () {
+		const naja = mockNaja();
+		naja.initialize();
+		cleanPopstateListener(naja.historyHandler);
+
+		const data = [
+			42,
+			'foo',
+			'bar',
+		];
+
+		this.fetchMock.when((request) => request.url === 'http://localhost:9876/makeRequest/postArray')
+			.handler = async (request) => new Response(
+				JSON.stringify({request: await request.text()}),
+				{status: 200},
+			);
+
+		const request = naja.makeRequest('POST', '/makeRequest/postArray', data);
+		return request.then((payload) => {
+			assert.deepEqual(payload, {request: '0=42&1=foo&2=bar'});
+		});
+	});
+
 	describe('options', function () {
 		it('should be set to default options', function () {
 			const naja = mockNaja();

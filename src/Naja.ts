@@ -155,13 +155,7 @@ export class Naja extends EventTarget {
 			return;
 		}
 
-		if (Array.isArray(value)) {
-			let index = 0;
-			for (const subvalue of value) {
-				this.appendToQueryString(searchParams, `${key}[${index++}]`, subvalue);
-			}
-
-		} else if (Object.getPrototypeOf(value) === Object.prototype) {
+		if (Array.isArray(value) || Object.getPrototypeOf(value) === Object.prototype) {
 			for (const [subkey, subvalue] of Object.entries(value)) {
 				this.appendToQueryString(searchParams, `${key}[${subkey}]`, subvalue);
 			}
@@ -187,7 +181,7 @@ export class Naja extends EventTarget {
 
 		// sending a POJO -> serialize it recursively into URLSearchParams
 		const isDataPojo = data !== null && Object.getPrototypeOf(data) === Object.prototype;
-		if (isDataPojo) {
+		if (isDataPojo || Array.isArray(data)) {
 			// for GET requests, append values to URL and return empty request body
 			// otherwise build `new URLSearchParams()` to act as the request body
 			const transformedData = isGet ? url.searchParams : new URLSearchParams();
