@@ -105,13 +105,14 @@ export class UIHandler extends EventTarget {
 			url = element.getAttribute('formaction') ?? form?.getAttribute('action') ?? window.location.pathname + window.location.search;
 			data = new FormData(form ?? undefined);
 
-			if (element.type === 'submit' || element.tagName === 'BUTTON') {
+			if (element.type === 'submit' && element.name !== '') {
 				data.append(element.name, element.value || '');
 
 			} else if (element.type === 'image') {
 				const coords = element.getBoundingClientRect();
-				data.append(`${element.name}.x`, Math.max(0, Math.floor(event !== undefined ? event.pageX - coords.left : 0)));
-				data.append(`${element.name}.y`, Math.max(0, Math.floor(event !== undefined ? event.pageY - coords.top : 0)));
+				const prefix = element.name !== '' ? `${element.name}.` : '';
+				data.append(`${prefix}x`, Math.max(0, Math.floor(event !== undefined ? event.pageX - coords.left : 0)));
+				data.append(`${prefix}y`, Math.max(0, Math.floor(event !== undefined ? event.pageY - coords.top : 0)));
 			}
 		}
 
