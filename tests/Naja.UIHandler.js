@@ -450,10 +450,7 @@ describe('UIHandler', function () {
 		it('form input[type="submit"].ajax', function () {
 			const naja = mockNaja();
 			const mock = sinon.mock(naja);
-			const containsSubmit = sinon.match((value) => {
-				// some browsers have no way of getting data *out* from FormData
-				return 'has' in value ? value.has('submit') : true;
-			});
+			const containsSubmit = sinon.match((value) => value.has('submit'));
 
 			mock.expects('makeRequest')
 				.withExactArgs('GET', '/UIHandler/submit', sinon.match.instanceOf(FormData).and(containsSubmit), {})
@@ -476,10 +473,7 @@ describe('UIHandler', function () {
 		it('form input[type="image"].ajax', function () {
 			const naja = mockNaja();
 			const mock = sinon.mock(naja);
-			const containsImage = sinon.match((value) => {
-				// some browsers have no way of getting data *out* from FormData
-				return 'has' in value ? (value.has('image.x') && value.has('image.y')) : true;
-			});
+			const containsImage = sinon.match((value) => value.has('image.x') && value.has('image.y'));
 
 			mock.expects('makeRequest')
 				.withExactArgs('GET', '/UIHandler/image', sinon.match.instanceOf(FormData).and(containsImage), {})
