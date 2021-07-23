@@ -36,7 +36,8 @@ But don't consider them carved in stone; if you're not sure about something, jus
 ### Code style and tests
 
 - Keep the coding style. You can run the linter via `yarn run lint` to check for CS violations.
-- Tests must pass. You can run them via `yarn run test-local`. This launches Karma and runs the test suite in Chrome
-  and Firefox. On the CI server, the tests are executed on a wider range of browsers in the cloud to ensure that the
-  changes in code are compatible.
-- Generally speaking, Travis CI must report all green before your pull request can be merged. No exceptions made.
+- Tests must pass. You can run them via `yarn run test`. This launches Karma and runs the test suite in Chrome.
+  On the CI server, the tests are executed on a wider range of browsers to ensure that the changes in code are
+  compatible.
+- As a last step, you should run `yarn run build` to make sure that Naja builds correctly with your changes in.
+- Generally speaking, Github Actions must report all green before your pull request can be merged.
