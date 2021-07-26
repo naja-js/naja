@@ -1,6 +1,8 @@
 import {Naja} from '../Naja';
 
 export class ScriptLoader {
+	private loadedScripts = new Set<string>();
+
 	public constructor(naja: Naja) {
 		naja.addEventListener('success', (event) => {
 			const {payload} = event.detail;
@@ -23,6 +25,11 @@ export class ScriptLoader {
 			const scripts = el.querySelectorAll('script');
 			for (let i = 0; i < scripts.length; i++) {
 				const script = scripts.item(i);
+				const scriptId = script.getAttribute('data-naja-script-id');
+				if (scriptId !== null && scriptId !== '' && this.loadedScripts.has(scriptId)) {
+					continue;
+				}
+
 				const scriptEl = window.document.createElement('script');
 				scriptEl.innerHTML = script.innerHTML;
 
@@ -36,6 +43,10 @@ export class ScriptLoader {
 
 				window.document.head.appendChild(scriptEl)
 					.parentNode!.removeChild(scriptEl);
+
+				if (scriptId !== null && scriptId !== '') {
+					this.loadedScripts.add(scriptId);
+				}
 			}
 		});
 	}
