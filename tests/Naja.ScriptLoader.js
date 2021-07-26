@@ -44,6 +44,8 @@ describe('ScriptLoader', function () {
 		el.id = 'snippet--bar';
 		document.body.appendChild(el);
 
+		window.SCRIPT_LOADED = false;
+
 		const snippets = {
 			'snippet--foo': 'foo',
 			'snippet--bar': 'foo <script type="text/javascript">window.SCRIPT_LOADED = true;</script> bar',
@@ -52,5 +54,34 @@ describe('ScriptLoader', function () {
 		scriptLoader.loadScripts(snippets);
 		assert.isTrue(window.SCRIPT_LOADED);
 		document.body.removeChild(el);
+	});
+
+	it('deduplicates scripts by id', function() {
+		const naja = mockNaja();
+		const scriptLoader = new ScriptLoader(naja);
+
+		const foo = document.createElement('div');
+		foo.id = 'snippet--foo';
+		document.body.appendChild(foo);
+
+		const baz = document.createElement('div');
+		baz.id = 'snippet--baz';
+		document.body.appendChild(baz);
+
+		window.SCRIPT_COUNTER = 0;
+		window.DEDUPE_COUNTER = 0;
+
+		const snippets = {
+			'snippet--foo': 'foo <script type="text/javascript">window.SCRIPT_COUNTER++;</script> bar',
+			'snippet--baz': 'foo <script type="text/javascript" data-naja-script-id="dedupe">window.DEDUPE_COUNTER++;</script> bar',
+		};
+
+		scriptLoader.loadScripts(snippets);
+		scriptLoader.loadScripts(snippets);
+
+		assert.strictEqual(window.SCRIPT_COUNTER, 2);
+		assert.strictEqual(window.DEDUPE_COUNTER, 1);
+		document.body.removeChild(foo);
+		document.body.removeChild(baz);
 	});
 });
