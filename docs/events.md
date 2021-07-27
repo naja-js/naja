@@ -136,3 +136,24 @@ The `redirect` event's `detail` has the following properties:
 - `isHardRedirect: boolean`, a flag telling whether the redirect is going to be a hard one,
 - `setHardRedirect: (value: boolean) => void`, a method which can be called to override the hard redirect flag,
 - `options: Object`.
+
+
+## HistoryHandler
+
+### buildState
+
+This event is dispatched when a history entry state is being constructed. You can use this event to alter the history entry state: attach additional information to it, or e.g. change the UI caching behaviour.
+
+The `buildState` event's `detail` has the following properties:
+
+- `state: Object`, the built state to be stored in the history entry,
+- `options: Object`, the options of the request that caused the history entry to be added.
+
+### restoreState
+
+This event is dispatched when a history state entry is being restored in response to user navigation. You can use this event to alter the UI caching behaviour or provide options for the subsequent asynchronous request if UI cache is disabled. You can also call the event's `preventDefault()` method to entirely bypass Naja's behaviour and handle the state restoration on your own.
+
+The `restoreState` event's `detail` has the following properties:
+
+- `state: Object`, the state that is being restored from the history entry,
+- `options: Object`, the options of the request that will be fired if the state doesn't contain UI cache.

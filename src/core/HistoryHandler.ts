@@ -1,5 +1,6 @@
-import {BeforeEvent, InitEvent, Naja, SuccessEvent} from '../Naja';
+import {BeforeEvent, InitEvent, Naja, Options, SuccessEvent} from '../Naja';
 import {InteractionEvent} from './UIHandler';
+import {TypedEventListener} from '../utils';
 
 declare module '../Naja' {
 	interface Options {
@@ -8,14 +9,20 @@ declare module '../Naja' {
 	}
 }
 
+export interface HistoryState extends Record<string, any> {
+	href: string;
+	title?: string;
+	ui: Record<string, string> | false;
+}
+
 export interface HistoryAdapter {
-	replaceState(data: any, title: string, url: string): void;
-	pushState(data: any, title: string, url: string): void;
+	replaceState(state: HistoryState, title: string, url: string): void;
+	pushState(state: HistoryState, title: string, url: string): void;
 }
 
 export type HistoryMode = boolean | 'replace';
 
-export class HistoryHandler {
+export class HistoryHandler extends EventTarget {
 	private href: string | null = null;
 	public popStateHandler = this.handlePopState.bind(this);
 
@@ -23,6 +30,8 @@ export class HistoryHandler {
 	public historyAdapter: HistoryAdapter;
 
 	public constructor(private readonly naja: Naja) {
+		super();
+
 		naja.addEventListener('init', this.initialize.bind(this));
 		naja.addEventListener('before', this.saveUrl.bind(this));
 		naja.addEventListener('success', this.pushNewState.bind(this));
@@ -30,8 +39,8 @@ export class HistoryHandler {
 		naja.uiHandler.addEventListener('interaction', this.configureMode.bind(this));
 
 		this.historyAdapter = {
-			replaceState: (data, title, url) => window.history.replaceState(data, title, url),
-			pushState: (data, title, url) => window.history.pushState(data, title, url),
+			replaceState: (state, title, url) => window.history.replaceState(state, title, url),
+			pushState: (state, title, url) => window.history.pushState(state, title, url),
 		};
 	}
 
@@ -43,27 +52,34 @@ export class HistoryHandler {
 
 		window.addEventListener('popstate', this.popStateHandler);
 		this.historyAdapter.replaceState(
-			this.buildState(window.location.href, this.uiCache),
+			this.buildState(window.location.href, this.uiCache, defaultOptions),
 			window.document.title,
 			window.location.href,
 		);
 	}
 
-	private handlePopState(e: PopStateEvent): void {
-		if ( ! e.state) {
+	private handlePopState(event: PopStateEvent): void {
+		const {state} = event;
+		if ( ! state) {
 			return;
 		}
 
-		if (e.state.ui) {
-			this.handleSnippets(e.state.ui);
-			this.handleTitle(e.state.title);
+		const options = this.naja.prepareOptions();
+		if ( ! this.dispatchEvent(new CustomEvent('restoreState', {cancelable: true, detail: {state, options}}))) {
+			return;
+		}
 
-		} else if (e.state.ui === false) {
+		if (state.ui) {
+			this.handleSnippets(state.ui);
+			this.handleTitle(state.title);
+
+		} else if (state.ui === false) {
 			this.naja.makeRequest(
 				'GET',
-				e.state.href,
+				state.href,
 				null,
 				{
+					...options,
 					history: false,
 					historyUiCache: false,
 				},
@@ -89,7 +105,7 @@ export class HistoryHandler {
 			options.history = HistoryHandler.normalizeMode(value);
 		}
 
-		if (element.hasAttribute('data-naja-history-cache') || (element as HTMLInputElement).form?.hasAttribute('data-naja-history-nocache')) {
+		if (element.hasAttribute('data-naja-history-cache') || (element as HTMLInputElement).form?.hasAttribute('data-naja-history-cache')) {
 			const value = element.getAttribute('data-naja-history-cache') ?? (element as HTMLInputElement).form?.getAttribute('data-naja-history-cache');
 			options.historyUiCache = value !== 'off';
 		}
@@ -120,7 +136,7 @@ export class HistoryHandler {
 		const method = mode === 'replace' ? 'replaceState' : 'pushState';
 		const uiCache = options.historyUiCache === true || (options.historyUiCache !== false && this.uiCache); // eslint-disable-line no-extra-parens
 		this.historyAdapter[method](
-			this.buildState(this.href!, uiCache),
+			this.buildState(this.href!, uiCache, options),
 			window.document.title,
 			this.href!,
 		);
@@ -128,19 +144,24 @@ export class HistoryHandler {
 		this.href = null;
 	}
 
-	private buildState(href: string, uiCache: boolean): any {
-		const state: any = {
-			href,
-		};
+	private buildState(href: string, uiCache: boolean, options: Options): HistoryState {
+		let state: HistoryState;
 
 		if (uiCache) {
-			state.title = window.document.title;
-			state.ui = this.findSnippets();
+			state = {
+				href,
+				title: window.document.title,
+				ui: this.findSnippets(),
+			};
 
 		} else {
-			state.ui = false;
+			state = {
+				href,
+				ui: false,
+			};
 		}
 
+		this.dispatchEvent(new CustomEvent('buildState', {detail: {state, options}}));
 		return state;
 	}
 
@@ -165,4 +186,15 @@ export class HistoryHandler {
 	private handleTitle(title: string): void {
 		window.document.title = title;
 	}
+
+	declare public addEventListener: <K extends keyof HistoryHandlerEventMap | string>(type: K, listener: TypedEventListener<HistoryHandler, K extends keyof HistoryHandlerEventMap ? HistoryHandlerEventMap[K] : CustomEvent>, options?: boolean | AddEventListenerOptions) => void;
+	declare public removeEventListener: <K extends keyof HistoryHandlerEventMap | string>(type: K, listener: TypedEventListener<HistoryHandler, K extends keyof HistoryHandlerEventMap ? HistoryHandlerEventMap[K] : CustomEvent>, options?: boolean | AddEventListenerOptions) => void;
+}
+
+export type BuildStateEvent = CustomEvent<{state: HistoryState, options: Options}>;
+export type RestoreStateEvent = CustomEvent<{state: HistoryState, options: Options}>;
+
+interface HistoryHandlerEventMap {
+	buildState: BuildStateEvent;
+	restoreState: RestoreStateEvent;
 }
