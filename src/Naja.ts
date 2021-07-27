@@ -75,6 +75,18 @@ export class Naja extends EventTarget {
 	}
 
 
+	public prepareOptions(options?: Options): Options {
+		return {
+			...this.defaultOptions,
+			...options,
+			fetch: {
+				...this.defaultOptions.fetch,
+				...options?.fetch,
+			},
+		};
+	}
+
+
 	public async makeRequest(
 		method: string,
 		url: string | URL,
@@ -86,14 +98,7 @@ export class Naja extends EventTarget {
 			url = new URL(url, location.href);
 		}
 
-		options = {
-			...this.defaultOptions,
-			...options,
-			fetch: {
-				...this.defaultOptions.fetch || {},
-				...options.fetch || {},
-			},
-		};
+		options = this.prepareOptions(options);
 
 		const headers = new Headers(options.fetch!.headers || {});
 		const body = this.transformData(url, method, data);

@@ -157,6 +157,42 @@ describe('HistoryHandler', function () {
 		});
 	});
 
+	it('dispatches event on build state', function () {
+		const naja = mockNaja({
+			snippetHandler: SnippetHandler,
+			historyHandler: HistoryHandler,
+		});
+		naja.initialize();
+		cleanPopstateListener(naja.historyHandler);
+
+		const el = document.createElement('div');
+		el.id = 'snippet-history-foo';
+		document.body.appendChild(el);
+
+		const mock = sinon.mock(naja.historyHandler.historyAdapter);
+		mock.expects('pushState').once();
+
+		const buildStateCallback = sinon.spy();
+		naja.historyHandler.addEventListener('buildState', buildStateCallback);
+
+		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet-history-foo': 'foo'}});
+		return naja.makeRequest('GET', '/HistoryHandler/event').then(() => {
+			assert.isTrue(buildStateCallback.calledOnce);
+			assert.isTrue(buildStateCallback.calledWith(
+				sinon.match((event) => event.constructor.name === 'CustomEvent')
+				.and(sinon.match.has('detail', sinon.match.object
+					.and(sinon.match.has('state', sinon.match.object))
+					.and(sinon.match.has('options', sinon.match.object))
+				))
+			));
+
+			mock.verify();
+			mock.restore();
+
+			document.body.removeChild(el);
+		});
+	});
+
 	describe('configures mode properly on interaction', function () {
 		it('missing data-naja-history', () => {
 			const naja = mockNaja({uiHandler: UIHandler});
@@ -363,6 +399,7 @@ describe('HistoryHandler', function () {
 				'/HistoryHandler/popStateWithoutCache',
 				null,
 				{
+					fetch: {},
 					history: false,
 					historyUiCache: false,
 				},
@@ -432,6 +469,81 @@ describe('HistoryHandler', function () {
 		assert.equal(document.title, previousTitle);
 		assert.equal(el.innerHTML, 'foo');
 		document.body.removeChild(el);
+		cleanPopstateListener(naja.historyHandler);
+	});
+
+	it('dispatches event on popstate', function () {
+		const naja = mockNaja({
+			snippetHandler: SnippetHandler,
+			historyHandler: HistoryHandler,
+		});
+		naja.initialize();
+
+		const mock = sinon.mock(naja);
+		mock.expects('makeRequest')
+			.withExactArgs('GET', '/HistoryHandler/popState/event', null, {
+				fetch: {},
+				history: false,
+				historyUiCache: false,
+				customOption: 42,
+			})
+			.once();
+
+		const restoreCallback = sinon.spy((event) => {
+			event.detail.options.customOption = 42;
+		});
+		naja.historyHandler.addEventListener('restoreState', restoreCallback);
+
+		const state = {
+			href: '/HistoryHandler/popState/event',
+			title: 'new title',
+			ui: false,
+		};
+		window.dispatchEvent(createPopStateEvent(state));
+
+		assert.isTrue(restoreCallback.calledOnce);
+		assert.isTrue(restoreCallback.calledWith(
+			sinon.match((event) => event.constructor.name === 'CustomEvent')
+			.and(sinon.match.has('detail', sinon.match.object
+				.and(sinon.match.has('state', state))
+				.and(sinon.match.has('options', sinon.match.object))
+			))
+		));
+
+		mock.verify();
+		cleanPopstateListener(naja.historyHandler);
+	});
+
+	it('cancels popstate if event.defaultPrevented', function () {
+		const naja = mockNaja({
+			snippetHandler: SnippetHandler,
+			historyHandler: HistoryHandler,
+		});
+		naja.initialize();
+
+		const mock = sinon.mock(naja);
+		mock.expects('makeRequest').never();
+
+		const restoreCallback = sinon.spy((event) => event.preventDefault());
+		naja.historyHandler.addEventListener('restoreState', restoreCallback);
+
+		const state = {
+			href: '/HistoryHandler/popState/event',
+			title: 'new title',
+			ui: false,
+		};
+		window.dispatchEvent(createPopStateEvent(state));
+
+		assert.isTrue(restoreCallback.calledOnce);
+		assert.isTrue(restoreCallback.calledWith(
+			sinon.match((event) => event.constructor.name === 'CustomEvent')
+				.and(sinon.match.has('detail', sinon.match.object
+					.and(sinon.match.has('state', state))
+					.and(sinon.match.has('options', sinon.match.object))
+				))
+		));
+
+		mock.verify();
 		cleanPopstateListener(naja.historyHandler);
 	});
 });
