@@ -142,7 +142,7 @@ The `redirect` event's `detail` has the following properties:
 
 ### buildState
 
-This event is dispatched when a history entry state is being constructed. You can use this event to alter the history entry state: attach additional information to it, or e.g. change the UI caching behaviour.
+This event is dispatched when a history entry state is being constructed. You can use this event to alter the history entry state, e.g. attach additional information to it.
 
 The `buildState` event's `detail` has the following properties:
 
@@ -151,9 +151,39 @@ The `buildState` event's `detail` has the following properties:
 
 ### restoreState
 
-This event is dispatched when a history state entry is being restored in response to user navigation. You can use this event to alter the UI caching behaviour or provide options for the subsequent asynchronous request if UI cache is disabled. You can also call the event's `preventDefault()` method to entirely bypass Naja's behaviour and handle the state restoration on your own.
+This event is dispatched when a history state entry is being restored in response to user navigation.
 
 The `restoreState` event's `detail` has the following properties:
 
 - `state: Object`, the state that is being restored from the history entry,
-- `options: Object`, the options of the request that will be fired if the state doesn't contain UI cache.
+- `options: Object`, the options object constructed from Naja's `defaultOptions`.
+
+
+## SnippetCache
+
+### store
+
+This event is dispatched when snippets are being stored in cache. You can alter the snippets to be stored in cache. You can also call the event's `preventDefault()` method to entirely bypass Naja's behaviour and keep this request off-the-record as far as snippet cache is concerned.
+
+The `store` event's `detail` has the following properties:
+
+- `snippets: Object`, the snippets to be stored in cache storage,
+- `state: Object`, the built state to be stored in the history entry,
+- `options: Object`, the options of the request that caused the history entry to be added.
+
+### fetch
+
+This event is dispatched when snippets are being fetched from cache in response to user navigation. You can use this event to alter the snippet caching behaviour or provide options for the subsequent asynchronous request if cache is disabled. You can also call the event's `preventDefault()` method to entirely bypass Naja's behaviour and handle the snippets restoration on your own.
+
+- `state: Object`, the state that is being restored from the history entry,
+- `options: Object`, the options of the request that will be fired if snippet cache is disabled.
+
+### restore
+
+This event is dispatched when snippets are being restored from cache. You can use this event to alter the snippets to be restored. You can also call the event's `preventDefault()` method to entirely bypass Naja's behaviour and handle the snippets restoration on your own.
+
+The `restore` event's `detail` has the following properties:
+
+- `snippets: Object`, the snippets to be updated, as restored from cache storage,
+- `state: Object`, the state that is being restored from the history entry,
+- `options: Object`, the options used for snippet update; you can read these in [SnippetHandler's events](#snippethandler).

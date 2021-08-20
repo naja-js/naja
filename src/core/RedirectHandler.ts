@@ -5,6 +5,10 @@ declare module '../Naja' {
 	interface Options {
 		forceRedirect?: boolean;
 	}
+
+	interface Payload {
+		redirect?: string;
+	}
 }
 
 interface LocationAdapter {

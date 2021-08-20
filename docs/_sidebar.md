@@ -11,6 +11,7 @@
     - [Snippets](snippets.md)
     - [Forms](forms.md)
     - [History](history.md)
+    - [Snippet cache](snippet-cache.md)
     - [Scripts in snippets](scripts.md)
     - [Default extensions](extensions-default.md)
 

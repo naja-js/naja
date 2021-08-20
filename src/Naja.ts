@@ -3,6 +3,7 @@ import {FormsHandler} from './core/FormsHandler';
 import {RedirectHandler} from './core/RedirectHandler';
 import {SnippetHandler} from './core/SnippetHandler';
 import {HistoryHandler} from './core/HistoryHandler';
+import {SnippetCache} from './core/SnippetCache';
 import {ScriptLoader} from './core/ScriptLoader';
 import {TypedEventListener} from './utils';
 
@@ -10,14 +11,8 @@ export interface Options extends Record<string, any> {
 	fetch?: RequestInit;
 }
 
-export interface Payload extends Record<string, any> {
-	snippets?: Record<string, string>;
-
-	redirect?: string;
-
-	postGet?: boolean;
-	url?: string;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface Payload extends Record<string, any> {}
 
 export class Naja extends EventTarget {
 	public readonly VERSION: number = 2;
@@ -29,6 +24,7 @@ export class Naja extends EventTarget {
 	public readonly snippetHandler: SnippetHandler;
 	public readonly formsHandler: FormsHandler;
 	public readonly historyHandler: HistoryHandler;
+	public readonly snippetCache: SnippetCache;
 	public readonly scriptLoader: ScriptLoader;
 	private readonly extensions: Extension[] = [];
 
@@ -41,15 +37,17 @@ export class Naja extends EventTarget {
 		snippetHandler?: { new(naja: Naja): SnippetHandler },
 		formsHandler?: { new(naja: Naja): FormsHandler },
 		historyHandler?: { new(naja: Naja): HistoryHandler },
+		snippetCache?: { new(naja: Naja): SnippetCache },
 		scriptLoader?: { new(naja: Naja): ScriptLoader },
 	) {
 		super();
-		this.uiHandler = uiHandler ? new uiHandler(this) : new UIHandler(this);
-		this.redirectHandler = redirectHandler ? new redirectHandler(this) : new RedirectHandler(this);
-		this.snippetHandler = snippetHandler ? new snippetHandler(this) : new SnippetHandler(this);
-		this.formsHandler = formsHandler ? new formsHandler(this) : new FormsHandler(this);
-		this.historyHandler = historyHandler ? new historyHandler(this) : new HistoryHandler(this);
-		this.scriptLoader = scriptLoader ? new scriptLoader(this) : new ScriptLoader(this);
+		this.uiHandler = new (uiHandler ?? UIHandler)(this);
+		this.redirectHandler = new (redirectHandler ?? RedirectHandler)(this);
+		this.snippetHandler = new (snippetHandler ?? SnippetHandler)(this);
+		this.formsHandler = new (formsHandler ?? FormsHandler)(this);
+		this.historyHandler = new (historyHandler ?? HistoryHandler)(this);
+		this.snippetCache = new (snippetCache ?? SnippetCache)(this);
+		this.scriptLoader = new (scriptLoader ?? ScriptLoader)(this);
 	}
 
 
@@ -67,10 +65,10 @@ export class Naja extends EventTarget {
 			throw new Error('Cannot initialize Naja, it is already initialized.');
 		}
 
-		this.defaultOptions = defaultOptions;
+		this.defaultOptions = this.prepareOptions(defaultOptions);
 		this.extensions.forEach((extension) => extension.initialize(this));
 
-		this.dispatchEvent(new CustomEvent('init', {detail: {defaultOptions}}));
+		this.dispatchEvent(new CustomEvent('init', {detail: {defaultOptions: this.defaultOptions}}));
 		this.initialized = true;
 	}
 

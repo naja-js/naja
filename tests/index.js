@@ -17,6 +17,7 @@ import './Naja.FormsHandler';
 import './Naja.HistoryHandler';
 import './Naja.RedirectHandler';
 import './Naja.ScriptLoader';
+import './Naja.SnippetCache';
 import './Naja.SnippetHandler';
 import './Naja.UIHandler';
 import './Naja.ext.AbortExtension';
