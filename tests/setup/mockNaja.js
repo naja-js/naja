@@ -17,7 +17,10 @@ class FormsHandlerMock {
 	processForm(evt) {}
 }
 
-class HistoryHandlerMock {
+class HistoryHandlerMock extends EventTarget {
+}
+
+class SnippetCacheMock extends EventTarget {
 }
 
 class ScriptLoaderMock {
@@ -32,6 +35,7 @@ export const mockNaja = (mocks = {}) => {
 		mocks.snippetHandler || SnippetHandlerMock,
 		mocks.formsHandler || FormsHandlerMock,
 		mocks.historyHandler || HistoryHandlerMock,
-		mocks.scriptLoader || ScriptLoaderMock
+		mocks.snippetCache || SnippetCacheMock,
+		mocks.scriptLoader || ScriptLoaderMock,
 	);
 };

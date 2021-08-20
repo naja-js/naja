@@ -1,6 +1,12 @@
 import {Naja, Options} from '../Naja';
 import {TypedEventListener} from '../utils';
 
+declare module '../Naja' {
+	interface Payload {
+		snippets?: Record<string, string>;
+	}
+}
+
 type SnippetUpdateOperation = (snippet: Element, content: string) => void;
 
 export class SnippetHandler extends EventTarget {
@@ -20,6 +26,19 @@ export class SnippetHandler extends EventTarget {
 				this.updateSnippets(payload.snippets, false, options);
 			}
 		});
+	}
+
+	public static findSnippets(predicate?: (snippet: Element) => boolean): Record<string, string> {
+		const result: Record<string, string> = {};
+		const snippets = window.document.querySelectorAll('[id^="snippet-"]');
+		for (let i = 0; i < snippets.length; i++) {
+			const snippet = snippets.item(i);
+			if (predicate?.(snippet) ?? true) {
+				result[snippet.id] = snippet.innerHTML;
+			}
+		}
+
+		return result;
 	}
 
 	public updateSnippets(snippets: Record<string, string>, fromCache = false, options: Options = {}): void {

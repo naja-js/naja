@@ -1,6 +1,7 @@
 import {mockNaja} from './setup/mockNaja';
 import {fakeFetch} from './setup/fakeFetch';
 import {cleanPopstateListener} from './setup/cleanPopstateListener';
+import {createPopstateEvent} from './setup/createPopstateEvent';
 import {assert} from 'chai';
 import sinon from 'sinon';
 
@@ -12,36 +13,12 @@ import {UIHandler} from '../src/core/UIHandler';
 describe('HistoryHandler', function () {
 	fakeFetch();
 
-	it('constructor()', function () {
-		const naja = mockNaja();
-		const mock = sinon.mock(naja);
-
-		mock.expects('addEventListener')
-			.withExactArgs('init', sinon.match.instanceOf(Function))
-			.once();
-
-		mock.expects('addEventListener')
-			.withExactArgs('before', sinon.match.instanceOf(Function))
-			.once();
-
-		mock.expects('addEventListener')
-			.withExactArgs('success', sinon.match.instanceOf(Function))
-			.once();
-
-		new HistoryHandler(naja);
-		mock.verify();
-	});
-
 	it('saves initial state', function () {
 		const naja = mockNaja();
 		const historyHandler = new HistoryHandler(naja);
 
 		const mock = sinon.mock(historyHandler.historyAdapter);
-		mock.expects('replaceState').withExactArgs({
-			href: 'http://localhost:9876/context.html',
-			title: '',
-			ui: {},
-		}, '', 'http://localhost:9876/context.html').once();
+		mock.expects('replaceState').withExactArgs({href: 'http://localhost:9876/context.html'}, '', 'http://localhost:9876/context.html').once();
 
 		historyHandler.initialize(new CustomEvent('init', {detail: {defaultOptions: {}}}));
 		cleanPopstateListener(historyHandler);
@@ -58,31 +35,13 @@ describe('HistoryHandler', function () {
 		naja.initialize();
 		cleanPopstateListener(naja.historyHandler);
 
-		const el = document.createElement('div');
-		el.id = 'snippet-history-foo';
-		document.body.appendChild(el);
-
-		const ignoredEl = document.createElement('div');
-		ignoredEl.id = 'snippet-history-bar';
-		ignoredEl.setAttribute('data-naja-history-nocache', true);
-		document.body.appendChild(ignoredEl);
-
 		const mock = sinon.mock(naja.historyHandler.historyAdapter);
-		mock.expects('pushState').withExactArgs({
-			href: 'http://localhost:9876/HistoryHandler/pushState',
-			title: '',
-			ui: {
-				'snippet-history-foo': 'foo'
-			},
-		}, '', 'http://localhost:9876/HistoryHandler/pushState').once();
+		mock.expects('pushState').withExactArgs({href: 'http://localhost:9876/HistoryHandler/pushState'}, '', 'http://localhost:9876/HistoryHandler/pushState').once();
 
-		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet-history-foo': 'foo'}});
+		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {});
 		return naja.makeRequest('GET', '/HistoryHandler/pushState').then(() => {
 			mock.verify();
 			mock.restore();
-
-			document.body.removeChild(el);
-			document.body.removeChild(ignoredEl);
 		});
 	});
 
@@ -94,25 +53,13 @@ describe('HistoryHandler', function () {
 		naja.initialize();
 		cleanPopstateListener(naja.historyHandler);
 
-		const el = document.createElement('div');
-		el.id = 'snippet-history-foo';
-		document.body.appendChild(el);
-
 		const mock = sinon.mock(naja.historyHandler.historyAdapter);
-		mock.expects('replaceState').withExactArgs({
-			href: 'http://localhost:9876/HistoryHandler/replaceState',
-			title: '',
-			ui: {
-				'snippet-history-foo': 'foo'
-			},
-		}, '', 'http://localhost:9876/HistoryHandler/replaceState').once();
+		mock.expects('replaceState').withExactArgs({href: 'http://localhost:9876/HistoryHandler/replaceState'}, '', 'http://localhost:9876/HistoryHandler/replaceState').once();
 
-		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet-history-foo': 'foo'}});
+		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {});
 		return naja.makeRequest('GET', '/HistoryHandler/replaceState', null, {history: 'replace'}).then(() => {
 			mock.verify();
 			mock.restore();
-
-			document.body.removeChild(el);
 		});
 	});
 
@@ -125,11 +72,7 @@ describe('HistoryHandler', function () {
 		cleanPopstateListener(naja.historyHandler);
 
 		const mock = sinon.mock(naja.historyHandler.historyAdapter);
-		mock.expects('pushState').withExactArgs({
-			href: '/HistoryHandler/postGet/targetUrl',
-			title: '',
-			ui: {},
-		}, '', '/HistoryHandler/postGet/targetUrl').once();
+		mock.expects('pushState').withExactArgs({href: '/HistoryHandler/postGet/targetUrl'}, '', '/HistoryHandler/postGet/targetUrl').once();
 
 		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {url: '/HistoryHandler/postGet/targetUrl', postGet: true});
 		return naja.makeRequest('GET', '/HistoryHandler/postGet').then(() => {
@@ -150,46 +93,10 @@ describe('HistoryHandler', function () {
 		mock.expects('pushState').never();
 		mock.expects('replaceState').never();
 
-		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet-history-foo': 'foo'}});
+		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {});
 		return naja.makeRequest('GET', '/HistoryHandler/disabled', null, {history: false}).then(() => {
 			mock.verify();
 			mock.restore();
-		});
-	});
-
-	it('dispatches event on build state', function () {
-		const naja = mockNaja({
-			snippetHandler: SnippetHandler,
-			historyHandler: HistoryHandler,
-		});
-		naja.initialize();
-		cleanPopstateListener(naja.historyHandler);
-
-		const el = document.createElement('div');
-		el.id = 'snippet-history-foo';
-		document.body.appendChild(el);
-
-		const mock = sinon.mock(naja.historyHandler.historyAdapter);
-		mock.expects('pushState').once();
-
-		const buildStateCallback = sinon.spy();
-		naja.historyHandler.addEventListener('buildState', buildStateCallback);
-
-		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet-history-foo': 'foo'}});
-		return naja.makeRequest('GET', '/HistoryHandler/event').then(() => {
-			assert.isTrue(buildStateCallback.calledOnce);
-			assert.isTrue(buildStateCallback.calledWith(
-				sinon.match((event) => event.constructor.name === 'CustomEvent')
-				.and(sinon.match.has('detail', sinon.match.object
-					.and(sinon.match.has('state', sinon.match.object))
-					.and(sinon.match.has('options', sinon.match.object))
-				))
-			));
-
-			mock.verify();
-			mock.restore();
-
-			document.body.removeChild(el);
 		});
 	});
 
@@ -283,267 +190,76 @@ describe('HistoryHandler', function () {
 		});
 	});
 
-
-	describe('disabling uiCache', () => {
-		it('does not save snippets in initial state if uiCache is disabled globally', () => {
-			const naja = mockNaja();
-			const historyHandler = new HistoryHandler(naja);
-			historyHandler.uiCache = false;
-
-			const mock = sinon.mock(historyHandler.historyAdapter);
-			mock.expects('replaceState').withExactArgs({
-				href: 'http://localhost:9876/context.html',
-				ui: false,
-			}, 'new title', 'http://localhost:9876/context.html').once();
-
-			historyHandler.initialize(new CustomEvent('init', {detail: {defaultOptions: {}}}));
-			cleanPopstateListener(historyHandler);
-
-			mock.verify();
-			mock.restore();
-		});
-
-		it('does not push snippets to state if uiCache is disabled globally', function () {
-			const naja = mockNaja({
-				historyHandler: HistoryHandler,
-			});
-			naja.historyHandler.uiCache = false;
-			naja.initialize();
-			cleanPopstateListener(naja.historyHandler);
-
-			const el = document.createElement('div');
-			el.id = 'snippet-history-foo';
-			document.body.appendChild(el);
-
-			const mock = sinon.mock(naja.historyHandler.historyAdapter);
-			mock.expects('pushState').withExactArgs({
-				href: 'http://localhost:9876/HistoryHandler/pushStateWithoutCache',
-				ui: false,
-			}, 'new title', 'http://localhost:9876/HistoryHandler/pushStateWithoutCache').once();
-
-			this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet-history-foo': 'foo'}});
-			return naja.makeRequest('GET', '/HistoryHandler/pushStateWithoutCache').then(() => {
-				mock.verify();
-				mock.restore();
-
-				document.body.removeChild(el);
-			});
-		});
-
-		it('does not push snippets to state if uiCache is enabled globally but disabled via options', function () {
-			const naja = mockNaja({
-				historyHandler: HistoryHandler,
-			});
-			naja.initialize();
-			cleanPopstateListener(naja.historyHandler);
-
-			const el = document.createElement('div');
-			el.id = 'snippet-history-foo';
-			document.body.appendChild(el);
-
-			const mock = sinon.mock(naja.historyHandler.historyAdapter);
-			mock.expects('pushState').withExactArgs({
-				href: 'http://localhost:9876/HistoryHandler/pushStateWithoutCacheOption',
-				ui: false,
-			}, 'new title', 'http://localhost:9876/HistoryHandler/pushStateWithoutCacheOption').once();
-
-			this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet-history-foo': 'foo'}});
-			return naja.makeRequest('GET', '/HistoryHandler/pushStateWithoutCacheOption', null, {historyUiCache: false}).then(() => {
-				mock.verify();
-				mock.restore();
-
-				document.body.removeChild(el);
-			});
-		});
-
-		it('pushes snippets to state if uiCache is disabled globally but enabled via options', function () {
+	describe('event system', function () {
+		it('dispatches event on build state', function () {
 			const naja = mockNaja({
 				snippetHandler: SnippetHandler,
 				historyHandler: HistoryHandler,
 			});
-			naja.historyHandler.uiCache = false;
 			naja.initialize();
 			cleanPopstateListener(naja.historyHandler);
 
-			const el = document.createElement('div');
-			el.id = 'snippet-history-foo';
-			document.body.appendChild(el);
-
 			const mock = sinon.mock(naja.historyHandler.historyAdapter);
-			mock.expects('pushState').withExactArgs({
-				href: 'http://localhost:9876/HistoryHandler/pushStateWithCache',
-				title: 'new title',
-				ui: {
-					'snippet-history-foo': 'foo'
-				},
-			}, 'new title', 'http://localhost:9876/HistoryHandler/pushStateWithCache').once();
+			mock.expects('pushState').once();
 
-			this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet-history-foo': 'foo'}});
-			return naja.makeRequest('GET', '/HistoryHandler/pushStateWithCache', null, {historyUiCache: true}).then(() => {
+			const buildStateCallback = sinon.spy();
+			naja.historyHandler.addEventListener('buildState', buildStateCallback);
+
+			this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {});
+			return naja.makeRequest('GET', '/HistoryHandler/event').then(() => {
+				assert.isTrue(buildStateCallback.calledOnce);
+				assert.isTrue(buildStateCallback.calledWith(
+					sinon.match((event) => event.constructor.name === 'CustomEvent')
+						.and(sinon.match.has('detail', sinon.match.object
+							.and(sinon.match.has('state', sinon.match.object))
+							.and(sinon.match.has('options', sinon.match.object))
+						))
+				));
+
 				mock.verify();
 				mock.restore();
-
-				document.body.removeChild(el);
 			});
 		});
 
-		it('replays request on popstate if it had uiCache disabled', () => {
+		it('dispatches event on popstate', function () {
 			const naja = mockNaja({
+				snippetHandler: SnippetHandler,
 				historyHandler: HistoryHandler,
 			});
 			naja.initialize();
 
-			const mock = sinon.mock(naja);
-			mock.expects('makeRequest').withExactArgs(
-				'GET',
-				'/HistoryHandler/popStateWithoutCache',
-				null,
-				{
-					fetch: {},
-					history: false,
-					historyUiCache: false,
-				},
-			).once();
+			const restoreCallback = sinon.spy();
+			naja.historyHandler.addEventListener('restoreState', restoreCallback);
 
-			window.dispatchEvent(createPopStateEvent({
-				href: '/HistoryHandler/popStateWithoutCache',
-				ui: false,
-			}));
+			const state = {href: '/HistoryHandler/popState/event'};
+			window.dispatchEvent(createPopstateEvent(state));
+
+			assert.isTrue(restoreCallback.calledOnce);
+			assert.isTrue(restoreCallback.calledWith(
+				sinon.match((event) => event.constructor.name === 'CustomEvent')
+					.and(sinon.match.has('detail', sinon.match.object
+						.and(sinon.match.has('state', state))
+						.and(sinon.match.has('options', sinon.match.object))
+					))
+			));
 
 			cleanPopstateListener(naja.historyHandler);
-			mock.verify();
-			mock.restore();
 		});
-	});
 
+		it('does not dispatch event on initial popstate', function () {
+			const naja = mockNaja({
+				snippetHandler: SnippetHandler,
+				historyHandler: HistoryHandler,
+			});
+			naja.initialize();
 
-	const createPopStateEvent = (state) => {
-		return new PopStateEvent('popstate', {
-			bubbles: true,
-			cancelable: true,
-			state,
+			const restoreCallback = sinon.spy();
+			naja.historyHandler.addEventListener('restoreState', restoreCallback);
+
+			window.dispatchEvent(createPopstateEvent(null));
+
+			assert.isTrue(restoreCallback.notCalled);
+			cleanPopstateListener(naja.historyHandler);
 		});
-	};
-
-
-	it('redraws snippets on popstate', function () {
-		const naja = mockNaja({
-			snippetHandler: SnippetHandler,
-			historyHandler: HistoryHandler,
-		});
-		naja.initialize();
-
-		const el = document.createElement('div');
-		el.id = 'snippet-history-foo';
-		document.body.appendChild(el);
-
-		window.dispatchEvent(createPopStateEvent({
-			href: '/HistoryHandler/popState',
-			title: 'new title',
-			ui: {
-				'snippet-history-foo': 'foo bar baz',
-			},
-		}));
-
-		assert.equal(document.title, 'new title');
-		assert.equal(el.innerHTML, 'foo bar baz');
-		document.body.removeChild(el);
-		cleanPopstateListener(naja.historyHandler);
-	});
-
-	it('does not trigger on initial pop', function () {
-		const naja = mockNaja({
-			snippetHandler: SnippetHandler,
-			historyHandler: HistoryHandler,
-		});
-		naja.initialize();
-
-		const el = document.createElement('div');
-		el.id = 'snippet-history-foo';
-		el.innerHTML = 'foo';
-		document.body.appendChild(el);
-
-		const previousTitle = document.title;
-		window.dispatchEvent(createPopStateEvent(null));
-
-		assert.equal(document.title, previousTitle);
-		assert.equal(el.innerHTML, 'foo');
-		document.body.removeChild(el);
-		cleanPopstateListener(naja.historyHandler);
-	});
-
-	it('dispatches event on popstate', function () {
-		const naja = mockNaja({
-			snippetHandler: SnippetHandler,
-			historyHandler: HistoryHandler,
-		});
-		naja.initialize();
-
-		const mock = sinon.mock(naja);
-		mock.expects('makeRequest')
-			.withExactArgs('GET', '/HistoryHandler/popState/event', null, {
-				fetch: {},
-				history: false,
-				historyUiCache: false,
-				customOption: 42,
-			})
-			.once();
-
-		const restoreCallback = sinon.spy((event) => {
-			event.detail.options.customOption = 42;
-		});
-		naja.historyHandler.addEventListener('restoreState', restoreCallback);
-
-		const state = {
-			href: '/HistoryHandler/popState/event',
-			title: 'new title',
-			ui: false,
-		};
-		window.dispatchEvent(createPopStateEvent(state));
-
-		assert.isTrue(restoreCallback.calledOnce);
-		assert.isTrue(restoreCallback.calledWith(
-			sinon.match((event) => event.constructor.name === 'CustomEvent')
-			.and(sinon.match.has('detail', sinon.match.object
-				.and(sinon.match.has('state', state))
-				.and(sinon.match.has('options', sinon.match.object))
-			))
-		));
-
-		mock.verify();
-		cleanPopstateListener(naja.historyHandler);
-	});
-
-	it('cancels popstate if event.defaultPrevented', function () {
-		const naja = mockNaja({
-			snippetHandler: SnippetHandler,
-			historyHandler: HistoryHandler,
-		});
-		naja.initialize();
-
-		const mock = sinon.mock(naja);
-		mock.expects('makeRequest').never();
-
-		const restoreCallback = sinon.spy((event) => event.preventDefault());
-		naja.historyHandler.addEventListener('restoreState', restoreCallback);
-
-		const state = {
-			href: '/HistoryHandler/popState/event',
-			title: 'new title',
-			ui: false,
-		};
-		window.dispatchEvent(createPopStateEvent(state));
-
-		assert.isTrue(restoreCallback.calledOnce);
-		assert.isTrue(restoreCallback.calledWith(
-			sinon.match((event) => event.constructor.name === 'CustomEvent')
-				.and(sinon.match.has('detail', sinon.match.object
-					.and(sinon.match.has('state', state))
-					.and(sinon.match.has('options', sinon.match.object))
-				))
-		));
-
-		mock.verify();
-		cleanPopstateListener(naja.historyHandler);
 	});
 });

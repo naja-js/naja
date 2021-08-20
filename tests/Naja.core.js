@@ -23,7 +23,7 @@ describe('Naja.js', function () {
 		it('should initialize with default options', function () {
 			const naja = mockNaja();
 			naja.initialize({answer: 42});
-			assert.deepEqual({answer: 42}, naja.defaultOptions);
+			assert.deepEqual({answer: 42, fetch: {}}, naja.defaultOptions);
 		});
 
 		it('dispatches init event with default options', function () {
@@ -39,7 +39,7 @@ describe('Naja.js', function () {
 			assert.isTrue(initCallback.calledWith(
 				sinon.match((event) => event.constructor.name === 'CustomEvent')
 				.and(sinon.match.has('detail', sinon.match.object
-					.and(sinon.match.has('defaultOptions', defaultOptions))
+					.and(sinon.match.has('defaultOptions', {...defaultOptions, fetch: {}}))
 				))
 			));
 		});
