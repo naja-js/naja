@@ -56,7 +56,6 @@ export default [
 		],
 		plugins: [
 			typescript({
-				include: ['src/**/*.ts'],
 				declaration: true,
 				declarationDir: path.dirname(pkg.module),
 				emitDeclarationOnly: true,

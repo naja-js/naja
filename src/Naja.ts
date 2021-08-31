@@ -131,7 +131,7 @@ export class Naja extends EventTarget {
 
 			payload = await response.json();
 
-		} catch (error) {
+		} catch (error: any) {
 			if (error.name === 'AbortError') {
 				this.dispatchEvent(new CustomEvent('abort', {detail: {request, error, options}}));
 				this.dispatchEvent(new CustomEvent('complete', {detail: {request, response, payload: undefined, error, options}}));
