@@ -1,3 +1,16 @@
+// ready
+
+export const onDomReady = (callback: () => void): void => {
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', callback);
+	} else {
+		callback();
+	}
+};
+
+
+// assert
+
 export class AssertionError extends Error {}
 export const assert: (condition: boolean, description?: string) => asserts condition = (condition, description) => {
 	if ( ! condition) {
