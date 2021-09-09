@@ -1,5 +1,6 @@
 import {Naja} from '../Naja';
 import {InteractionEvent} from './UIHandler';
+import {onDomReady} from '../utils';
 
 export class FormsHandler {
 	public netteForms: any;
@@ -10,7 +11,7 @@ export class FormsHandler {
 	}
 
 	private initialize(): void {
-		this.initForms(window.document.body);
+		onDomReady(() => this.initForms(window.document.body));
 		this.naja.snippetHandler.addEventListener('afterUpdate', (event) => {
 			const {snippet} = event.detail;
 			this.initForms(snippet);

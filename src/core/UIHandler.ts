@@ -1,5 +1,5 @@
 import {Naja, Options, Payload} from '../Naja';
-import {assert, TypedEventListener} from '../utils';
+import {assert, onDomReady, TypedEventListener} from '../utils';
 
 export class UIHandler extends EventTarget {
 	public selector: string = '.ajax';
@@ -12,7 +12,7 @@ export class UIHandler extends EventTarget {
 	}
 
 	private initialize(): void {
-		this.bindUI(window.document.body);
+		onDomReady(() => this.bindUI(window.document.body));
 		this.naja.snippetHandler.addEventListener('afterUpdate', (event) => {
 			const {snippet} = event.detail;
 			this.bindUI(snippet);

@@ -1,6 +1,6 @@
 import {BeforeEvent, InitEvent, Naja, Options, SuccessEvent} from '../Naja';
 import {InteractionEvent} from './UIHandler';
-import {TypedEventListener} from '../utils';
+import {onDomReady, TypedEventListener} from '../utils';
 
 declare module '../Naja' {
 	interface Options {
@@ -52,11 +52,11 @@ export class HistoryHandler extends EventTarget {
 	private initialize(event: InitEvent): void {
 		const {defaultOptions} = event.detail;
 		window.addEventListener('popstate', this.popStateHandler);
-		this.historyAdapter.replaceState(
+		onDomReady(() => this.historyAdapter.replaceState(
 			this.buildState(window.location.href, defaultOptions),
 			window.document.title,
 			window.location.href,
-		);
+		));
 	}
 
 	private handlePopState(event: PopStateEvent): void {
