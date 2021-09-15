@@ -971,6 +971,13 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@onslip/karma-playwright-launcher@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@onslip/karma-playwright-launcher/-/karma-playwright-launcher-0.2.1.tgz#0816e905cf7c2ea73d236f46794c44558e3ab880"
+  integrity sha512-m5EA2mvGwYXoc4Wywdn9Zl+iTW64VJ8DmFXIlDbbExq6xeBmGfXrFzo5nmyLlA1AdXBfBgTpypvX3dJJs/g8Uw==
+  dependencies:
+    playwright "^1.0.0"
+
 "@rollup/plugin-babel@^5.3.0":
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/@rollup/plugin-babel/-/plugin-babel-5.3.0.tgz#9cb1c5146ddd6a4968ad96f209c50c62f92f9879"
