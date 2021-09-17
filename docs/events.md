@@ -1,30 +1,72 @@
 # Events reference
 
-Naja and some of its components implement the `EventTarget` interface. This means that you can hook onto the lifecycle
-events via the `addEventListener()` method. All dispatched events are `CustomEvent`s and their `detail` attribute holds
-event-specific data.
+Naja and some of its components implement the `EventTarget` interface. This means that you can hook onto the lifecycle events via the `addEventListener()` method. All dispatched events are `CustomEvent`s and their `detail` attribute holds event-specific data.
 
 
 ## Naja
 
 ### init
 
-This event is dispatched when `naja.initialize()` is called. It can be used to initialize all the necessities of
-an extension. If you've followed the instructions, the DOM is already loaded by the time this event is dispatched,
-so that you can access DOM elements in the listener. The `init` event's `detail` has the following properties:
+This event is dispatched [when `naja.initialize()` is called](initialization.md). It can be used to initialize all the necessities of an extension.
+
+The `init` event's `detail` has the following properties:
 
 - `defaultOptions: Object`, an object holding the default options passed to `naja.initialize()` method.
 
+```js
+naja.addEventListener('init', (event) => {
+	console.log(event.detail.defaultOptions);
+});
+```
+
+Depending on how you initialize Naja, the DOM might not yet be loaded by the time this event is dispatched. You should make sure that the DOM is loaded if you access it in the `init` listener:
+
+```js
+naja.addEventListener('init', (event) => {
+	const attachListener = () => document.querySelector('.selector').addEventListener('keydown', (event) => { /* ... */ });
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', () => attachListener());
+	} else {
+		attachListener();
+	}
+});
+```
+
+
+## Request lifecycle
+
+Whenever a request is dispatched, either directly via `naja.makeRequest()` or indirectly through user interaction, Naja dispatches a set of events throughout the request's lifecycle:
+
+```mermaid
+graph LR
+	req("naja.makeRequest()") --> before([before])
+	before --> start([start])
+	start --> success([success])
+	start --> error([error])
+	start --> abort([abort])
+	success & error & abort --> complete([complete])
+```
+
+
 ### before
 
-This event is dispatched when the `Request` is created but not yet sent. At this point, you can call the event's
-`preventDefault()` method to cancel the request. The event's `detail` holds the following properties:
+This event is dispatched when the `Request` is created but not yet sent. At this point, you can call the event's `preventDefault()` method to cancel the request.
+
+The event's `detail` holds the following properties:
 
 - `request: Request`, the Fetch API request object,
 - `method: string`, the requested HTTP method,
 - `url: string`, the requested URL,
 - `data: any`, the data to be sent along with the request,
 - `options: Object`.
+
+```js
+naja.addEventListener('before', (event) => {
+	if (event.detail.url.endsWith('/forbidden')) {
+		event.preventDefault();
+	}
+});
+```
 
 ### start
 
@@ -35,14 +77,33 @@ This event is dispatched right after the request is sent. Its `detail` holds the
 - `abortController: AbortController`, an `AbortController` instance for current request,
 - `options: Object`.
 
+```js
+const abortControllers = new WeakMap();
+naja.addEventListener('start', (event) => {
+	abortControllers.put(event.detail.request, event.detail.abortController);
+});
+```
+
 ### abort
 
-This event is dispatched if the request is aborted. Aborting the request does not trigger error handling because
-it is not an error per se, but it might be useful to react to it. This event's `detail` has the following properties:
-    
+This event is dispatched if the request is aborted. Aborting the request does not trigger error handling because it is not an error per se, but it might be useful to react to it. This event's `detail` has the following properties:
+
 - `request: Request`, the aborted request object,
 - `error: AbortError`, the abort error instance,
 - `options: Object`.
+
+```js
+naja.addEventListener('abort', (event) => {
+	if (window.confirm('The request was aborted. Retry?')) {
+		naja.makeRequest(
+			event.detail.request.method,
+			event.detail.request.url,
+			null,
+			event.detail.options,
+		);
+	}
+});
+```
 
 ### success
 
@@ -53,6 +114,13 @@ This event is dispatched when the request successfully finishes. Its `detail` ha
 - `payload: Object`, the parsed response payload,
 - `options: Object`.
 
+```js
+naja.addEventListener('success', (event) => {
+	const url = event.detail.payload.url ?? event.detail.request.url;
+	third.party.analytics.push('pageView', url);
+});
+```
+
 ### error
 
 This event is dispatched when the request finishes with errors. Its `detail` has the following properties:
@@ -62,10 +130,15 @@ This event is dispatched when the request finishes with errors. Its `detail` has
 - `error: Error`, an object describing the error,
 - `options: Object`.
 
+```js
+naja.addEventListener('error', (event) => {
+	third.party.errorTracker.sendError(event.detail.error);
+});
+```
+
 ### complete
 
-This event is dispatched when the request finishes, regardless of whether it succeeded or failed. Its `detail` has
-the following properties:
+This event is dispatched when the request finishes, regardless of whether it succeeded or failed. Its `detail` has the following properties:
 
 - `request: Request`, the request object,
 - `response: ?Response`, the response object if there is any,
@@ -73,62 +146,63 @@ the following properties:
 - `error: ?Error`, an object describing the error if the request failed,
 - `options: Object`.
 
+```js
+naja.addEventListener('complete', (event) => {
+	console.debug(`Finished processing request ${event.detail.request.url}`);
+});
+```
+
 
 ## UIHandler
 
 ### interaction
 
-This event is dispatched when the user interacts with a DOM element that has the Naja's listener bound to it, or when
-using manual dispatch (see more in [UI binding](ui-binding.md)). This event's `preventDefault()` method can be used
-to prevent the request from being dispatched. This event's `detail` has the following properties:
+This event is dispatched when the user interacts with a DOM element that has the Naja's listener bound to it, or when using manual dispatch. This event's `preventDefault()` method can be used to prevent the request from being dispatched.
+
+This event's `detail` has the following properties:
 
 - `element: HTMLElement`, the element the user interacted with,
-- `originalEvent: ?Event`, the original UI event, or `undefined` if the interaction was triggered [by hand](ui-binding.md),
+- `originalEvent: ?Event`, the original UI event, or `undefined` if the interaction was triggered [by hand](ui-binding.md#manual-dispatch),
 - `options: Object`, an empty object that can be populated with options based on the element's attributes.
+
+See the [UI binding docs](ui-binding.md#interaction-event) for usage examples.
 
 
 ## SnippetHandler
 
 ### beforeUpdate
 
-This event is dispatched *before* updating the contents of each and every snippet. You can prevent the snippet from
-updating by calling the event's `preventDefault()` method.
+This event is dispatched *before* updating the contents of each and every snippet. You can prevent the snippet from updating by calling the event's `preventDefault()` method.
 
 The event's `detail` has the following properties:
 
 - `snippet: Element`, the snippet element,
 - `content: string`, the new content from response payload,
-- `fromCache: boolean`, a flag telling whether the snippet is being updated from cache after user navigation through
-    history, or as a result of a request to the server,
-- `operation: (snippet: Element, content: string) => void`, the operation that is going to be done with the snippet
-    and its new content,
-- `changeOperation: (operation: (snippet: Element, content: string) => void) => void`, a method that can be called
-    to override the snippet update `operation`,
+- `fromCache: boolean`, a flag telling whether the snippet is being updated from cache after user navigation through history, or as a result of a request to the server,
+- `operation: (snippet: Element, content: string) => void`, the operation that is going to be done with the snippet and its new content,
+- `changeOperation: (operation: (snippet: Element, content: string) => void) => void`, a method that can be called to override the snippet update `operation`,
 - `options: Object`.
 
 ### afterUpdate
 
-This event is dispatched *after* updating the contents of each and every snippet. If the snippet update has been
-prevented by canceling the `beforeUpdate` event, this event is not dispatched for given snippet.
+This event is dispatched *after* updating the contents of each and every snippet. If the snippet update has been prevented by canceling the `beforeUpdate` event, this event is not dispatched for given snippet.
 
 The event's `detail` has the following properties:
 
 - `snippet: Element`, the snippet element,
 - `content: string`, the new content from response payload,
-- `fromCache: boolean`, a flag telling whether the snippet is being updated from cache after user navigation through
-    history, or as a result of a request to the server,
-- `operation: (snippet: Element, content: string) => void`, the operation that has been done with the snippet and
-    its new content, 
+- `fromCache: boolean`, a flag telling whether the snippet is being updated from cache after user navigation through history, or as a result of a request to the server,
+- `operation: (snippet: Element, content: string) => void`, the operation that has been done with the snippet and its new content, 
 - `options: Object`.
+
+See the [snippet handling docs](snippets.md#snippet-update-events) for usage examples.
 
 
 ## RedirectHandler
 
 ### redirect
 
-This event is dispatched before a redirect is made. The event's `preventDefault()` method can be used to prevent
-the redirection from happening. You can also see and alter whether the redirect is going to be made by issuing
-another asynchronous request through Naja, or the hard way via the browser.
+This event is dispatched before a redirect is made. The event's `preventDefault()` method can be used to prevent the redirection from happening. You can also see and alter whether the redirect is going to be made by issuing another asynchronous request through Naja, or the hard way via the browser.
 
 The `redirect` event's `detail` has the following properties:
 
@@ -136,6 +210,8 @@ The `redirect` event's `detail` has the following properties:
 - `isHardRedirect: boolean`, a flag telling whether the redirect is going to be a hard one,
 - `setHardRedirect: (value: boolean) => void`, a method which can be called to override the hard redirect flag,
 - `options: Object`.
+
+See the [redirection docs](redirection.md#redirect-event) for usage examples.
 
 
 ## HistoryHandler
@@ -157,6 +233,8 @@ The `restoreState` event's `detail` has the following properties:
 
 - `state: Object`, the state that is being restored from the history entry,
 - `options: Object`, the options object constructed from Naja's `defaultOptions`.
+
+See the [history integration docs](history.md#history-integration-events) for usage examples.
 
 
 ## SnippetCache
@@ -187,3 +265,5 @@ The `restore` event's `detail` has the following properties:
 - `snippets: Object`, the snippets to be updated, as restored from cache storage,
 - `state: Object`, the state that is being restored from the history entry,
 - `options: Object`, the options used for snippet update; you can read these in [SnippetHandler's events](#snippethandler).
+
+See the [snippet cache docs](snippet-cache.md#snippet-cache-events) for usage examples.
