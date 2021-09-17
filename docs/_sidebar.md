@@ -1,25 +1,28 @@
 - [Home](/)
 
-- [Upgrading from 1.x](upgrade-from-1.md)
-- [Supported releases](support.md)
+- [Quick start](quick-start.md)
 
 - Using Naja
-    - [Quick start](quick-start.md)
-    - [Dispatching requests](dispatch.md)
-    - [UI binding](ui-binding.md)
-    - [Redirection](redirection.md)
-    - [Snippets](snippets.md)
-    - [Forms](forms.md)
-    - [History](history.md)
-    - [Snippet cache](snippet-cache.md)
-    - [Scripts in snippets](scripts.md)
-    - [Default extensions](extensions-default.md)
+  - [Installation](installation.md)
+  - [Initialization](initialization.md)
+  - [Dispatching requests](dispatch.md)
+  - [UI binding](ui-binding.md)
+  - [Redirection](redirection.md)
+  - [Snippets](snippets.md)
+  - [Forms](forms.md)
+  - [History](history.md)
+  - [Snippet cache](snippet-cache.md)
+  - [Default extensions](extensions-default.md)
 
 - Customizing Naja
-    - [Extending Naja](extensibility.md)
-    - [Events reference](events.md)
-    - [Writing extensions](extensions-custom.md)
+  - [Extending Naja](extensibility.md)
+  - [Events reference](events.md)
+  - [Writing extensions](extensions-custom.md)
+  - [Integrating with third-party services](extensions-integration.md)
+
+- [Supported releases](support.md)
 
 ---
 
-[Naja 1.x docs](/1.x/)
+- [Upgrading from 1.x](upgrade-from-1.md)
+- [Naja 1.x docs](/1.x/)

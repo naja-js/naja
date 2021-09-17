@@ -1,12 +1,23 @@
 # UI binding
 
-`UIHandler` binds Naja's AJAX handler to all links, forms and submit inputs marked with `ajax` class.
+As soon as Naja is initialized, it attaches its handler to all links, forms and submit inputs that match a configured selector. By default, the selector is `.ajax`, i.e. all you have to do is to add the `ajax` class to your links and forms that you want to be handled asynchronously:
+
+```html
+<a n:href="refresh!" class="ajax">Refresh</a>
+
+<form n:name="form" class="ajax">
+    <input n:name="submit">
+</form>
+
+<form n:name="otherForm">
+    <input n:name="submit" class="ajax">
+</form>
+```
 
 
 ## Custom selector
 
-You can customize the bound selector easily, changing it to a data attribute, inverting it, or even disabling it
-entirely (see below for further notes):
+You can easily customize the bound selector, e.g. change it to a data attribute, invert the behaviour, or even provide an empty selector to attach AJAX behaviour to *all* links and forms. Note that this must be configured *before* calling `naja.initialize()`:
 
 ```js
 naja.uiHandler.selector = '[data-naja]';
@@ -16,52 +27,80 @@ naja.uiHandler.selector = ':not(.synchronous)';
 naja.uiHandler.selector = '';
 ```
 
+### Allowed origins
 
-## Interaction event
-
-Whenever the user clicks a Naja-bound element, `UIHandler` dispatches the `interaction` event. The event contains the
-clicked element, the original UI event if there is one, and current request's `options` object that you can modify.
-The `interaction` event is cancelable, so if you call `preventDefault()` the request won't be dispatched.
-
-
-## Allowed origins
-
-Note that if you change the selector to an opt-out (`:not(.synchronous)`, empty string, etc.), *all* links will become
-asynchronous. Naja prevents you from shooting yourself in the foot and does not dispatch AJAX requests for external URLs
-unless you explicitly allow them:
+If you change the selector to an opt-out (`:not(.synchronous)`, empty string, etc.), *all* links will become asynchronous. Naja prevents you from shooting yourself in the foot with cross-origin AJAX requests and does not handle external URLs unless you explicitly allow them:
 
 ```js
 naja.uiHandler.allowedOrigins.push('https://allowed.origin.com:4000');
 ```
 
-The current origin is allowed by default, i.e. it does not matter whether the `href` in the link points to a relative
-path or an absolute one.
-
-
-## Manual dispatch
-
-`UIHandler` exposes two helper methods for dispatching UI-bound requests manually. This is especially useful if you need
-to submit a form programmatically, because `form.submit()` does not trigger the form's `submit` event.
-
-```js
-naja.uiHandler.clickElement(element);
-naja.uiHandler.submitForm(form);
-```
-
-Neither `element` nor `form` have to be bound to Naja via the configured selector. However, the aforementioned allowed
-origin rules still apply, and the `interaction` event is triggered with `originalEvent` set to undefined.
-
-Since Naja 2.1.0, these methods return the promise from the underlying call to `naja.makeRequest()`.
+The current origin is allowed by default, i.e. it does not matter whether the `href` of the link points to a relative URL or an absolute one.
 
 
 ## Manual bind
 
-You can also manually bind the AJAX handler to DOM nodes that are created dynamically via a different mechanism than
-Nette snippets:
+You can manually bind Naja's handler to DOM elements that are created dynamically via a different mechanism than snippets:
 
 ```js
+const element = document.createElement('a');
+element.href = '/link-target';
+element.classList.add('ajax');
+document.body.appendChild(element);
+
 naja.uiHandler.bindUI(element);
 ```
 
-The method searches the given `element` and its children for elements that match the configured selector and attaches
-the AJAX handler to them.
+The `bindUI` method searches the given `element` and its children for elements that match the configured selector and attaches Naja's handler to them.
+
+
+## Manual dispatch
+
+Naja exposes two helper methods for dispatching UI-bound requests manually, `clickElement(link)` and `submitForm(form)`. The target element **does not** have to be bound to Naja via the configured selector. However, the aforementioned [allowed origin rules](#allowed-origins) still apply.
+
+The `submitForm()` method is especially useful if you need to submit a form programmatically — such as when a value of an input changes — because `form.submit()` does not trigger the form's `submit` event which Naja relies on:
+
+```js
+selectBox.addEventListener('change', (event) => {
+	naja.uiHandler.submitForm(event.target.form);
+});
+```
+
+Both of them optionally accept the `options` object that you can use to configure the request:
+
+```js
+naja.uiHandler.clickElement(link, { history: false });
+```
+
+Both of these methods return the promise from the [underlying call to `naja.makeRequest()`](dispatch.md#handling-the-response):
+
+```js
+naja.uiHandler.clickElement(link)
+	.then((payload) => { /* process payload */ });
+```
+
+
+## Interaction event
+
+Whenever the user clicks a Naja-bound element, the `interaction` event is dispatched. It contains the clicked element, the original UI event (unless the interaction was triggered manually), and the current request's `options` object that you can modify. You can also call the event's `preventDefault()` to prevent the request from being dispatched:
+
+```js
+naja.uiHandler.addEventListener('interaction', (event) => {
+	if (event.detail.element.hasAttribute('data-confirm')
+        && ! window.confirm(event.detail.element.getAttribute('data-confirm'))
+    ) {
+		event.preventDefault();
+	}
+});
+```
+
+This event is particularly useful for configuring the behaviour of extensions based on the DOM elements and their attributes:
+
+```js
+naja.uiHandler.addEventListener('interaction', (event) => {
+	if (event.detail.element.hasAttribute('data-spinner-target')) {
+		const spinnerSelector = event.detail.element.getAttribute('data-spinner-target');
+		event.detail.options.spinner = document.querySelector(spinnerSelector);
+	}
+});
+```

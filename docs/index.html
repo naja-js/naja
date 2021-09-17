@@ -6,14 +6,27 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta name="description" content="Modern AJAX library for Nette Framework">
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <link rel="stylesheet" href="//unpkg.com/docsify-themeable/dist/css/theme-simple.css">
+  <link rel="stylesheet" href="//unpkg.com/docsify-themeable/dist/css/theme-simple.css" media="(prefers-color-scheme: light)">
+  <link rel="stylesheet" href="//unpkg.com/docsify-themeable/dist/css/theme-simple-dark.css" media="(prefers-color-scheme: dark)">
+  <style>
+    #support-link {
+      text-align: center;
+      font-size: 14px;
+      color: rgba(77, 77, 77, 0.6);
+    }
+    @media (prefers-color-scheme: dark) {
+      #support-link {
+        color: rgba(232, 232, 232, 0.6);
+      }
+    }
+  </style>
 </head>
 <body>
   <div id="app"></div>
   <script>
     window.$docsify = {
       name: 'Naja',
-      logo: 'logo.svg',
+      logo: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'logo_dark.svg' : 'logo.svg',
       repo: 'https://github.com/jiripudil/Naja',
       loadNavbar: true,
       loadSidebar: true,
@@ -23,7 +36,7 @@
       plugins: [
         // add link to support to footer on every page
         (hook) => {
-          const supportFooter = '?> Did not find your answer? [Ask for help](https://github.com/jiripudil/Naja/discussions/new?category=support) on Github.';
+          const supportFooter = '<div id="support-link">Did not find your answer? <a href="https://github.com/jiripudil/Naja/discussions/new?category=support">Ask for help</a> on Github.</div>';
           hook.beforeEach((content) => `${content}\n---\n${supportFooter}`);
         },
 
@@ -59,5 +72,8 @@
   <script src="//unpkg.com/prismjs/components/prism-bash.min.js"></script>
   <script src="//unpkg.com/prismjs/components/prism-php.min.js"></script>
   <script src="//unpkg.com/prismjs/components/prism-typescript.min.js"></script>
+  <script src="//unpkg.com/mermaid/dist/mermaid.js"></script>
+  <script src="//unpkg.com/docsify-mermaid/dist/docsify-mermaid.js"></script>
+  <script>mermaid.initialize({startOnLoad: true});</script>
 </body>
 </html>
