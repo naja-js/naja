@@ -2,6 +2,17 @@
 
 - [Quick start](quick-start.md)
 
+- Guide
+  - [Introduction](guide/00-introduction.md)
+  - [Install and set up Naja](guide/01-install-setup-naja.md)
+  - [Add and redraw snippets](guide/02-add-redraw-snippets.md)
+  - [Fix the basket](guide/03-fix-basket.md)
+  - [Fix the reviews widget](guide/04-fix-reviews-widget.md)
+  - [Fix the category filter](guide/05-fix-category-filter.md)
+  - [Hook into the request lifecycle](guide/06-hook-into-request-lifecycle.md)
+  - [Write some extensions](guide/07-extensions.md)
+  - [Closing thoughts](guide/08-closing-thoughts.md)
+
 - Using Naja
   - [Installation](installation.md)
   - [Initialization](initialization.md)
