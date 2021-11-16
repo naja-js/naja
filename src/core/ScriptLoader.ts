@@ -1,14 +1,26 @@
 import {Naja} from '../Naja';
+import {onDomReady} from '../utils';
 
 export class ScriptLoader {
 	private loadedScripts = new Set<string>();
 
 	public constructor(naja: Naja) {
-		naja.addEventListener('success', (event) => {
-			const {payload} = event.detail;
-			if (payload.snippets) {
-				this.loadScripts(payload.snippets);
-			}
+		naja.addEventListener('init', () => {
+			onDomReady(() => {
+				document.querySelectorAll('script[data-naja-script-id]').forEach((script) => {
+					const scriptId = script.getAttribute('data-naja-script-id');
+					if (scriptId !== null && scriptId !== '') {
+						this.loadedScripts.add(scriptId);
+					}
+				});
+			});
+
+			naja.addEventListener('success', (event) => {
+				const {payload} = event.detail;
+				if (payload.snippets) {
+					this.loadScripts(payload.snippets);
+				}
+			});
 		});
 	}
 
