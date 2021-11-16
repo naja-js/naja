@@ -14,7 +14,7 @@ describe('ScriptLoader', function () {
 		const mock = sinon.mock(naja);
 
 		mock.expects('addEventListener')
-			.withExactArgs('success', sinon.match.instanceOf(Function))
+			.withExactArgs('init', sinon.match.instanceOf(Function))
 			.once();
 
 		new ScriptLoader(naja);
@@ -24,6 +24,7 @@ describe('ScriptLoader', function () {
 	it('loads scripts in snippets', function () {
 		const naja = mockNaja();
 		const scriptLoader = new ScriptLoader(naja);
+		naja.initialize();
 
 		const mock = sinon.mock(scriptLoader);
 		mock.expects('loadScripts')
@@ -57,12 +58,21 @@ describe('ScriptLoader', function () {
 	});
 
 	it('deduplicates scripts by id', function() {
+		const script = document.createElement('script');
+		script.setAttribute('data-naja-script-id', 'initial');
+		document.body.appendChild(script);
+
 		const naja = mockNaja();
 		const scriptLoader = new ScriptLoader(naja);
+		naja.initialize();
 
 		const foo = document.createElement('div');
 		foo.id = 'snippet--foo';
 		document.body.appendChild(foo);
+
+		const bar = document.createElement('div');
+		bar.id = 'snippet--bar';
+		document.body.appendChild(bar);
 
 		const baz = document.createElement('div');
 		baz.id = 'snippet--baz';
@@ -70,10 +80,12 @@ describe('ScriptLoader', function () {
 
 		window.SCRIPT_COUNTER = 0;
 		window.DEDUPE_COUNTER = 0;
+		window.INITIAL_COUNTER = 0;
 
 		const snippets = {
 			'snippet--foo': 'foo <script type="text/javascript">window.SCRIPT_COUNTER++;</script> bar',
-			'snippet--baz': 'foo <script type="text/javascript" data-naja-script-id="dedupe">window.DEDUPE_COUNTER++;</script> bar',
+			'snippet--bar': 'foo <script type="text/javascript" data-naja-script-id="dedupe">window.DEDUPE_COUNTER++;</script> bar',
+			'snippet--baz': 'foo <script type="text/javascript" data-naja-script-id="initial">window.INITIAL_COUNTER++;</script> bar',
 		};
 
 		scriptLoader.loadScripts(snippets);
@@ -81,7 +93,10 @@ describe('ScriptLoader', function () {
 
 		assert.strictEqual(window.SCRIPT_COUNTER, 2);
 		assert.strictEqual(window.DEDUPE_COUNTER, 1);
+		assert.strictEqual(window.INITIAL_COUNTER, 0);
+		document.body.removeChild(script);
 		document.body.removeChild(foo);
+		document.body.removeChild(bar);
 		document.body.removeChild(baz);
 	});
 });
