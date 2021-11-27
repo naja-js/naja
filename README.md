@@ -1,7 +1,7 @@
 # Naja
 
-[![Build Status](https://img.shields.io/github/workflow/status/jiripudil/Naja/Test)](https://github.com/jiripudil/Naja/actions?query=workflow%3ATest)
-[![Code Coverage](https://img.shields.io/codecov/c/github/jiripudil/Naja.svg)](https://codecov.io/gh/jiripudil/Naja)
+[![Build Status](https://img.shields.io/github/workflow/status/naja-js/naja/Test)](https://github.com/naja-js/naja/actions?query=workflow%3ATest)
+[![Code Coverage](https://img.shields.io/codecov/c/github/naja-js/naja.svg)](https://codecov.io/gh/naja-js/naja)
 [![latest version](https://img.shields.io/npm/v/naja)](https://npmjs.com/package/naja)
 [![license](https://img.shields.io/npm/l/naja)](https://npmjs.com/package/naja)
 [![minified size](https://img.shields.io/bundlephobia/min/naja)](https://npmjs.com/package/naja)
@@ -13,7 +13,7 @@
 
 Naja is a full-featured JS client-side AJAX library for Nette Framework.
 
-It is written using modern-day JavaScript, but compiled into a bundle that works in all modern browsers. Every build of Naja is [thoroughly tested](https://github.com/jiripudil/Naja/actions?query=workflow%3ATest) and therefore guaranteed to work in the latest versions of Chromium (Chrome and Edge), Firefox, and WebKit (Safari).
+It is written using modern-day JavaScript, but compiled into a bundle that works in all modern browsers. Every build of Naja is [thoroughly tested](https://github.com/naja-js/naja/actions?query=workflow%3ATest) and therefore guaranteed to work in the latest versions of Chromium (Chrome and Edge), Firefox, and WebKit (Safari).
 
 
 ## Very quick start

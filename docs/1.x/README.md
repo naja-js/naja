@@ -1,7 +1,7 @@
 # Naja
 
-[![Build Status](https://img.shields.io/travis/jiripudil/Naja.svg)](https://travis-ci.org/jiripudil/Naja)
-[![Code Coverage](https://img.shields.io/codecov/c/github/jiripudil/Naja.svg)](https://codecov.io/gh/jiripudil/Naja)
+[![Build Status](https://img.shields.io/travis/naja-js/naja.svg)](https://travis-ci.org/naja-js/naja)
+[![Code Coverage](https://img.shields.io/codecov/c/github/naja-js/naja.svg)](https://codecov.io/gh/naja-js/naja)
 [![npm version](https://img.shields.io/npm/v/naja.svg)](https://npmjs.com/package/naja)
 [![npm monthly downloads](https://img.shields.io/npm/dm/naja.svg)](https://npmjs.com/package/naja)
 [![npm downloads](https://img.shields.io/npm/dt/naja.svg)](https://npmjs.com/package/naja)

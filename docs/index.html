@@ -27,7 +27,7 @@
     window.$docsify = {
       name: 'Naja',
       logo: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'logo_dark.svg' : 'logo.svg',
-      repo: 'https://github.com/jiripudil/Naja',
+      repo: 'https://github.com/naja-js/naja',
       loadNavbar: true,
       loadSidebar: true,
       auto2top: true,
@@ -36,7 +36,7 @@
       plugins: [
         // add link to support to footer on every page
         (hook) => {
-          const supportFooter = '<div id="support-link">Did not find your answer? <a href="https://github.com/jiripudil/Naja/discussions/new?category=support">Ask for help</a> on Github.</div>';
+          const supportFooter = '<div id="support-link">Did not find your answer? <a href="https://github.com/naja-js/naja/discussions/new?category=support">Ask for help</a> on Github.</div>';
           hook.beforeEach((content) => `${content}\n---\n${supportFooter}`);
         },
 

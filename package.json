@@ -55,6 +55,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jiripudil/Naja.git"
+    "url": "git+https://github.com/naja-js/naja.git"
   }
 }
