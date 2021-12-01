@@ -17,7 +17,7 @@ By following these guidelines, you can make the whole process of reviewing and a
 
 ### General guidelines
 
-- Please open pull requests from specific branches against `master`. Open a separate pull request for each requested change or bugfix.
+- Please open pull requests from specific branches against `main`. Open a separate pull request for each requested change or bugfix.
 - More smaller, dedicated commits with concise commit messages are better than a big messy one with a lot of changes. Each commit should be usable on its own, with working code and passing tests (see below).
 - Describe as clearly as possible your intent and the reasoning behind the proposed changes. Provide links to related issues if there are any.
 - Cover the proposed changes with tests: add new tests for features and regression tests for bugfixes.
