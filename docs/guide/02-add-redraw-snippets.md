@@ -17,7 +17,7 @@ If you reload the page now and open the Network tab of your browser's developmen
 
 Apart from the network request, however, nothing else happens on the page when you click the link. We still need to add some more logic to the server-side code.
 
-?> You can learn more about how Naja binds to UI elements in [UI binding](../ui-binding.md).
+?> You can learn more about how Naja binds to UI elements in [UI binding](/ui-binding.md).
 
 ## Snippets
 
@@ -60,6 +60,6 @@ public function beforeRender(): void
 
 With all these changes, the basic interactions on the website should now be handled asynchronously by Naja: when you click a link, Naja sends a background request and redraws the contents of the page. It also stores the snippets into History API entry so that when you press the browser's Back button, the page changes back instantly and without a roundtrip to the server.
 
-?> You can learn more about Naja's handling of snippets in [Snippets](../snippets.md).
+?> You can learn more about Naja's handling of snippets in [Snippets](/snippets.md).
 
 This comes with its own caveats, though. We'll take a look at them and find a way to solve them in the next chapter.

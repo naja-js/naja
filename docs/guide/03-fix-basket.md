@@ -18,7 +18,7 @@ We need to remove the redirection and let the `redrawControl` code that's alread
 
 Then do the same change in `BasketPresenter.php`.
 
-?> You can learn more about how Naja follows redirects in [Redirection](../redirection.md).
+?> You can learn more about how Naja follows redirects in [Redirection](/redirection.md).
 
 ### Hint Naja about the target URL
 
@@ -53,7 +53,7 @@ Open the `AddToBasketButtonControl.latte` template and add the `data-naja-histor
 
 Now when you click on a product on the product list, add a few pieces of it to the basket and then press Back in the browser, you should get right back to the product list. One thing is still off, though.
 
-?> You can learn more about Naja's integration into the History API in [History](../history.md).
+?> You can learn more about Naja's integration into the History API in [History](/history.md).
 
 ## Preserve the basket widget
 
@@ -68,6 +68,6 @@ Open the `BasketWidgetComponent.latte` and mark the snippet with the `data-naja-
 
 Now the basket widget should properly update when you modify the basket contents, and preserve the latest state when navigating through the website and browser's history.
 
-?> You can learn more about the snippet caching mechanism in [Snippet cache](../snippet-cache.md).
+?> You can learn more about the snippet caching mechanism in [Snippet cache](/snippet-cache.md).
 
 With the basket solved, next we'll take a look at the third-party reviews widget on the product detail page.

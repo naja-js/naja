@@ -25,6 +25,6 @@ Now that the initialization script is only executed once, we need to add a secon
 
 We are omitting the script identifier this time because we want this to execute every time the user visits a product detail. That way, the third-party SDK is only included on the initial product detail load, and we use its API to reload the reviews widget on every subsequent visit.
 
-?> You can learn more about how Naja loads scripts included in snippets in [Snippets](../snippets.md#scripts-in-snippets).
+?> You can learn more about how Naja loads scripts included in snippets in [Snippets](/snippets.md#scripts-in-snippets).
 
 In the next chapter, we'll take a look at the product list.

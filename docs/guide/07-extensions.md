@@ -46,7 +46,7 @@ Since `naja` is now a parameter of the extension's initializer, we can safely re
   naja.initialize();
 ```
 
-?> You can learn more about writing custom extensions in [Writing extensions](../extensions-custom.md).
+?> You can learn more about writing custom extensions in [Writing extensions](/extensions-custom.md).
 
 ## Spinner extension
 
@@ -81,7 +81,7 @@ Let's open the `index.js` file and import and register the extension:
   naja.initialize();
 ```
 
-?> You can learn more about request lifecycle events in [Events reference](../events.md#request-lifecycle).
+?> You can learn more about request lifecycle events in [Events reference](/events.md#request-lifecycle).
 
 
 ### Localize the spinner

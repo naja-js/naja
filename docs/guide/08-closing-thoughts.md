@@ -20,7 +20,7 @@ And set the imported reference to Naja:
   naja.initialize();
 ```
 
-?> You can learn more about Naja's integration with nette-forms in [Forms](../forms.md).
+?> You can learn more about Naja's integration with nette-forms in [Forms](/forms.md).
 
 
 ## That's it!

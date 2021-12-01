@@ -16,7 +16,7 @@ The API should look familiar. Naja builds on top of established web standards, s
 
 The event system is designed to allow you to hook _deep_ into Naja's capabilities and extend them or integrate them with your own or third-party scripts. Events are very simple, but at the same time very flexible and very powerful: some of them expose very internal options that allow you to change the behaviour of Naja's components or bypass them altogether.
 
-?> The specific events and their contents are explained in detail in the [Events reference](../events.md).
+?> The specific events and their contents are explained in detail in the [Events reference](/events.md).
 
 ## Track pageviews
 
@@ -45,7 +45,7 @@ naja.addEventListener('success', (event) => {
 
 Lots of Naja's components use the exact same event. They are prioritized so that you can be sure that when your listener is executed, all snippets have already been updated (and cached in the browser history) and the URL has been rewritten. Thus, you can safely omit the `url` and `title` optional arguments of the `trackPageview()` method because it can infer them from the browser state.
 
-?> You can learn more about Naja's request lifecycle events in [Events reference](../events.md#request-lifecycle).
+?> You can learn more about Naja's request lifecycle events in [Events reference](/events.md#request-lifecycle).
 
 Speaking of browser history, to mimic the browser's handling of history navigation, we'll also need to track a pageview when the user navigates back and forth. We'll use the `restoreState` event of `HistoryHandler`. Again, the snippets have been restored from cache and the URL has been reverted by the time the listener is executed:
 
@@ -53,7 +53,7 @@ Speaking of browser history, to mimic the browser's handling of history navigati
 naja.historyHandler.addEventListener('restoreState', () => window.analytics?.trackPageview());
 ```
 
-?> You can learn more about history-related events in [History](../history.md#history-integration-events).
+?> You can learn more about history-related events in [History](/history.md#history-integration-events).
 
 Finally, import the script into the `index.js`:
 
@@ -67,7 +67,7 @@ You can easily check that everything is working by opening the browser's develop
 
 So far we've covered the happy path, but what happens when something goes wrong?
 
-When you dispatch requests manually (either via [`makeRequest()`](../dispatch.md) or [manual UI dispatch](../ui-binding.md#manual-dispatch)), you can respond to errors by awaiting the completion of the returned promise. But with the user's UI interactions, you don't have such liberty – network and response processing errors are silently discarded so as not to disrupt the user's experience.
+When you dispatch requests manually (either via [`makeRequest()`](/dispatch.md) or [manual UI dispatch](/ui-binding.md#manual-dispatch)), you can respond to errors by awaiting the completion of the returned promise. But with the user's UI interactions, you don't have such liberty – network and response processing errors are silently discarded so as not to disrupt the user's experience.
 
 Luckily, before Naja throws the error away, it exposes it in the `error` event. Let's inform the user that something went wrong by displaying a toast to them.
 

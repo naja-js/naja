@@ -32,7 +32,7 @@ And then change the form submission method call from above to this:
 
 Now the category filter is handled via Naja and results in an asynchronous request, but we've introduced other issues.
 
-?> You can learn more about manual submission in [UI binding](../ui-binding.md#manual-dispatch).
+?> You can learn more about manual submission in [UI binding](/ui-binding.md#manual-dispatch).
 
 
 ## Remove the redirect
@@ -69,6 +69,6 @@ Lastly, we'll make sure that the function is called on initial load, and also af
 + naja.snippetHandler.addEventListener('afterUpdate', (event) => enableCategoryFilter(event.detail.snippet));
 ```
 
-?> You can learn more about snippet-related events in [Snippets](../snippets.md#snippet-update-events).
+?> You can learn more about snippet-related events in [Snippets](/snippets.md#snippet-update-events).
 
 The application should now be fully functional. In the next chapter, we'll discuss the request lifecycle in Naja and how to hook into it.
