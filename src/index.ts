@@ -1,5 +1,3 @@
-import './polyfills';
-
 import {Naja, HttpError} from './Naja';
 import {AbortExtension} from './extensions/AbortExtension';
 import {UniqueExtension} from './extensions/UniqueExtension';

@@ -15,9 +15,7 @@
   "module": "dist/Naja.esm.js",
   "types": "dist/index.esm.d.ts",
   "dependencies": {
-    "@babel/runtime": "^7.13.10",
-    "abortcontroller-polyfill": "^1.5.0",
-    "event-target-shim": "^6.0.2"
+    "@babel/runtime": "^7.13.10"
   },
   "devDependencies": {
     "@babel/core": "^7.13.14",
