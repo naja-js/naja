@@ -40,28 +40,16 @@
           hook.beforeEach((content) => `${content}\n---\n${supportFooter}`);
         },
 
-        // GA4
-        (hook) => {
-          // append gtag script
+        // insights
+        () => {
           const script = document.createElement('script');
           script.async = true;
-          script.src = 'https://www.googletagmanager.com/gtag/js?id=G-HWKP64QVTF';
+          script.src = 'https://getinsights.io/js/insights.js';
+          script.addEventListener('load', () => {
+            window.insights.init('bBpgIeDo_fK54qhM');
+            window.insights.trackPages({hash: true});
+          });
           document.body.appendChild(script);
-
-          // configure measurement
-          window.dataLayer = window.dataLayer || [];
-          window.gtag = function(){dataLayer.push(arguments);}
-          window.gtag('js', new Date());
-          window.gtag('config', 'G-HWKP64QVTF', {
-            send_page_view: false,
-          });
-
-          // setup sending page_views
-          hook.beforeEach(() => {
-            window.gtag('event', 'page_view', {
-              page_path: location.hash,
-            });
-          });
         },
       ],
     };
