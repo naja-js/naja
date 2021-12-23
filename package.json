@@ -1,6 +1,6 @@
 {
   "name": "naja",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "Modern AJAX library for Nette Framework",
   "keywords": [
     "nette",
