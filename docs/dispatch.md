@@ -49,7 +49,7 @@ public function actionDefault(string $value)
 You can easily submit a form through Naja by serializing it into the `FormData` instance:
 
 ```js
-naja.mekeRequest('POST', '/form', new FormData(form));
+naja.makeRequest('POST', '/form', new FormData(form));
 ```
 
 ### File upload
