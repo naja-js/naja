@@ -1,4 +1,4 @@
-# Naja
+# Naja documentation
 
 [![Build Status](https://img.shields.io/github/workflow/status/naja-js/naja/Test)](https://github.com/naja-js/naja/actions?query=workflow%3ATest)
 [![Code Coverage](https://img.shields.io/codecov/c/github/naja-js/naja.svg)](https://codecov.io/gh/naja-js/naja)
