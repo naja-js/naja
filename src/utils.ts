@@ -22,9 +22,9 @@ export const assert: (condition: boolean, description?: string) => asserts condi
 
 // typed EventTarget
 
-type TypedEventListenerFunction<ET extends EventTarget, E extends Event> = (this: ET, event: E) => boolean | void;
+type TypedEventListenerFunction<ET extends EventTarget, E extends Event> = (this: ET, event: E) => boolean | void | Promise<void>;
 type TypedEventListenerObject<E extends Event> = {
-	handleEvent(event: E): void;
+	handleEvent(event: E): void | Promise<void>;
 };
 
 export type TypedEventListener<ET extends EventTarget, E extends Event> =
