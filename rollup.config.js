@@ -12,11 +12,8 @@ const output = {
 };
 
 const babelPlugin = babel({
-	exclude: /node_modules\/(?!event-target-shim)/,
-	include: [
-		'src/**',
-		'node_modules/event-target-shim/**',
-	],
+	exclude: /node_modules/,
+	include: 'src/**',
 	babelHelpers: 'runtime',
 });
 
