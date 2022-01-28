@@ -184,7 +184,7 @@ class SessionCacheStorage implements SnippetCacheStorage {
 	public readonly type = 'session';
 
 	public store(data: CachedSnippets): string {
-		const key = Math.random().toString(36).substr(2, 6);
+		const key = Math.random().toString(36).substring(2, 8);
 		window.sessionStorage.setItem(key, JSON.stringify(data));
 		return key;
 	}
