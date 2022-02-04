@@ -40,18 +40,6 @@
           const supportFooter = '<div id="support-link">Did not find your answer? <a href="https://github.com/naja-js/naja/discussions/new?category=support">Ask for help</a> on Github.</div>';
           hook.beforeEach((content) => `${content}\n---\n${supportFooter}`);
         },
-
-        // insights
-        () => {
-          const script = document.createElement('script');
-          script.async = true;
-          script.src = 'https://getinsights.io/js/insights.js';
-          script.addEventListener('load', () => {
-            window.insights.init('bBpgIeDo_fK54qhM');
-            window.insights.trackPages({hash: true});
-          });
-          document.body.appendChild(script);
-        },
       ],
     };
   </script>
