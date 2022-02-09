@@ -21,7 +21,7 @@ module.exports = (config) => {
 				}),
 				commonjs(),
 				babel({
-					exclude: /node_modules\/(?!event-target-shim)/,
+					exclude: /node_modules/,
 					babelHelpers: 'runtime',
 					extensions: ['.js', '.ts'],
 					presets: [
