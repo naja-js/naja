@@ -51,6 +51,11 @@ export class HistoryHandler extends EventTarget {
 
 	private initialize(event: InitEvent): void {
 		const {defaultOptions} = event.detail;
+		
+		if (!defaultOptions.history) {
+			return;
+		}
+		
 		window.addEventListener('popstate', this.popStateHandler);
 		onDomReady(() => this.historyAdapter.replaceState(
 			this.buildState(window.location.href, defaultOptions),
