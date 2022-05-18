@@ -5,6 +5,7 @@ import {onDomReady, TypedEventListener} from '../utils';
 declare module '../Naja' {
 	interface Options {
 		history?: HistoryMode;
+		href?: string;
 	}
 
 	interface Payload {
@@ -25,7 +26,6 @@ export interface HistoryAdapter {
 export type HistoryMode = boolean | 'replace';
 
 export class HistoryHandler extends EventTarget {
-	private href: string | null = null;
 	public popStateHandler = this.handlePopState.bind(this);
 	public historyAdapter: HistoryAdapter;
 
@@ -70,8 +70,8 @@ export class HistoryHandler extends EventTarget {
 	}
 
 	private saveUrl(event: BeforeEvent): void {
-		const {url} = event.detail;
-		this.href = url;
+		const {url, options} = event.detail;
+		options.href ??= url;
 	}
 
 	private configureMode(event: InteractionEvent): void {
@@ -107,17 +107,15 @@ export class HistoryHandler extends EventTarget {
 		}
 
 		if (payload.postGet && payload.url) {
-			this.href = payload.url;
+			options.href = payload.url;
 		}
 
 		const method = mode === 'replace' ? 'replaceState' : 'pushState';
 		this.historyAdapter[method](
-			this.buildState(this.href!, options),
+			this.buildState(options.href!, options),
 			window.document.title,
-			this.href!,
+			options.href!,
 		);
-
-		this.href = null;
 	}
 
 	private buildState(href: string, options: Options): HistoryState {
