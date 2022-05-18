@@ -279,7 +279,7 @@ describe('SnippetCache', function () {
 						.and(sinon.match.has('detail', sinon.match.object
 							.and(sinon.match.has('snippets', {'snippet-cache-foo': 'foo'}))
 							.and(sinon.match.has('state', {href: 'http://localhost:9876/SnippetCache/storeEvent', snippets: {storage: TEST_STORAGE_TYPE, key: 'key'}}))
-							.and(sinon.match.has('options', {snippetCache: TEST_STORAGE_TYPE, fetch: {}}))
+							.and(sinon.match.has('options', {snippetCache: TEST_STORAGE_TYPE, fetch: {}, href: 'http://localhost:9876/SnippetCache/storeEvent'}))
 						))
 				));
 
