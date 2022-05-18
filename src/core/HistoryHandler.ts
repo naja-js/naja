@@ -1,4 +1,4 @@
-import {BeforeEvent, InitEvent, Naja, Options, SuccessEvent} from '../Naja';
+import {BeforeEvent, Naja, Options, SuccessEvent} from '../Naja';
 import {InteractionEvent} from './UIHandler';
 import {onDomReady, TypedEventListener} from '../utils';
 
@@ -26,6 +26,7 @@ export interface HistoryAdapter {
 export type HistoryMode = boolean | 'replace';
 
 export class HistoryHandler extends EventTarget {
+	private initialized = false;
 	public popStateHandler = this.handlePopState.bind(this);
 	public historyAdapter: HistoryAdapter;
 
@@ -34,6 +35,7 @@ export class HistoryHandler extends EventTarget {
 
 		naja.addEventListener('init', this.initialize.bind(this));
 		naja.addEventListener('before', this.saveUrl.bind(this));
+		naja.addEventListener('before', this.replaceInitialState.bind(this));
 		naja.addEventListener('success', this.pushNewState.bind(this));
 
 		naja.uiHandler.addEventListener('interaction', this.configureMode.bind(this));
@@ -49,16 +51,6 @@ export class HistoryHandler extends EventTarget {
 		this.naja.defaultOptions.snippetCache = value;
 	}
 
-	private initialize(event: InitEvent): void {
-		const {defaultOptions} = event.detail;
-		window.addEventListener('popstate', this.popStateHandler);
-		onDomReady(() => this.historyAdapter.replaceState(
-			this.buildState(window.location.href, defaultOptions),
-			window.document.title,
-			window.location.href,
-		));
-	}
-
 	private handlePopState(event: PopStateEvent): void {
 		const {state} = event;
 		if ( ! state) {
@@ -69,9 +61,27 @@ export class HistoryHandler extends EventTarget {
 		this.dispatchEvent(new CustomEvent('restoreState', {detail: {state, options}}));
 	}
 
+	private initialize(): void {
+		window.addEventListener('popstate', this.popStateHandler);
+	}
+
 	private saveUrl(event: BeforeEvent): void {
 		const {url, options} = event.detail;
 		options.href ??= url;
+	}
+
+	private replaceInitialState(event: BeforeEvent): void {
+		const {options} = event.detail;
+		const mode = HistoryHandler.normalizeMode(options.history);
+		if (mode !== false && ! this.initialized) {
+			onDomReady(() => this.historyAdapter.replaceState(
+				this.buildState(window.location.href, options),
+				window.document.title,
+				window.location.href,
+			));
+
+			this.initialized = true;
+		}
 	}
 
 	private configureMode(event: InteractionEvent): void {

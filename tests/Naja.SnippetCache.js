@@ -39,8 +39,7 @@ describe('SnippetCache', function () {
 		const testStorage = new TestSnippetCacheStorage();
 		naja.snippetCache.storages[TEST_STORAGE_TYPE] = testStorage;
 
-		naja.initialize();
-		cleanPopstateListener(naja.historyHandler);
+		naja.historyHandler.initialized = true;
 
 		const historyAdapterMock = sinon.mock(naja.historyHandler.historyAdapter);
 		historyAdapterMock.expects('pushState').withExactArgs({
@@ -89,7 +88,7 @@ describe('SnippetCache', function () {
 		});
 		naja.snippetCache.storages[TEST_STORAGE_TYPE] = testStorage;
 
-		naja.initialize();
+		naja.historyHandler.initialize();
 
 		const el = document.createElement('div');
 		el.id = 'snippet-cache-foo';
@@ -260,8 +259,7 @@ describe('SnippetCache', function () {
 			const testStorage = new TestSnippetCacheStorage();
 			naja.snippetCache.storages[TEST_STORAGE_TYPE] = testStorage;
 
-			naja.initialize();
-			cleanPopstateListener(naja.historyHandler);
+			naja.historyHandler.initialized = true;
 			sinon.stub(naja.historyHandler.historyAdapter);
 
 			const el = document.createElement('div');
@@ -299,8 +297,7 @@ describe('SnippetCache', function () {
 			const testStorage = new TestSnippetCacheStorage();
 			naja.snippetCache.storages[TEST_STORAGE_TYPE] = testStorage;
 
-			naja.initialize();
-			cleanPopstateListener(naja.historyHandler);
+			naja.historyHandler.initialized = true;
 			sinon.stub(naja.historyHandler.historyAdapter);
 
 			const storeCallback = sinon.spy((evt) => evt.preventDefault());
@@ -325,7 +322,7 @@ describe('SnippetCache', function () {
 			});
 			naja.snippetCache.storages[TEST_STORAGE_TYPE] = testStorage;
 
-			naja.initialize();
+			naja.historyHandler.initialize();
 
 			const fetchCallback = sinon.spy();
 			const restoreCallback = sinon.spy();
@@ -380,7 +377,7 @@ describe('SnippetCache', function () {
 			});
 			naja.snippetCache.storages[TEST_STORAGE_TYPE] = testStorage;
 
-			naja.initialize();
+			naja.historyHandler.initialize();
 
 			const fetchCallback = sinon.spy((evt) => evt.preventDefault());
 			const restoreCallback = sinon.spy();
@@ -420,7 +417,7 @@ describe('SnippetCache', function () {
 			});
 			naja.snippetCache.storages[TEST_STORAGE_TYPE] = testStorage;
 
-			naja.initialize();
+			naja.historyHandler.initialize();
 
 			const restoreCallback = sinon.spy((evt) => evt.preventDefault());
 			naja.snippetCache.addEventListener('restore', restoreCallback);

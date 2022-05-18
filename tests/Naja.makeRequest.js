@@ -27,7 +27,7 @@ describe('makeRequest()', function () {
 		naja.addEventListener('complete', completeCallback);
 
 		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {answer: 42});
-		const request = naja.makeRequest('GET', '/makeRequest/success/events');
+		const request = naja.makeRequest('GET', '/makeRequest/success/events', null, {history: false});
 
 		return request.then(() => {
 			assert.isTrue(beforeCallback.called);
@@ -86,9 +86,10 @@ describe('makeRequest()', function () {
 	it('should resolve with the response if the request succeeds', function () {
 		const naja = mockNaja();
 		naja.initialize();
+		cleanPopstateListener(naja.historyHandler);
 
 		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {answer: 42});
-		const request = naja.makeRequest('GET', '/makeRequest/success/resolve');
+		const request = naja.makeRequest('GET', '/makeRequest/success/resolve', null, {history: false});
 
 		return request.then((response) => {
 			assert.deepEqual(response, {answer: 42});
@@ -113,7 +114,7 @@ describe('makeRequest()', function () {
 		naja.addEventListener('complete', completeCallback);
 
 		this.fetchMock.respond(500, {'Content-Type': 'application/json'}, {});
-		const request = naja.makeRequest('GET', '/makeRequest/error/events');
+		const request = naja.makeRequest('GET', '/makeRequest/error/events', null, {history: false});
 
 		return request.catch(() => {
 			assert.isTrue(beforeCallback.calledWith(
@@ -174,7 +175,7 @@ describe('makeRequest()', function () {
 		sinon.stub(naja.historyHandler.historyAdapter);
 
 		this.fetchMock.respond(500, {'Content-Type': 'application/json'}, {});
-		const request = naja.makeRequest('GET', '/makeRequest/error/reject');
+		const request = naja.makeRequest('GET', '/makeRequest/error/reject', null, {history: false});
 
 		return request.catch((error) => {
 			assert.isOk(error); // isOk = truthy
@@ -203,7 +204,7 @@ describe('makeRequest()', function () {
 		const error = new Error('NetworkError');
 		this.fetchMock.reject(error);
 
-		const request = naja.makeRequest('GET', '/makeRequest/error/events');
+		const request = naja.makeRequest('GET', '/makeRequest/error/events', null, {history: false});
 
 		return request.catch(() => {
 			assert.isTrue(beforeCallback.calledWith(
@@ -266,7 +267,7 @@ describe('makeRequest()', function () {
 		const error = new Error('NetworkError');
 		this.fetchMock.reject(error);
 
-		const request = naja.makeRequest('GET', '/makeRequest/error/reject');
+		const request = naja.makeRequest('GET', '/makeRequest/error/reject', null, {history: false});
 
 		return request.catch((actual) => {
 			assert.strictEqual(actual, error);
@@ -276,6 +277,7 @@ describe('makeRequest()', function () {
 	it('should call abort event if the request is aborted', function () {
 		const naja = mockNaja();
 		naja.initialize();
+		cleanPopstateListener(naja.historyHandler);
 
 		const abortCallback = sinon.spy();
 		const successCallback = sinon.spy();
@@ -287,7 +289,7 @@ describe('makeRequest()', function () {
 		naja.addEventListener('complete', completeCallback);
 
 		this.fetchMock.abort();
-		const request = naja.makeRequest('GET', '/makeRequest/abort');
+		const request = naja.makeRequest('GET', '/makeRequest/abort', null, {history: false});
 
 		return request.then((payload) => {
 			assert.deepEqual(payload, {});
@@ -328,7 +330,7 @@ describe('makeRequest()', function () {
 		naja.addEventListener('complete', completeCallback);
 		naja.addEventListener('before', (evt) => evt.preventDefault());
 
-		const request = naja.makeRequest('GET', '/makeRequest/abortedBefore');
+		const request = naja.makeRequest('GET', '/makeRequest/abortedBefore', null, {history: false});
 		return request.then((payload) => {
 			assert.deepEqual(payload, {});
 			assert.isFalse(completeCallback.called);
@@ -347,7 +349,7 @@ describe('makeRequest()', function () {
 		this.fetchMock.when((request) => request.url === 'http://localhost:9876/makeRequest/getFormData?foo=bar&baz=42')
 			.respond(200, {'Content-Type': 'application/json'}, {answer: 42});
 
-		const request = naja.makeRequest('GET', '/makeRequest/getFormData', formData);
+		const request = naja.makeRequest('GET', '/makeRequest/getFormData', formData, {history: false});
 		return request.then((payload) => {
 			assert.deepEqual(payload, {answer: 42});
 		});
@@ -375,7 +377,7 @@ describe('makeRequest()', function () {
 		this.fetchMock.when((request) => request.url === 'http://localhost:9876/makeRequest/getPOJO?foo=bar&baz=42&qux%5B0%5D%5Bbar%5D=baz&qux%5B0%5D%5Bbaz%5D=qux&qux%5B1%5D=foo')
 			.respond(200, {'Content-Type': 'application/json'}, {answer: 42});
 
-		const request = naja.makeRequest('GET', '/makeRequest/getPOJO', data);
+		const request = naja.makeRequest('GET', '/makeRequest/getPOJO', data, {history: false});
 		return request.then((payload) => {
 			assert.deepEqual(payload, {answer: 42});
 		});
@@ -406,7 +408,7 @@ describe('makeRequest()', function () {
 				{status: 200},
 			);
 
-		const request = naja.makeRequest('POST', '/makeRequest/postPOJO', data);
+		const request = naja.makeRequest('POST', '/makeRequest/postPOJO', data, {history: false});
 		return request.then((payload) => {
 			assert.deepEqual(payload, {request: 'foo=bar&baz=42&qux%5B0%5D%5Bbar%5D=baz&qux%5B0%5D%5Bbaz%5D=qux&qux%5B1%5D=foo'});
 		});
@@ -429,7 +431,7 @@ describe('makeRequest()', function () {
 				{status: 200},
 			);
 
-		const request = naja.makeRequest('POST', '/makeRequest/postArray', data);
+		const request = naja.makeRequest('POST', '/makeRequest/postArray', data, {history: false});
 		return request.then((payload) => {
 			assert.deepEqual(payload, {request: '0=42&1=foo&2=bar'});
 		});
@@ -445,7 +447,7 @@ describe('makeRequest()', function () {
 			naja.addEventListener('before', beforeCallback);
 
 			this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {answer: 42});
-			const request = naja.makeRequest('GET', '/makeRequest/options/defaultOptions');
+			const request = naja.makeRequest('GET', '/makeRequest/options/defaultOptions', null, {history: false});
 
 			return request.then(() => {
 				assert.isTrue(beforeCallback.called);
@@ -471,7 +473,7 @@ describe('makeRequest()', function () {
 			};
 
 			this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {answer: 42});
-			const request = naja.makeRequest('GET', '/makeRequest/options/defaultOptions', null, {'customOption': 24, 'anotherOption': 42});
+			const request = naja.makeRequest('GET', '/makeRequest/options/defaultOptions', null, {'customOption': 24, 'anotherOption': 42, history: false});
 
 			return request.then(() => {
 				assert.isTrue(beforeCallback.called);
@@ -494,7 +496,7 @@ describe('makeRequest()', function () {
 			this.fetchMock.when((request) => request.credentials === 'include')
 				.respond(200, {'Content-Type': 'application/json'}, {answer: 42});
 
-			return naja.makeRequest('GET', '/makeRequest/options/defaultOptions', null, {fetch: {credentials: 'include'}});
+			return naja.makeRequest('GET', '/makeRequest/options/defaultOptions', null, {fetch: {credentials: 'include'}, history: false});
 		});
 	});
 });
