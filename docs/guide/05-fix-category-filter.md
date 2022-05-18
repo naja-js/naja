@@ -61,7 +61,7 @@ We'll start by renaming the `initialize` function and adding the root `element` 
 +     const categoryFilter = element.querySelector('.categoryFilter');
 ```
 
-Lastly, we'll make sure that the function is called on initial load, and also after every snippet update by hooking into the SnippetHandler's `afterUpdate` event:
+Lastly, we'll make sure that the function is called on initial load, and also after every snippet update by hooking into the SnippetHandler's `afterUpdate` event. For the initial invocation, we need to wait until the DOM is loaded; for that, we'll reuse a tiny utility function called `onDomReady` that's already imported in the script:
 
 ```diff
 - onDomReady(initialize);
