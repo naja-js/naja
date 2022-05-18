@@ -8,30 +8,21 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v2
-        env:
-          cache-name: yarn-cache
+      - uses: actions/checkout@v3
+      - uses: crazy-max/ghaction-import-gpg@v4
         with:
-          path: ~/.yarn-cache
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - uses: crazy-max/ghaction-import-gpg@v2
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_SIGNING_KEY }}
-          PASSPHRASE: ${{ secrets.GPG_SIGNING_KEY_PASSPHRASE }}
-      - uses: actions/setup-node@v2-beta
+          gpg_private_key: ${{ secrets.GPG_SIGNING_KEY }}
+          passphrase: ${{ secrets.GPG_SIGNING_KEY_PASSPHRASE }}
+      - uses: actions/setup-node@v3
         with:
-          node-version: '14.x'
+          node-version: lts/*
+          cache: yarn
       - run: yarn install --frozen-lockfile
       - run: yarn build
       - run: |
           gpg --local-user B352BC4C --armor --detach-sig dist/Naja.js
           gpg --local-user B352BC4C --armor --detach-sig dist/Naja.min.js
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: dist-files
           path: dist/
@@ -40,88 +31,35 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build]
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
         with:
           name: dist-files
           path: dist/
 
-      - id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
-          body: '--- TODO ---'
           draft: true
-
-      - uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/Naja.js
-          asset_name: Naja.js
-          asset_content_type: application/javascript
-
-      - uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/Naja.js.map
-          asset_name: Naja.js.map
-          asset_content_type: application/octet-stream
-
-      - uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/Naja.js.asc
-          asset_name: Naja.js.asc
-          asset_content_type: application/pgp-signature
-
-      - uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/Naja.min.js
-          asset_name: Naja.min.js
-          asset_content_type: application/javascript
-
-      - uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/Naja.min.js.map
-          asset_name: Naja.min.js.map
-          asset_content_type: application/octet-stream
-
-      - uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/Naja.min.js.asc
-          asset_name: Naja.min.js.asc
-          asset_content_type: application/pgp-signature
+          files: |
+            dist/Naja.js
+            dist/Naja.js.map
+            dist/Naja.js.asc
+            dist/Naja.min.js
+            dist/Naja.min.js.map
+            dist/Naja.min.js.asc
 
   publish:
     runs-on: ubuntu-latest
     needs: [build]
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
         with:
           name: dist-files
           path: dist/
-      - uses: actions/setup-node@v2-beta
+      - uses: actions/setup-node@v3
         with:
-          node-version: '14.x'
+          node-version: lts/*
           registry-url: 'https://registry.npmjs.org'
       - run: npm publish
         env:

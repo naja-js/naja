@@ -11,23 +11,14 @@ jobs:
     env:
       CI: true
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v2
-        env:
-          cache-name: yarn-cache
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          path: ~/.yarn-cache
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - uses: actions/setup-node@v2-beta
-        with:
-          node-version: '14.x'
-      - uses: microsoft/playwright-github-action@v1
+          node-version: lts/*
+          cache: yarn
+      - run: yarn run playwright install-deps
       - run: yarn install --frozen-lockfile
       - run: yarn lint
       - run: yarn build # type check
       - run: yarn test
-      - uses: codecov/codecov-action@v1
+      - uses: codecov/codecov-action@v3
