@@ -13,6 +13,34 @@ import {UIHandler} from '../src/core/UIHandler';
 describe('HistoryHandler', function () {
 	fakeFetch();
 
+	it('is initialized when history-enabled request is dispatched', function () {
+		const naja = mockNaja({
+			historyHandler: HistoryHandler,
+		});
+
+		assert.isFalse(naja.historyHandler.initialized);
+
+		naja.addEventListener('before', (event) => event.preventDefault());
+
+		return naja.makeRequest('GET', '/HistoryHandler/initialize').then(() => {
+			assert.isTrue(naja.historyHandler.initialized);
+		});
+	});
+
+	it('is not initialized when non-history-enabled request is dispatched', function () {
+		const naja = mockNaja({
+			historyHandler: HistoryHandler,
+		});
+
+		assert.isFalse(naja.historyHandler.initialized);
+
+		naja.addEventListener('before', (event) => event.preventDefault());
+
+		return naja.makeRequest('GET', '/HistoryHandler/initialize', null, {history: false}).then(() => {
+			assert.isFalse(naja.historyHandler.initialized);
+		});
+	});
+
 	it('saves initial state', function () {
 		const naja = mockNaja();
 		const historyHandler = new HistoryHandler(naja);
@@ -20,8 +48,7 @@ describe('HistoryHandler', function () {
 		const mock = sinon.mock(historyHandler.historyAdapter);
 		mock.expects('replaceState').withExactArgs({href: 'http://localhost:9876/context.html'}, '', 'http://localhost:9876/context.html').once();
 
-		historyHandler.initialize(new CustomEvent('init', {detail: {defaultOptions: {}}}));
-		cleanPopstateListener(historyHandler);
+		historyHandler.replaceInitialState(new CustomEvent('before', {detail: {options: {history: true}}}));
 
 		mock.verify();
 		mock.restore();
@@ -32,8 +59,8 @@ describe('HistoryHandler', function () {
 			snippetHandler: SnippetHandler,
 			historyHandler: HistoryHandler,
 		});
-		naja.initialize();
-		cleanPopstateListener(naja.historyHandler);
+
+		naja.historyHandler.initialized = true;
 
 		const mock = sinon.mock(naja.historyHandler.historyAdapter);
 		mock.expects('pushState').withExactArgs({href: 'http://localhost:9876/HistoryHandler/pushState'}, '', 'http://localhost:9876/HistoryHandler/pushState').once();
@@ -50,8 +77,8 @@ describe('HistoryHandler', function () {
 			snippetHandler: SnippetHandler,
 			historyHandler: HistoryHandler,
 		});
-		naja.initialize();
-		cleanPopstateListener(naja.historyHandler);
+
+		naja.historyHandler.initialized = true;
 
 		const mock = sinon.mock(naja.historyHandler.historyAdapter);
 		mock.expects('replaceState').withExactArgs({href: 'http://localhost:9876/HistoryHandler/replaceState'}, '', 'http://localhost:9876/HistoryHandler/replaceState').once();
@@ -68,8 +95,8 @@ describe('HistoryHandler', function () {
 			snippetHandler: SnippetHandler,
 			historyHandler: HistoryHandler,
 		});
-		naja.initialize();
-		cleanPopstateListener(naja.historyHandler);
+
+		naja.historyHandler.initialized = true;
 
 		const mock = sinon.mock(naja.historyHandler.historyAdapter);
 		mock.expects('pushState').withExactArgs({href: '/HistoryHandler/postGet/targetUrl'}, '', '/HistoryHandler/postGet/targetUrl').once();
@@ -86,8 +113,6 @@ describe('HistoryHandler', function () {
 			snippetHandler: SnippetHandler,
 			historyHandler: HistoryHandler,
 		});
-		naja.initialize();
-		cleanPopstateListener(naja.historyHandler);
 
 		const mock = sinon.mock(naja.historyHandler.historyAdapter);
 		mock.expects('pushState').never();
@@ -196,8 +221,8 @@ describe('HistoryHandler', function () {
 				snippetHandler: SnippetHandler,
 				historyHandler: HistoryHandler,
 			});
-			naja.initialize();
-			cleanPopstateListener(naja.historyHandler);
+
+			naja.historyHandler.initialized = true;
 
 			const mock = sinon.mock(naja.historyHandler.historyAdapter);
 			mock.expects('pushState').once();
@@ -226,7 +251,7 @@ describe('HistoryHandler', function () {
 				snippetHandler: SnippetHandler,
 				historyHandler: HistoryHandler,
 			});
-			naja.initialize();
+			naja.historyHandler.initialize();
 
 			const restoreCallback = sinon.spy();
 			naja.historyHandler.addEventListener('restoreState', restoreCallback);
@@ -251,7 +276,7 @@ describe('HistoryHandler', function () {
 				snippetHandler: SnippetHandler,
 				historyHandler: HistoryHandler,
 			});
-			naja.initialize();
+			naja.historyHandler.initialize();
 
 			const restoreCallback = sinon.spy();
 			naja.historyHandler.addEventListener('restoreState', restoreCallback);
