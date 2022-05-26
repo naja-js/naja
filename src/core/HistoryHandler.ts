@@ -15,6 +15,7 @@ declare module '../Naja' {
 }
 
 export interface HistoryState extends Record<string, any> {
+	source: string;
 	href: string;
 }
 
@@ -53,7 +54,7 @@ export class HistoryHandler extends EventTarget {
 
 	private handlePopState(event: PopStateEvent): void {
 		const {state} = event;
-		if ( ! state) {
+		if (state?.source !== 'naja') {
 			return;
 		}
 
@@ -129,7 +130,7 @@ export class HistoryHandler extends EventTarget {
 	}
 
 	private buildState(href: string, options: Options): HistoryState {
-		const state: HistoryState = {href};
+		const state: HistoryState = {source: 'naja', href};
 		this.dispatchEvent(new CustomEvent('buildState', {detail: {state, options}}));
 		return state;
 	}
