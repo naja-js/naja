@@ -66,7 +66,7 @@ export class UIHandler extends EventTarget {
 		}
 
 		const element = event.currentTarget;
-		const options: Options = {};
+		const options = this.naja.prepareOptions();
 
 		const ignoreErrors = () => {
 			// don't reject the promise in case of an error as developers have no way of handling the rejection

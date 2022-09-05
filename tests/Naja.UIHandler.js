@@ -186,7 +186,7 @@ describe('UIHandler', function () {
 			const naja = mockNaja();
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
-				.withExactArgs('GET', 'http://localhost:9876/UIHandler/relative', null, {})
+				.withExactArgs('GET', 'http://localhost:9876/UIHandler/relative', null, {fetch: {}})
 				.once();
 
 			const handler = new UIHandler(naja);
@@ -213,7 +213,7 @@ describe('UIHandler', function () {
 			const naja = mockNaja();
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
-				.withExactArgs('GET', 'http://localhost:9876/UIHandler/sameOrigin', null, {})
+				.withExactArgs('GET', 'http://localhost:9876/UIHandler/sameOrigin', null, {fetch: {}})
 				.once();
 
 			const handler = new UIHandler(naja);
@@ -240,7 +240,7 @@ describe('UIHandler', function () {
 			const naja = mockNaja();
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
-				.withExactArgs('GET', 'http://another-site.com/foo', null, {})
+				.withExactArgs('GET', 'http://another-site.com/foo', null, {fetch: {}})
 				.once();
 
 			const handler = new UIHandler(naja);
@@ -268,7 +268,7 @@ describe('UIHandler', function () {
 			const naja = mockNaja();
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
-				.withExactArgs('GET', 'http://another-site.com/foo', null, {})
+				.withExactArgs('GET', 'http://another-site.com/foo', null, {fetch: {}})
 				.once();
 
 			const handler = new UIHandler(naja);
@@ -319,7 +319,7 @@ describe('UIHandler', function () {
 			const naja = mockNaja();
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
-				.withExactArgs('GET', 'http://localhost:9876/UIHandler/a', null, {})
+				.withExactArgs('GET', 'http://localhost:9876/UIHandler/a', null, {fetch: {}})
 				.once();
 
 			const listener = sinon.spy();
@@ -367,7 +367,7 @@ describe('UIHandler', function () {
 			const naja = mockNaja();
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
-				.withExactArgs('GET', 'http://localhost:9876/UIHandler/a', null, {foo: 42})
+				.withExactArgs('GET', 'http://localhost:9876/UIHandler/a', null, {fetch: {}, foo: 42})
 				.once();
 
 			const handler = new UIHandler(naja);
@@ -389,7 +389,7 @@ describe('UIHandler', function () {
 			const naja = mockNaja();
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
-				.withExactArgs('GET', 'http://localhost:9876/UIHandler/a', null, {})
+				.withExactArgs('GET', 'http://localhost:9876/UIHandler/a', null, {fetch: {}})
 				.once()
 				.returns(Promise.reject(new Error()));
 
@@ -409,7 +409,7 @@ describe('UIHandler', function () {
 			const naja = mockNaja();
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
-				.withExactArgs('GET', 'http://localhost:9876/UIHandler/a', null, {})
+				.withExactArgs('GET', 'http://localhost:9876/UIHandler/a', null, {fetch: {}})
 				.once();
 
 			const handler = new UIHandler(naja);
@@ -430,7 +430,7 @@ describe('UIHandler', function () {
 			const naja = mockNaja();
 			const mock = sinon.mock(naja);
 			mock.expects('makeRequest')
-				.withExactArgs('POST', '/UIHandler/form', sinon.match.instanceOf(FormData), {})
+				.withExactArgs('POST', '/UIHandler/form', sinon.match.instanceOf(FormData), {fetch: {}})
 				.once();
 
 			const handler = new UIHandler(naja);
@@ -453,7 +453,7 @@ describe('UIHandler', function () {
 			const containsSubmit = sinon.match((value) => value.has('submit'));
 
 			mock.expects('makeRequest')
-				.withExactArgs('GET', '/UIHandler/submit', sinon.match.instanceOf(FormData).and(containsSubmit), {})
+				.withExactArgs('GET', '/UIHandler/submit', sinon.match.instanceOf(FormData).and(containsSubmit), {fetch: {}})
 				.once();
 
 			const handler = new UIHandler(naja);
@@ -476,7 +476,7 @@ describe('UIHandler', function () {
 			const containsImage = sinon.match((value) => value.has('image.x') && value.has('image.y'));
 
 			mock.expects('makeRequest')
-				.withExactArgs('GET', '/UIHandler/image', sinon.match.instanceOf(FormData).and(containsImage), {})
+				.withExactArgs('GET', '/UIHandler/image', sinon.match.instanceOf(FormData).and(containsImage), {fetch: {}})
 				.once();
 
 			const handler = new UIHandler(naja);
