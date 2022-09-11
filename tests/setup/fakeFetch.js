@@ -49,8 +49,7 @@ class Expectation {
 
 	respond(status, headers, payload) {
 		const body = new Blob([JSON.stringify(payload)]);
-		const response = new Response(body, {status, headers});
-		this.handler = () => Promise.resolve(response);
+		this.handler = () => Promise.resolve(new Response(body, {status, headers}));
 	}
 
 	reject(error) {

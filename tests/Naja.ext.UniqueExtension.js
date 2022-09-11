@@ -9,77 +9,77 @@ describe('UniqueExtension', function () {
 	fakeFetch();
 
 	it('aborts previous request', function () {
-		// older Safari doesn't play well with fakeFetch'd Request
-		if ( ! Request.prototype.hasOwnProperty('signal')) {
-			this.skip();
-		}
-
 		const naja = mockNaja();
 		const uniqueExtension = new UniqueExtension();
 		uniqueExtension.initialize(naja);
+
+		let aborted = false;
 
 		this.fetchMock.when((request) => /first/.test(request.url))
 			.handler = (request) => new Promise((resolve, reject) => {
 				const abortError = new Error('AbortError');
 				abortError.name = 'AbortError';
-				request.signal.onabort = () => reject(abortError);
+				request.signal.addEventListener('abort', () => {
+					aborted = true;
+					reject(abortError);
+				});
 			});
 
 		this.fetchMock.when((request) => /second/.test(request.url))
 			.respond(200, {}, {});
 
 		const firstRequest = naja.makeRequest('GET', '/UniqueExtension/enabled/first');
-		naja.makeRequest('GET', '/UniqueExtension/enabled/second');
+		const secondRequest = naja.makeRequest('GET', '/UniqueExtension/enabled/second');
 
-		return firstRequest.catch((error) => {
-			assert.equal(error.name, 'AbortError');
+		return Promise.all([firstRequest, secondRequest]).then(() => {
+			assert.isTrue(aborted);
 		});
 	});
 
 	it('aborts previous request with the same key', function () {
-		// older Safari doesn't play well with fakeFetch'd Request
-		if ( ! Request.prototype.hasOwnProperty('signal')) {
-			this.skip();
-		}
-
 		const naja = mockNaja();
 		const uniqueExtension = new UniqueExtension();
 		uniqueExtension.initialize(naja);
 
+		let aborted = false;
+
 		this.fetchMock.when((request) => /first/.test(request.url))
 			.handler = (request) => new Promise((resolve, reject) => {
-			const abortError = new Error('AbortError');
-			abortError.name = 'AbortError';
-			request.signal.onabort = () => reject(abortError);
-		});
+				const abortError = new Error('AbortError');
+				abortError.name = 'AbortError';
+				request.signal.addEventListener('abort', () => {
+					aborted = true;
+					reject(abortError);
+				});
+			});
 
 		this.fetchMock.when((request) => /(second|third)/.test(request.url))
 			.respond(200, {}, {});
 
 		const firstRequest = naja.makeRequest('GET', '/UniqueExtension/enabled/first', null, {unique: 'differentKey'});
-		naja.makeRequest('GET', '/UniqueExtension/enabled/second');
-		naja.makeRequest('GET', '/UniqueExtension/enabled/third', null, {unique: 'differentKey'});
+		const secondRequest = naja.makeRequest('GET', '/UniqueExtension/enabled/second');
+		const thirdRequest = naja.makeRequest('GET', '/UniqueExtension/enabled/third', null, {unique: 'differentKey'});
 
-		return firstRequest.catch((error) => {
-			assert.equal(error.name, 'AbortError');
+		return Promise.all([firstRequest, secondRequest, thirdRequest]).then(() => {
+			assert.isTrue(aborted);
 		});
 	});
 
 	it('does not abort request if disabled', function () {
-		// older Safari doesn't play well with fakeFetch'd Request
-		if ( ! Request.prototype.hasOwnProperty('signal')) {
-			this.skip();
-		}
-
 		const naja = mockNaja();
 		const uniqueExtension = new UniqueExtension();
 		uniqueExtension.initialize(naja);
+
+		let aborted = false;
 
 		this.fetchMock.when()
 			.handler = (request) => new Promise((resolve, reject) => {
 				const abortError = new Error('AbortError');
 				abortError.name = 'AbortError';
-				request.signal.onabort = () => reject(abortError);
+				request.signal.addEventListener('abort', () => {
+					aborted = true;
+					reject(abortError);
+				});
 
 				const body = new Blob(['{}']);
 				const response = new Response(body, {status: 200, headers: {'Content-Type': 'application/json'}});
@@ -89,24 +89,26 @@ describe('UniqueExtension', function () {
 		const firstRequest = naja.makeRequest('GET', '/UniqueExtension/disabled/first');
 		const secondRequest = naja.makeRequest('GET', '/UniqueExtension/disabled/second', null, {unique: false});
 
-		return Promise.all([firstRequest, secondRequest]);
+		return Promise.all([firstRequest, secondRequest]).then(() => {
+			assert.isFalse(aborted);
+		});
 	});
 
 	it('does not abort request with different key', function () {
-		// older Safari doesn't play well with fakeFetch'd Request
-		if ( ! Request.prototype.hasOwnProperty('signal')) {
-			this.skip();
-		}
-
 		const naja = mockNaja();
 		const uniqueExtension = new UniqueExtension();
 		uniqueExtension.initialize(naja);
+
+		let aborted = false;
 
 		this.fetchMock.when()
 			.handler = (request) => new Promise((resolve, reject) => {
 			const abortError = new Error('AbortError');
 			abortError.name = 'AbortError';
-			request.signal.onabort = () => reject(abortError);
+			request.signal.addEventListener('abort', () => {
+				aborted = true;
+				reject(abortError);
+			});
 
 			const body = new Blob(['{}']);
 			const response = new Response(body, {status: 200, headers: {'Content-Type': 'application/json'}});
@@ -116,6 +118,8 @@ describe('UniqueExtension', function () {
 		const firstRequest = naja.makeRequest('GET', '/UniqueExtension/disabled/first');
 		const secondRequest = naja.makeRequest('GET', '/UniqueExtension/disabled/second', null, {unique: 'differentKey'});
 
-		return Promise.all([firstRequest, secondRequest]);
+		return Promise.all([firstRequest, secondRequest]).then(() => {
+			assert.isFalse(aborted);
+		});
 	});
 });
