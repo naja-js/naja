@@ -41,7 +41,8 @@ Whenever a request is dispatched, either directly via `naja.makeRequest()` or in
 graph LR
 	req("naja.makeRequest()") --> before([before])
 	before --> start([start])
-	start --> success([success])
+	start --> payload([payload])
+	payload --> success([success])
 	start --> error([error])
 	start --> abort([abort])
 	success & error & abort --> complete([complete])
@@ -105,9 +106,9 @@ naja.addEventListener('abort', (event) => {
 });
 ```
 
-### success
+### payload & success
 
-This event is dispatched when the request successfully finishes. Its `detail` has the following properties:
+This pair of events is dispatched when the request successfully finishes. The `detail` of both of these events has the following properties:
 
 - `request: Request`, the request object,
 - `response: Response`, the returned response object,
@@ -120,6 +121,10 @@ naja.addEventListener('success', (event) => {
 	third.party.analytics.push('pageView', url);
 });
 ```
+
+The difference between `payload` and `success` is that any userland listeners attached to the `success` event run *after* Naja's internal components, while listeners to the `payload` event are triggered *before* Naja's internals. You can use the `payload` event to set `options` for Naja's internals based on the payload received from the server.
+
+?> The `payload` event has been introduced in Naja 2.5.0.
 
 ### error
 

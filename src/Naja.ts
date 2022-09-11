@@ -147,6 +147,7 @@ export class Naja extends EventTarget {
 			throw error;
 		}
 
+		this.dispatchEvent(new CustomEvent('payload', {detail: {request, response, payload, options}}));
 		this.dispatchEvent(new CustomEvent('success', {detail: {request, response, payload, options}}));
 		this.dispatchEvent(new CustomEvent('complete', {detail: {request, response, payload, error: undefined, options}}));
 
@@ -225,6 +226,7 @@ export type InitEvent = CustomEvent<{defaultOptions: Options}>;
 export type BeforeEvent = CustomEvent<{request: Request, method: string, url: string, data: any, options: Options}>;
 export type StartEvent = CustomEvent<{request: Request, promise: Promise<Response>, abortController: AbortController, options: Options}>;
 export type AbortEvent = CustomEvent<{request: Request, error: Error, options: Options}>;
+export type PayloadEvent = CustomEvent<{request: Request, response: Response, payload: Payload, options: Options}>;
 export type SuccessEvent = CustomEvent<{request: Request, response: Response, payload: Payload, options: Options}>;
 export type ErrorEvent = CustomEvent<{request: Request, response: Response | undefined, error: Error, options: Options}>;
 export type CompleteEvent = CustomEvent<{request: Request, response: Response | undefined, error: Error | undefined, payload: Payload | undefined, options: Options}>;
@@ -234,6 +236,7 @@ interface NajaEventMap {
 	before: BeforeEvent;
 	start: StartEvent;
 	abort: AbortEvent;
+	payload: PayloadEvent;
 	success: SuccessEvent;
 	error: ErrorEvent;
 	complete: CompleteEvent;

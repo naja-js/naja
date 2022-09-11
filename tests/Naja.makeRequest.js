@@ -16,12 +16,14 @@ describe('makeRequest()', function () {
 
 		const beforeCallback = sinon.spy();
 		const startCallback = sinon.spy();
+		const payloadCallback = sinon.spy();
 		const successCallback = sinon.spy();
 		const errorCallback = sinon.spy();
 		const completeCallback = sinon.spy();
 
 		naja.addEventListener('before', beforeCallback);
 		naja.addEventListener('start', startCallback);
+		naja.addEventListener('payload', payloadCallback);
 		naja.addEventListener('success', successCallback);
 		naja.addEventListener('error', errorCallback);
 		naja.addEventListener('complete', completeCallback);
@@ -44,13 +46,25 @@ describe('makeRequest()', function () {
 			));
 
 			assert.isTrue(startCallback.called);
-			assert.isTrue(startCallback.calledBefore(successCallback));
+			assert.isTrue(startCallback.calledBefore(payloadCallback));
 			assert.isTrue(startCallback.calledWith(
 				sinon.match((event) => event.constructor.name === 'CustomEvent')
 				.and(sinon.match.has('detail', sinon.match.object
 					.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
 					.and(sinon.match.has('promise', sinon.match.instanceOf(Promise)))
 					.and(sinon.match.has('abortController', sinon.match.instanceOf(AbortController)))
+					.and(sinon.match.has('options', sinon.match.object))
+				))
+			));
+
+			assert.isTrue(payloadCallback.called);
+			assert.isTrue(payloadCallback.calledBefore(successCallback));
+			assert.isTrue(payloadCallback.calledWith(
+				sinon.match((event) => event.constructor.name === 'CustomEvent')
+				.and(sinon.match.has('detail', sinon.match.object
+					.and(sinon.match.has('request', sinon.match.instanceOf(Request)))
+					.and(sinon.match.has('response', sinon.match.instanceOf(Response)))
+					.and(sinon.match.has('payload'))
 					.and(sinon.match.has('options', sinon.match.object))
 				))
 			));
@@ -103,12 +117,14 @@ describe('makeRequest()', function () {
 
 		const beforeCallback = sinon.spy();
 		const startCallback = sinon.spy();
+		const payloadCallback = sinon.spy();
 		const successCallback = sinon.spy();
 		const errorCallback = sinon.spy();
 		const completeCallback = sinon.spy();
 
 		naja.addEventListener('before', beforeCallback);
 		naja.addEventListener('start', startCallback);
+		naja.addEventListener('payload', payloadCallback);
 		naja.addEventListener('success', successCallback);
 		naja.addEventListener('error', errorCallback);
 		naja.addEventListener('complete', completeCallback);
@@ -164,6 +180,7 @@ describe('makeRequest()', function () {
 				))
 			));
 
+			assert.isFalse(payloadCallback.called);
 			assert.isFalse(successCallback.called);
 		});
 	});
@@ -191,12 +208,14 @@ describe('makeRequest()', function () {
 
 		const beforeCallback = sinon.spy();
 		const startCallback = sinon.spy();
+		const payloadCallback = sinon.spy();
 		const successCallback = sinon.spy();
 		const errorCallback = sinon.spy();
 		const completeCallback = sinon.spy();
 
 		naja.addEventListener('before', beforeCallback);
 		naja.addEventListener('start', startCallback);
+		naja.addEventListener('payload', payloadCallback);
 		naja.addEventListener('success', successCallback);
 		naja.addEventListener('error', errorCallback);
 		naja.addEventListener('complete', completeCallback);
@@ -254,6 +273,7 @@ describe('makeRequest()', function () {
 				))
 			));
 
+			assert.isFalse(payloadCallback.called);
 			assert.isFalse(successCallback.called);
 		});
 	});
@@ -280,10 +300,12 @@ describe('makeRequest()', function () {
 		cleanPopstateListener(naja.historyHandler);
 
 		const abortCallback = sinon.spy();
+		const payloadCallback = sinon.spy();
 		const successCallback = sinon.spy();
 		const errorCallback = sinon.spy();
 		const completeCallback = sinon.spy();
 		naja.addEventListener('abort', abortCallback);
+		naja.addEventListener('payload', payloadCallback);
 		naja.addEventListener('success', successCallback);
 		naja.addEventListener('error', errorCallback);
 		naja.addEventListener('complete', completeCallback);
@@ -304,6 +326,7 @@ describe('makeRequest()', function () {
 				))
 			));
 
+			assert.isFalse(payloadCallback.called);
 			assert.isFalse(successCallback.called);
 			assert.isFalse(errorCallback.called);
 
