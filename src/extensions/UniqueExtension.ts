@@ -18,9 +18,11 @@ export class UniqueExtension implements Extension {
 	private readonly abortControllers: Map<string, AbortController> = new Map();
 
 	private checkUniqueness(event: InteractionEvent): void {
-		const {element, options} = event.detail;
-		const unique = element.getAttribute('data-naja-unique') ?? (element as HTMLInputElement).form?.getAttribute('data-naja-unique');
-		options.unique = unique === 'off' ? false : unique ?? 'default';
+		const { element, options } = event.detail;
+		const uniqueAttribute = element.getAttribute('data-naja-unique') ?? element.form?.getAttribute('data-naja-unique');
+		const uniqueDefault = options.unique ?? 'default';
+		const unique = uniqueAttribute ?? uniqueDefault;
+		options.unique = unique === 'off' ? false : unique;
 	}
 
 	private abortPreviousRequest(event: StartEvent): void {
