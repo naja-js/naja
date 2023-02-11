@@ -1,6 +1,6 @@
 # Naja documentation
 
-[![Build Status](https://img.shields.io/github/workflow/status/naja-js/naja/Test)](https://github.com/naja-js/naja/actions?query=workflow%3ATest)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/naja-js/naja/test.yml?branch=main)](https://github.com/naja-js/naja/actions?query=workflow%3ATest)
 [![Code Coverage](https://img.shields.io/codecov/c/github/naja-js/naja.svg)](https://codecov.io/gh/naja-js/naja)
 [![latest version](https://img.shields.io/npm/v/naja)](https://npmjs.com/package/naja)
 [![license](https://img.shields.io/npm/l/naja)](https://npmjs.com/package/naja)
