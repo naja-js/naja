@@ -50,7 +50,7 @@ export class SnippetHandler extends EventTarget {
 		});
 	}
 
-	public updateSnippet(snippet: HTMLElement, content: string, fromCache: boolean, options: Options): void {
+	public updateSnippet(snippet: Element, content: string, fromCache: boolean, options: Options): void {
 		let operation = this.op.replace;
 		if ((snippet.hasAttribute('data-naja-snippet-prepend') || snippet.hasAttribute('data-ajax-prepend')) && ! fromCache) {
 			operation = this.op.prepend;
