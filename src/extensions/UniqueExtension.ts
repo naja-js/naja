@@ -19,8 +19,10 @@ export class UniqueExtension implements Extension {
 
 	private checkUniqueness(event: InteractionEvent): void {
 		const {element, options} = event.detail;
-		const unique = element.getAttribute('data-naja-unique') ?? (element as HTMLInputElement).form?.getAttribute('data-naja-unique');
-		options.unique = unique === 'off' ? false : unique ?? 'default';
+		if (element.hasAttribute('data-naja-unique') ?? (element as HTMLInputElement).form?.hasAttribute('data-naja-unique')) {
+			const unique = element.getAttribute('data-naja-unique') ?? (element as HTMLInputElement).form?.getAttribute('data-naja-unique');
+			options.unique = unique === 'off' ? false : unique ?? 'default';
+		}
 	}
 
 	private abortPreviousRequest(event: StartEvent): void {
