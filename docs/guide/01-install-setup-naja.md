@@ -10,7 +10,7 @@ npm install naja
 
 This installs the latest version of Naja and its dependencies into the `node_modules` directory and records the specific installed versions into `package-lock.json` so that your colleagues will get the exact same versions when they set up the project later.
 
-?> You can learn more about various ways to install Naja in [Installation](/installation.md).
+?> You can learn more about alternative ways to install Naja in [Installation](/installation.md).
 
 ## Initialization
 
