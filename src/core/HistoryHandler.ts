@@ -16,6 +16,7 @@ declare module '../Naja' {
 
 export interface HistoryState extends Record<string, any> {
 	source: string;
+	cursor: number;
 	href: string;
 }
 
@@ -28,6 +29,8 @@ export type HistoryMode = boolean | 'replace';
 
 export class HistoryHandler extends EventTarget {
 	private initialized = false;
+	private cursor = 0;
+
 	public popStateHandler = this.handlePopState.bind(this);
 	public historyAdapter: HistoryAdapter;
 
@@ -58,8 +61,14 @@ export class HistoryHandler extends EventTarget {
 			return;
 		}
 
+		let direction: number | undefined;
+		if ('cursor' in state && typeof state.cursor === 'number') {
+			direction = state.cursor - this.cursor;
+			this.cursor = state.cursor;
+		}
+
 		const options = this.naja.prepareOptions();
-		this.dispatchEvent(new CustomEvent('restoreState', {detail: {state, options}}));
+		this.dispatchEvent(new CustomEvent('restoreState', {detail: {state, direction, options}}));
 	}
 
 	private initialize(): void {
@@ -76,7 +85,7 @@ export class HistoryHandler extends EventTarget {
 		const mode = HistoryHandler.normalizeMode(options.history);
 		if (mode !== false && ! this.initialized) {
 			onDomReady(() => this.historyAdapter.replaceState(
-				this.buildState(window.location.href, options),
+				this.buildState(window.location.href, this.cursor, options),
 				window.document.title,
 				window.location.href,
 			));
@@ -122,15 +131,22 @@ export class HistoryHandler extends EventTarget {
 		}
 
 		const method = mode === 'replace' ? 'replaceState' : 'pushState';
+		const cursor = mode === 'replace' ? this.cursor : ++this.cursor;
+
 		this.historyAdapter[method](
-			this.buildState(options.href!, options),
+			this.buildState(options.href!, cursor, options),
 			window.document.title,
 			options.href!,
 		);
 	}
 
-	private buildState(href: string, options: Options): HistoryState {
-		const state: HistoryState = {source: 'naja', href};
+	private buildState(href: string, cursor: number, options: Options): HistoryState {
+		const state: HistoryState = {
+			source: 'naja',
+			cursor,
+			href,
+		};
+
 		this.dispatchEvent(new CustomEvent('buildState', {detail: {state, options}}));
 		return state;
 	}
@@ -140,7 +156,7 @@ export class HistoryHandler extends EventTarget {
 }
 
 export type BuildStateEvent = CustomEvent<{state: HistoryState, options: Options}>;
-export type RestoreStateEvent = CustomEvent<{state: HistoryState, options: Options}>;
+export type RestoreStateEvent = CustomEvent<{state: HistoryState, direction: number | undefined, options: Options}>;
 
 interface HistoryHandlerEventMap {
 	buildState: BuildStateEvent;

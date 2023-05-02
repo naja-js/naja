@@ -230,6 +230,8 @@ The `buildState` event's `detail` has the following properties:
 - `state: Object`, the built state to be stored in the history entry,
 - `options: Object`, the options of the request that caused the history entry to be added.
 
+!> The `state` contains metadata that Naja relies on during restoration. Please do not override these keys: `source`, `cursor`, `href`.
+
 ### restoreState
 
 This event is dispatched when a history state entry is being restored in response to user navigation.
@@ -237,7 +239,10 @@ This event is dispatched when a history state entry is being restored in respons
 The `restoreState` event's `detail` has the following properties:
 
 - `state: Object`, the state that is being restored from the history entry,
+- `direction: number`, a number indicating the direction of the navigation: negative for going back in history, positive for going forward,
 - `options: Object`, the options object constructed from Naja's `defaultOptions`.
+
+?> The `direction` property has been added in Naja 2.6.0.
 
 See the [history integration docs](history.md#history-integration-events) for usage examples.
 

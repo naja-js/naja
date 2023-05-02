@@ -46,7 +46,7 @@ describe('HistoryHandler', function () {
 		const historyHandler = new HistoryHandler(naja);
 
 		const mock = sinon.mock(historyHandler.historyAdapter);
-		mock.expects('replaceState').withExactArgs({source: 'naja', href: 'http://localhost:9876/context.html'}, '', 'http://localhost:9876/context.html').once();
+		mock.expects('replaceState').withExactArgs({source: 'naja', cursor: 0, href: 'http://localhost:9876/context.html'}, '', 'http://localhost:9876/context.html').once();
 
 		historyHandler.replaceInitialState(new CustomEvent('before', {detail: {options: {history: true}}}));
 
@@ -63,7 +63,7 @@ describe('HistoryHandler', function () {
 		naja.historyHandler.initialized = true;
 
 		const mock = sinon.mock(naja.historyHandler.historyAdapter);
-		mock.expects('pushState').withExactArgs({source: 'naja', href: 'http://localhost:9876/HistoryHandler/pushState'}, '', 'http://localhost:9876/HistoryHandler/pushState').once();
+		mock.expects('pushState').withExactArgs({source: 'naja', cursor: 1, href: 'http://localhost:9876/HistoryHandler/pushState'}, '', 'http://localhost:9876/HistoryHandler/pushState').once();
 
 		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {});
 		return naja.makeRequest('GET', '/HistoryHandler/pushState').then(() => {
@@ -81,7 +81,7 @@ describe('HistoryHandler', function () {
 		naja.historyHandler.initialized = true;
 
 		const mock = sinon.mock(naja.historyHandler.historyAdapter);
-		mock.expects('replaceState').withExactArgs({source: 'naja', href: 'http://localhost:9876/HistoryHandler/replaceState'}, '', 'http://localhost:9876/HistoryHandler/replaceState').once();
+		mock.expects('replaceState').withExactArgs({source: 'naja', cursor: 0, href: 'http://localhost:9876/HistoryHandler/replaceState'}, '', 'http://localhost:9876/HistoryHandler/replaceState').once();
 
 		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {});
 		return naja.makeRequest('GET', '/HistoryHandler/replaceState', null, {history: 'replace'}).then(() => {
@@ -99,7 +99,7 @@ describe('HistoryHandler', function () {
 		naja.historyHandler.initialized = true;
 
 		const mock = sinon.mock(naja.historyHandler.historyAdapter);
-		mock.expects('pushState').withExactArgs({source: 'naja', href: '/HistoryHandler/postGet/targetUrl'}, '', '/HistoryHandler/postGet/targetUrl').once();
+		mock.expects('pushState').withExactArgs({source: 'naja', cursor: 1, href: '/HistoryHandler/postGet/targetUrl'}, '', '/HistoryHandler/postGet/targetUrl').once();
 
 		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {url: '/HistoryHandler/postGet/targetUrl', postGet: true});
 		return naja.makeRequest('GET', '/HistoryHandler/postGet').then(() => {
@@ -256,14 +256,19 @@ describe('HistoryHandler', function () {
 			const restoreCallback = sinon.spy();
 			naja.historyHandler.addEventListener('restoreState', restoreCallback);
 
-			const state = {source: 'naja', href: '/HistoryHandler/popState/event'};
+			assert.equal(naja.historyHandler.cursor, 0);
+
+			const state = {source: 'naja', cursor: 1, href: '/HistoryHandler/popState/event'};
 			window.dispatchEvent(createPopstateEvent(state));
+
+			assert.equal(naja.historyHandler.cursor, 1);
 
 			assert.isTrue(restoreCallback.calledOnce);
 			assert.isTrue(restoreCallback.calledWith(
 				sinon.match((event) => event.constructor.name === 'CustomEvent')
 					.and(sinon.match.has('detail', sinon.match.object
 						.and(sinon.match.has('state', state))
+						.and(sinon.match.has('direction', 1))
 						.and(sinon.match.has('options', sinon.match.object))
 					))
 			));

@@ -44,6 +44,7 @@ describe('SnippetCache', function () {
 		const historyAdapterMock = sinon.mock(naja.historyHandler.historyAdapter);
 		historyAdapterMock.expects('pushState').withExactArgs({
 			source: 'naja',
+			cursor: 1,
 			href: 'http://localhost:9876/SnippetCache/store',
 			snippets: {
 				storage: TEST_STORAGE_TYPE,
@@ -97,6 +98,7 @@ describe('SnippetCache', function () {
 
 		window.dispatchEvent(createPopstateEvent({
 			source: 'naja',
+			cursor: 0,
 			href: '/snippetCache/restore',
 			snippets: {
 				storage: TEST_STORAGE_TYPE,
@@ -278,7 +280,7 @@ describe('SnippetCache', function () {
 					sinon.match((event) => event.constructor.name === 'CustomEvent')
 						.and(sinon.match.has('detail', sinon.match.object
 							.and(sinon.match.has('snippets', {'snippet-cache-foo': 'foo'}))
-							.and(sinon.match.has('state', {source: 'naja', href: 'http://localhost:9876/SnippetCache/storeEvent', snippets: {storage: TEST_STORAGE_TYPE, key: 'key'}}))
+							.and(sinon.match.has('state', {source: 'naja', cursor: 1, href: 'http://localhost:9876/SnippetCache/storeEvent', snippets: {storage: TEST_STORAGE_TYPE, key: 'key'}}))
 							.and(sinon.match.has('options', {snippetCache: TEST_STORAGE_TYPE, fetch: {}, href: 'http://localhost:9876/SnippetCache/storeEvent'}))
 						))
 				));
