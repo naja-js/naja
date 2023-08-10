@@ -216,7 +216,7 @@ describe('HistoryHandler', function () {
 	});
 
 	describe('event system', function () {
-		it('dispatches event on build state', function () {
+		it('dispatches event on build state during push', function () {
 			const naja = mockNaja({
 				snippetHandler: SnippetHandler,
 				historyHandler: HistoryHandler,
@@ -237,6 +237,38 @@ describe('HistoryHandler', function () {
 					sinon.match((event) => event.constructor.name === 'CustomEvent')
 						.and(sinon.match.has('detail', sinon.match.object
 							.and(sinon.match.has('state', sinon.match.object))
+							.and(sinon.match.has('operation', 'pushState'))
+							.and(sinon.match.has('options', sinon.match.object))
+						))
+				));
+
+				mock.verify();
+				mock.restore();
+			});
+		});
+
+		it('dispatches event on build state during replacement', function () {
+			const naja = mockNaja({
+				snippetHandler: SnippetHandler,
+				historyHandler: HistoryHandler,
+			});
+
+			naja.historyHandler.initialized = true;
+
+			const mock = sinon.mock(naja.historyHandler.historyAdapter);
+			mock.expects('replaceState').once();
+
+			const buildStateCallback = sinon.spy();
+			naja.historyHandler.addEventListener('buildState', buildStateCallback);
+
+			this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {});
+			return naja.makeRequest('GET', '/HistoryHandler/event/replace', null, {history: 'replace'}).then(() => {
+				assert.isTrue(buildStateCallback.calledOnce);
+				assert.isTrue(buildStateCallback.calledWith(
+					sinon.match((event) => event.constructor.name === 'CustomEvent')
+						.and(sinon.match.has('detail', sinon.match.object
+							.and(sinon.match.has('state', sinon.match.object))
+							.and(sinon.match.has('operation', 'replaceState'))
 							.and(sinon.match.has('options', sinon.match.object))
 						))
 				));

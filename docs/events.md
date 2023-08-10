@@ -228,9 +228,12 @@ This event is dispatched when a history entry state is being constructed. You ca
 The `buildState` event's `detail` has the following properties:
 
 - `state: Object`, the built state to be stored in the history entry,
+- `operation: 'pushState' | 'replaceState'`, a value indicating whether the current state is being replaced, or a new state is being pushed,
 - `options: Object`, the options of the request that caused the history entry to be added.
 
 !> The `state` contains metadata that Naja relies on during restoration. Please do not override these keys: `source`, `cursor`, `href`.
+
+?> The `operation` property has been added in Naja 2.6.0.
 
 ### restoreState
 
