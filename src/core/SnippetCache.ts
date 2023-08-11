@@ -1,8 +1,8 @@
 import {Naja, Options} from '../Naja';
 import {InteractionEvent} from './UIHandler';
 import {BuildStateEvent, HistoryState, RestoreStateEvent} from './HistoryHandler';
-import {SnippetHandler} from './SnippetHandler';
-import {TypedEventListener} from '../utils';
+import {AfterUpdateEvent, SnippetHandler} from './SnippetHandler';
+import {onDomReady, TypedEventListener} from '../utils';
 
 declare module '../Naja' {
 	interface Options {
@@ -21,6 +21,7 @@ declare module './HistoryHandler' {
 
 export class SnippetCache extends EventTarget {
 	private readonly storages: Record<SnippetCacheStorageType, SnippetCacheStorage>;
+	private currentSnippets: Map<string, string> = new Map();
 
 	public constructor(private readonly naja: Naja) {
 		super();
@@ -30,6 +31,9 @@ export class SnippetCache extends EventTarget {
 			history: new HistoryCacheStorage(),
 			session: new SessionCacheStorage(),
 		};
+
+		naja.addEventListener('init', this.initializeIndex.bind(this));
+		naja.snippetHandler.addEventListener('afterUpdate', this.updateIndex.bind(this));
 
 		naja.uiHandler.addEventListener('interaction', this.configureCache.bind(this));
 		naja.historyHandler.addEventListener('buildState', this.buildHistoryState.bind(this));
@@ -47,6 +51,39 @@ export class SnippetCache extends EventTarget {
 		}
 
 		return this.storages[storageType];
+	}
+
+	private static shouldCacheSnippet(snippet: Element): boolean {
+		return ! snippet.hasAttribute('data-naja-history-nocache')
+			&& ! snippet.hasAttribute('data-history-nocache')
+			&& ( ! snippet.hasAttribute('data-naja-snippet-cache')
+				|| snippet.getAttribute('data-naja-snippet-cache') !== 'off');
+	}
+
+	private initializeIndex(): void {
+		onDomReady(() => {
+			const currentSnippets = SnippetHandler.findSnippets(SnippetCache.shouldCacheSnippet);
+			this.currentSnippets = new Map(Object.entries(currentSnippets));
+		});
+	}
+
+	private updateIndex(event: AfterUpdateEvent): void {
+		const {snippet, content, operation} = event.detail;
+		if ( ! SnippetCache.shouldCacheSnippet(snippet)) {
+			return;
+		}
+
+		const currentContent = this.currentSnippets.get(snippet.id) ?? '';
+
+		if (operation === this.naja.snippetHandler.op.replace) {
+			this.currentSnippets.set(snippet.id, content);
+		} else if (operation === this.naja.snippetHandler.op.append) {
+			this.currentSnippets.set(snippet.id, currentContent + content);
+		} else if (operation === this.naja.snippetHandler.op.prepend) {
+			this.currentSnippets.set(snippet.id, content + currentContent);
+		} else {
+			this.currentSnippets.set(snippet.id, snippet.innerHTML);
+		}
 	}
 
 	private configureCache(event: InteractionEvent): void {
@@ -75,12 +112,8 @@ export class SnippetCache extends EventTarget {
 			options.snippetCache = options.historyUiCache;
 		}
 
-		const snippets = SnippetHandler.findSnippets((snippet) =>
-			! snippet.hasAttribute('data-naja-history-nocache')
-			&& ! snippet.hasAttribute('data-history-nocache')
-			&& ( ! snippet.hasAttribute('data-naja-snippet-cache')
-				|| snippet.getAttribute('data-naja-snippet-cache') !== 'off')
-		);
+		const presentSnippetIds = Object.keys(SnippetHandler.findSnippets(SnippetCache.shouldCacheSnippet));
+		const snippets = Object.fromEntries(Array.from(this.currentSnippets).filter(([id]) => presentSnippetIds.includes(id)));
 
 		if ( ! this.dispatchEvent(new CustomEvent('store', {cancelable: true, detail: {snippets, state, options}}))) {
 			return;
