@@ -112,6 +112,58 @@ describe('SnippetCache', function () {
 		cleanPopstateListener(naja.historyHandler);
 	});
 
+	it('maintains a map of snippets', function () {
+		const naja = mockNaja({
+			snippetHandler: SnippetHandler,
+			historyHandler: HistoryHandler,
+			snippetCache: SnippetCache,
+		});
+
+		const testStorage = new TestSnippetCacheStorage();
+		naja.snippetCache.storages[TEST_STORAGE_TYPE] = testStorage;
+
+		naja.historyHandler.initialized = true;
+
+		const historyAdapterMock = sinon.mock(naja.historyHandler.historyAdapter);
+		historyAdapterMock.expects('pushState').withExactArgs({
+			source: 'naja',
+			cursor: 1,
+			href: 'http://localhost:9876/SnippetCache/map',
+			snippets: {
+				storage: TEST_STORAGE_TYPE,
+				key: 'key',
+			},
+		}, '', 'http://localhost:9876/SnippetCache/map').once();
+
+		const el = document.createElement('div');
+		el.id = 'snippet-cache-map';
+		el.innerHTML = '<span>foo</span>';
+		el.setAttribute('data-naja-snippet-append', '1');
+		document.body.appendChild(el);
+
+		const ignoredEl = document.createElement('div');
+		ignoredEl.id = 'snippet-cache-map-2';
+		ignoredEl.setAttribute('data-naja-snippet-cache', 'off');
+		document.body.appendChild(ignoredEl);
+
+		naja.snippetCache.initializeIndex(new CustomEvent('init'));
+		naja.snippetHandler.addEventListener('afterUpdate', (event) => {
+			event.detail.snippet.innerHTML = '<span>baz</span>';
+		});
+
+		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet-cache-map': '<span>bar</span>'}});
+		return naja.makeRequest('GET', '/SnippetCache/map', null, {snippetCache: TEST_STORAGE_TYPE}).then(() => {
+			assert.equal(el.innerHTML, '<span>baz</span>');
+
+			assert.deepEqual(testStorage.snippets, {'snippet-cache-map': '<span>foo</span><span>bar</span>'});
+			historyAdapterMock.verify();
+			historyAdapterMock.restore();
+
+			document.body.removeChild(el);
+			document.body.removeChild(ignoredEl);
+		});
+	});
+
 	describe('storages', function () {
 		it('off', function () {
 			const naja = mockNaja();
