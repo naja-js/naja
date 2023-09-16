@@ -1,21 +1,15 @@
-import babel from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
+import terser from '@rollup/plugin-terser';
 import typescript from '@rollup/plugin-typescript';
-import {terser} from 'rollup-plugin-terser';
 import path from 'path';
 
-import pkg from './package.json';
+import pkg from './package.json' assert { type: 'json' };
+
 const output = {
 	banner: `/*\n * Naja.js\n * ${pkg.version}\n *\n * by Jiří Pudil <https://jiripudil.cz>\n */`,
 	sourcemap: true,
 };
-
-const babelPlugin = babel({
-	exclude: /node_modules/,
-	include: 'src/**',
-	babelHelpers: 'runtime',
-});
 
 export default [
 	{
@@ -35,7 +29,6 @@ export default [
 			resolve(),
 			commonjs(),
 			typescript(),
-			babelPlugin,
 		],
 	},
 	{
@@ -73,7 +66,6 @@ export default [
 			resolve(),
 			commonjs(),
 			typescript(),
-			babelPlugin,
 			terser(),
 		],
 	},
@@ -91,7 +83,6 @@ export default [
 			resolve(),
 			commonjs(),
 			typescript(),
-			babelPlugin,
 		],
 	},
 ];

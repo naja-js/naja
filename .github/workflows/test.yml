@@ -16,8 +16,8 @@ jobs:
         with:
           node-version: lts/*
           cache: yarn
-      - run: yarn install --frozen-lockfile
-      - run: yarn run playwright install-deps
+      - run: yarn install --immutable
+      - run: yarn run playwright install --with-deps
       - run: yarn lint
       - run: yarn build # type check
       - run: yarn test
