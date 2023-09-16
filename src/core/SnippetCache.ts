@@ -23,6 +23,8 @@ export class SnippetCache extends EventTarget {
 	private readonly storages: Record<SnippetCacheStorageType, SnippetCacheStorage>;
 	private currentSnippets: Map<string, string> = new Map();
 
+	private static parser = new DOMParser();
+
 	public constructor(private readonly naja: Naja) {
 		super();
 
@@ -83,6 +85,13 @@ export class SnippetCache extends EventTarget {
 			this.currentSnippets.set(snippet.id, content + currentContent);
 		} else {
 			this.currentSnippets.set(snippet.id, snippet.innerHTML);
+		}
+
+		// update nested snippets
+		const snippetContent = SnippetCache.parser.parseFromString(content, 'text/html');
+		const nestedSnippets = SnippetHandler.findSnippets(SnippetCache.shouldCacheSnippet, snippetContent);
+		for (const [id, content] of Object.entries(nestedSnippets)) {
+			this.currentSnippets.set(id, content);
 		}
 	}
 
