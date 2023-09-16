@@ -5,13 +5,10 @@
 coverage/
 node_modules/
 tests/
-.browserslistrc
 .eslintrc
 .gitignore
 .npmignore
 .nycrc
-babel.config.js
 karma.conf.js
-karma.playwright.js
-rollup.config.js
+rollup.config.mjs
 yarn.lock
