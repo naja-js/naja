@@ -1,6 +1,7 @@
 .git/
 .github/
 .idea/
+.yarn/
 coverage/
 node_modules/
 tests/

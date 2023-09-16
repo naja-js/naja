@@ -6,6 +6,12 @@ dist/
 npm-debug.log*
 
 # Dependency management
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
 node_modules/
 
 # Coverage reports
