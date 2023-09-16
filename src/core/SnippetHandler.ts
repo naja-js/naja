@@ -28,9 +28,12 @@ export class SnippetHandler extends EventTarget {
 		});
 	}
 
-	public static findSnippets(predicate?: (snippet: Element) => boolean): Record<string, string> {
+	public static findSnippets(
+		predicate?: (snippet: Element) => boolean,
+		document: Document = window.document,
+	): Record<string, string> {
 		const result: Record<string, string> = {};
-		const snippets = window.document.querySelectorAll('[id^="snippet-"]');
+		const snippets = document.querySelectorAll('[id^="snippet-"]');
 		for (let i = 0; i < snippets.length; i++) {
 			const snippet = snippets.item(i);
 			if (predicate?.(snippet) ?? true) {
