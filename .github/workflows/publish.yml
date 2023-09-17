@@ -8,8 +8,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: crazy-max/ghaction-import-gpg@v4
+      - uses: actions/checkout@v4
+      - uses: crazy-max/ghaction-import-gpg@v6
         with:
           gpg_private_key: ${{ secrets.GPG_SIGNING_KEY }}
           passphrase: ${{ secrets.GPG_SIGNING_KEY_PASSPHRASE }}
@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: lts/*
           cache: yarn
-      - run: yarn install --frozen-lockfile
+      - run: yarn install --immutable
       - run: yarn build
       - run: |
           gpg --local-user B352BC4C --armor --detach-sig dist/Naja.js
@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v3
         with:
           name: dist-files
@@ -54,12 +54,12 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v3
         with:
           name: dist-files
           path: dist/
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: lts/*
           registry-url: 'https://registry.npmjs.org'
