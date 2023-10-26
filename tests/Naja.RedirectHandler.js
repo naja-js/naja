@@ -234,5 +234,30 @@ describe('RedirectHandler', function () {
 				))
 			));
 		});
+
+		it('can alter URL', function () {
+			const naja = mockNaja();
+			const redirectHandler = new RedirectHandler(naja);
+
+			const redirectCallback = sinon.spy((event) => event.detail.setUrl('/RedirectHandler/event/overridden'));
+			redirectHandler.addEventListener('redirect', redirectCallback);
+
+			const mock = sinon.mock(redirectHandler.locationAdapter);
+			mock.expects('assign')
+				.withExactArgs('/RedirectHandler/event/overridden')
+				.once();
+
+			redirectHandler.makeRedirect('/RedirectHandler/event/original', true);
+			mock.verify();
+
+			assert.isTrue(redirectCallback.calledOnce);
+			assert.isTrue(redirectCallback.calledWith(
+				sinon.match((event) => event.constructor.name === 'CustomEvent')
+					.and(sinon.match.has('detail', sinon.match.object
+						.and(sinon.match.has('url', '/RedirectHandler/event/original'))
+						.and(sinon.match.has('isHardRedirect', true))
+					))
+			));
+		});
 	});
 });

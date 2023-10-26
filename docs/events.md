@@ -212,9 +212,12 @@ This event is dispatched before a redirect is made. The event's `preventDefault(
 The `redirect` event's `detail` has the following properties:
 
 - `url: string`, the target URL,
+- `setUrl: (url: string) => void`, a method which can be called to alter the target URL,
 - `isHardRedirect: boolean`, a flag telling whether the redirect is going to be a hard one,
 - `setHardRedirect: (value: boolean) => void`, a method which can be called to override the hard redirect flag,
 - `options: Object`.
+
+?> The `setUrl()` method has been added in Naja 2.6.0.
 
 See the [redirection docs](redirection.md#redirect-event) for usage examples.
 
