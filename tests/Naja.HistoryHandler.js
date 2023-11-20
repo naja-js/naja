@@ -5,6 +5,7 @@ import {createPopstateEvent} from './setup/createPopstateEvent';
 import {assert} from 'chai';
 import sinon from 'sinon';
 
+import {RedirectHandler} from '../src/core/RedirectHandler';
 import {SnippetHandler} from '../src/core/SnippetHandler';
 import {HistoryHandler} from '../src/core/HistoryHandler';
 import {UIHandler} from '../src/core/UIHandler';
@@ -124,6 +125,35 @@ describe('HistoryHandler', function () {
 			mock.verify();
 			mock.restore();
 		});
+	});
+
+	it('uses correct url when redirected', function () {
+		const naja = mockNaja({
+			uiHandler: UIHandler,
+			redirectHandler: RedirectHandler,
+			snippetHandler: SnippetHandler,
+			historyHandler: HistoryHandler,
+		});
+
+		naja.historyHandler.initialized = true;
+
+		const mock = sinon.mock(naja.historyHandler.historyAdapter);
+		mock.expects('pushState').withExactArgs({source: 'naja', cursor: 1, href: '/HistoryHandler/redirect/targetUrl'}, '', '/HistoryHandler/redirect/targetUrl').once();
+		mock.expects('replaceState').never();
+
+		this.fetchMock.when((request) => request.url.endsWith('/redirect'))
+			.respond(200, {'Content-Type': 'application/json'}, {redirect: '/HistoryHandler/redirect/targetUrl'});
+
+		this.fetchMock.when((request) => request.url.endsWith('/redirect/targetUrl'))
+			.respond(200, {'Content-Type': 'application/json'}, {});
+
+		const makeRequestSpy = sinon.spy(naja, 'makeRequest');
+		return naja.makeRequest('GET', '/HistoryHandler/redirect')
+			.then(() => makeRequestSpy.getCall(1).returnValue) // wait for RedirectHandler's inner naja.makeRequest() to resolve
+			.then(() => {
+				mock.verify();
+				mock.restore();
+			});
 	});
 
 	describe('configures mode properly on interaction', function () {

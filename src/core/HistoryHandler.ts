@@ -1,4 +1,5 @@
 import {BeforeEvent, Naja, Options, SuccessEvent} from '../Naja';
+import {RedirectEvent} from './RedirectHandler';
 import {InteractionEvent} from './UIHandler';
 import {onDomReady, TypedEventListener} from '../utils';
 
@@ -42,6 +43,8 @@ export class HistoryHandler extends EventTarget {
 		naja.addEventListener('before', this.replaceInitialState.bind(this));
 		naja.addEventListener('success', this.pushNewState.bind(this));
 
+		naja.redirectHandler.addEventListener('redirect', this.saveRedirectedUrl.bind(this));
+
 		naja.uiHandler.addEventListener('interaction', this.configureMode.bind(this));
 
 		this.historyAdapter = {
@@ -75,6 +78,11 @@ export class HistoryHandler extends EventTarget {
 	private saveUrl(event: BeforeEvent): void {
 		const {url, options} = event.detail;
 		options.href ??= url;
+	}
+
+	private saveRedirectedUrl(event: RedirectEvent): void {
+		const {url, options} = event.detail;
+		options.href = url;
 	}
 
 	private replaceInitialState(event: BeforeEvent): void {
