@@ -4,7 +4,7 @@ import {assert} from 'chai';
 import sinon from 'sinon';
 
 import {ScriptLoader} from '../src/core/ScriptLoader';
-
+import {SnippetHandler} from '../src/core/SnippetHandler';
 
 describe('ScriptLoader', function () {
 	fakeFetch();
@@ -22,18 +22,26 @@ describe('ScriptLoader', function () {
 	});
 
 	it('loads scripts in snippets', function () {
-		const naja = mockNaja();
+		const naja = mockNaja({
+			snippetHandler: SnippetHandler,
+		});
+
+		const foo = document.createElement('div');
+		foo.id = 'snippet--foo';
+		document.body.appendChild(foo);
+
 		const scriptLoader = new ScriptLoader(naja);
 		naja.initialize();
 
 		const mock = sinon.mock(scriptLoader);
 		mock.expects('loadScripts')
-			.withExactArgs({'snippet--foo': 'foo'})
+			.withExactArgs('foo')
 			.once();
 
 		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet--foo': 'foo'}});
 		return naja.makeRequest('GET', '/ScriptLoader/loadScripts').then(() => {
 			mock.verify();
+			document.body.removeChild(foo);
 		});
 	});
 

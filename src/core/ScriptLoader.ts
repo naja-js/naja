@@ -15,51 +15,60 @@ export class ScriptLoader {
 				});
 			});
 
-			naja.addEventListener('success', (event) => {
-				const {payload} = event.detail;
-				if (payload.snippets) {
-					this.loadScripts(payload.snippets);
-				}
+			naja.snippetHandler.addEventListener('afterUpdate', (event) => {
+				const {content} = event.detail;
+				this.loadScripts(content);
 			});
 		});
 	}
 
-	public loadScripts(snippets: Record<string, string>): void {
-		Object.keys(snippets).forEach((id) => {
-			const content = snippets[id];
-			if ( ! /<script/i.test(content)) {
-				return;
-			}
+	public loadScripts(content: string): void;
+	public loadScripts(snippets: Record<string, string>): void;
+	public loadScripts(snippetsOrSnippet: Record<string, string> | string): void {
+		if (typeof snippetsOrSnippet === 'string') {
+			this.loadScriptsInSnippet(snippetsOrSnippet);
+			return;
+		}
 
-			const el = window.document.createElement('div');
-			el.innerHTML = content;
-
-			const scripts = el.querySelectorAll('script');
-			for (let i = 0; i < scripts.length; i++) {
-				const script = scripts.item(i);
-				const scriptId = script.getAttribute('data-naja-script-id');
-				if (scriptId !== null && scriptId !== '' && this.loadedScripts.has(scriptId)) {
-					continue;
-				}
-
-				const scriptEl = window.document.createElement('script');
-				scriptEl.innerHTML = script.innerHTML;
-
-				if (script.hasAttributes()) {
-					const attrs = script.attributes;
-					for (let j = 0; j < attrs.length; j++) {
-						const attrName = attrs[j].name;
-						scriptEl.setAttribute(attrName, attrs[j].value);
-					}
-				}
-
-				window.document.head.appendChild(scriptEl)
-					.parentNode!.removeChild(scriptEl);
-
-				if (scriptId !== null && scriptId !== '') {
-					this.loadedScripts.add(scriptId);
-				}
-			}
+		Object.keys(snippetsOrSnippet).forEach((id) => {
+			const content = snippetsOrSnippet[id];
+			this.loadScriptsInSnippet(content);
 		});
+	}
+
+	private loadScriptsInSnippet(content: string) {
+		if (!/<script/i.test(content)) {
+			return;
+		}
+
+		const el = window.document.createElement('div');
+		el.innerHTML = content;
+
+		const scripts = el.querySelectorAll('script');
+		for (let i = 0; i < scripts.length; i++) {
+			const script = scripts.item(i);
+			const scriptId = script.getAttribute('data-naja-script-id');
+			if (scriptId !== null && scriptId !== '' && this.loadedScripts.has(scriptId)) {
+				continue;
+			}
+
+			const scriptEl = window.document.createElement('script');
+			scriptEl.innerHTML = script.innerHTML;
+
+			if (script.hasAttributes()) {
+				const attrs = script.attributes;
+				for (let j = 0; j < attrs.length; j++) {
+					const attrName = attrs[j].name;
+					scriptEl.setAttribute(attrName, attrs[j].value);
+				}
+			}
+
+			window.document.head.appendChild(scriptEl)
+				.parentNode!.removeChild(scriptEl);
+
+			if (scriptId !== null && scriptId !== '') {
+				this.loadedScripts.add(scriptId);
+			}
+		}
 	}
 }
