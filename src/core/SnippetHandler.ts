@@ -7,15 +7,38 @@ declare module '../Naja' {
 	}
 }
 
-type SnippetUpdateOperation = (snippet: Element, content: string) => void;
+type SnippetUpdateOperation =
+	((snippet: Element, content: string) => void) | {
+		updateElement(snippet: Element, content: string): void;
+		updateIndex(currentContent: string, newContent: string): string;
+	};
 
 export class SnippetHandler extends EventTarget {
 	public readonly op: Record<'replace' | 'prepend' | 'append', SnippetUpdateOperation> = {
-		replace: (snippet, content) => {
-			snippet.innerHTML = content;
+		replace: {
+			updateElement(snippet, content) {
+				snippet.innerHTML = content;
+			},
+			updateIndex(_, newContent) {
+				return newContent;
+			},
 		},
-		prepend: (snippet, content) => snippet.insertAdjacentHTML('afterbegin', content),
-		append: (snippet, content) => snippet.insertAdjacentHTML('beforeend', content),
+		prepend: {
+			updateElement(snippet, content) {
+				snippet.insertAdjacentHTML('afterbegin', content);
+			},
+			updateIndex(currentContent, newContent) {
+				return newContent + currentContent;
+			},
+		},
+		append: {
+			updateElement(snippet, content) {
+				snippet.insertAdjacentHTML('beforeend', content);
+			},
+			updateIndex(currentContent, newContent) {
+				return currentContent + newContent;
+			},
+		},
 	};
 
 	public constructor(private readonly naja: Naja) {
@@ -79,11 +102,8 @@ export class SnippetHandler extends EventTarget {
 			return;
 		}
 
-		if (snippet.tagName.toLowerCase() === 'title') {
-			document.title = content;
-		} else {
-			operation(snippet, content);
-		}
+		const updateElement = typeof operation === 'function' ? operation : operation.updateElement;
+		updateElement(snippet, content);
 
 		this.dispatchEvent(new CustomEvent('afterUpdate', {
 			cancelable: true,
