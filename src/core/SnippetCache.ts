@@ -76,16 +76,14 @@ export class SnippetCache extends EventTarget {
 		}
 
 		const currentContent = this.currentSnippets.get(snippet.id) ?? '';
+		const updateIndex = typeof operation === 'object'
+			? operation.updateIndex
+			: () => content;
 
-		if (operation === this.naja.snippetHandler.op.replace) {
-			this.currentSnippets.set(snippet.id, content);
-		} else if (operation === this.naja.snippetHandler.op.append) {
-			this.currentSnippets.set(snippet.id, currentContent + content);
-		} else if (operation === this.naja.snippetHandler.op.prepend) {
-			this.currentSnippets.set(snippet.id, content + currentContent);
-		} else {
-			this.currentSnippets.set(snippet.id, snippet.innerHTML);
-		}
+		this.currentSnippets.set(
+			snippet.id,
+			updateIndex(currentContent, content),
+		);
 
 		// update nested snippets
 		const snippetContent = SnippetCache.parser.parseFromString(content, 'text/html');
