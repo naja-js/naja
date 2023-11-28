@@ -9,6 +9,14 @@ import {UIHandler} from '../src/core/UIHandler';
 
 
 describe('FormsHandler', function () {
+	before(function (done ) {
+		const netteForms = document.createElement('script');
+		netteForms.src = 'https://unpkg.com/nette-forms/src/assets/netteForms.js';
+		netteForms.onload = () => done();
+
+		document.body.appendChild(netteForms);
+	});
+
 	it('constructor()', function () {
 		const naja = mockNaja();
 		const mock = sinon.mock(naja);

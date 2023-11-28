@@ -21,7 +21,6 @@ export default [
 			format: 'esm',
 		},
 		external: [
-			/@babel\/runtime/,
 			...Object.keys(pkg.dependencies || {}),
 			...Object.keys(pkg.peerDependencies || {}),
 		],
@@ -40,7 +39,6 @@ export default [
 			format: 'esm',
 		},
 		external: [
-			/@babel\/runtime/,
 			...Object.keys(pkg.dependencies || {}),
 			...Object.keys(pkg.peerDependencies || {}),
 		],

@@ -46,7 +46,8 @@ describe('HistoryHandler', function () {
 		const historyHandler = new HistoryHandler(naja);
 
 		const mock = sinon.mock(historyHandler.historyAdapter);
-		mock.expects('replaceState').withExactArgs({source: 'naja', cursor: 0, href: 'http://localhost:9876/context.html'}, '', 'http://localhost:9876/context.html').once();
+		const href = sinon.match.string.and(sinon.match((value) => value.startsWith('http://localhost:9876/?wtr-session-id=')));
+		mock.expects('replaceState').withExactArgs({source: 'naja', cursor: 0, href}, '', href).once();
 
 		historyHandler.replaceInitialState(new CustomEvent('before', {detail: {options: {history: true}}}));
 

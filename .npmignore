@@ -8,7 +8,7 @@ tests/
 .eslintrc
 .gitignore
 .npmignore
-.nycrc
-karma.conf.js
+.yarnrc.yml
 rollup.config.mjs
+web-test-runner.config.mjs
 yarn.lock
