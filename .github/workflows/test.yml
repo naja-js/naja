@@ -22,3 +22,5 @@ jobs:
       - run: yarn build # type check
       - run: yarn test
       - uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
