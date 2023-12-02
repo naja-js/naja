@@ -188,6 +188,20 @@ The event's `detail` has the following properties:
 - `changeOperation: (operation: (snippet: Element, content: string) => void) => void`, a method that can be called to override the snippet update `operation`,
 - `options: Object`.
 
+### update
+
+This event is dispatched right before the now asynchronous update is invoked, and only if the update has not been prevented in `beforeUpdate` event. This event allows you to react to a snippet update synchronously, as opposed to `afterUpdate` that is only dispatched after the update operation resolves.
+
+The event's `detail` has the following properties:
+
+- `snippet: Element`, the snippet element,
+- `content: string`, the new content from response payload,
+- `fromCache: boolean`, a flag telling whether the snippet is being updated from cache after user navigation through history, or as a result of a request to the server,
+- `operation: (snippet: Element, content: string) => void`, the operation that has been done with the snippet and its new content,
+- `options: Object`.
+
+?> The `update` event has been added in Naja 3.0.0.
+
 ### afterUpdate
 
 This event is dispatched *after* updating the contents of each and every snippet. If the snippet update has been prevented by canceling the `beforeUpdate` event, this event is not dispatched for given snippet.
