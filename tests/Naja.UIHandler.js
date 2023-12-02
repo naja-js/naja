@@ -109,7 +109,7 @@ describe('UIHandler', function () {
 			document.body.removeChild(customSelectorLink);
 		});
 
-		it('binds after snippet update', function () {
+		it('binds after snippet update', async function () {
 			const snippetDiv = document.createElement('div');
 			snippetDiv.id = 'snippet-uiHandler-snippet-bind';
 			document.body.appendChild(snippetDiv);
@@ -121,7 +121,7 @@ describe('UIHandler', function () {
 			naja.uiHandler.handler = sinon.spy((evt) => evt.preventDefault());
 			naja.initialize();
 
-			naja.snippetHandler.updateSnippets({
+			await naja.snippetHandler.updateSnippets({
 				'snippet-uiHandler-snippet-bind': '<a href="/UIHandler/snippetBind" class="ajax" id="uiHandler-snippet-bind">test</a>',
 			});
 

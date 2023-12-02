@@ -35,7 +35,7 @@ describe('SnippetHandler', function () {
 		});
 	});
 
-	it('updateSnippets()', function () {
+	it('updateSnippets()', async function () {
 		const naja = mockNaja();
 		const snippetHandler = new SnippetHandler(naja);
 
@@ -56,7 +56,7 @@ describe('SnippetHandler', function () {
 			.withExactArgs(snippet2, 'bar.baz', false, {})
 			.once();
 
-		snippetHandler.updateSnippets({
+		await snippetHandler.updateSnippets({
 			'snippet--foo': 'foo',
 			'snippet-bar-baz': 'bar.baz',
 			'snippet--qux': 'is not there',
@@ -67,7 +67,7 @@ describe('SnippetHandler', function () {
 		document.body.removeChild(snippet2);
 	});
 
-	it('updateSnippet', function () {
+	it('updateSnippet', async function () {
 		const naja = mockNaja();
 		const snippetHandler = new SnippetHandler(naja);
 
@@ -77,12 +77,12 @@ describe('SnippetHandler', function () {
 		document.body.appendChild(el);
 
 		assert.equal(el.innerHTML, 'Foo');
-		snippetHandler.updateSnippet(el, 'Bar', false, {});
+		await snippetHandler.updateSnippet(el, 'Bar', false, {});
 		assert.equal(el.innerHTML, 'Bar');
 		document.body.removeChild(el);
 	});
 
-	it('updateSnippet() title', function () {
+	it('updateSnippet() title', async function () {
 		const naja = mockNaja();
 		const snippetHandler = new SnippetHandler(naja);
 
@@ -98,13 +98,13 @@ describe('SnippetHandler', function () {
 		assert.equal(titleEl.innerHTML, 'Foo');
 		assert.equal(document.title, 'Foo');
 
-		snippetHandler.updateSnippet(titleEl, 'Bar', false, {});
+		await snippetHandler.updateSnippet(titleEl, 'Bar', false, {});
 
 		assert.equal(titleEl.innerHTML, 'Bar');
 		assert.equal(document.title, 'Bar');
 	});
 
-	it('updateSnippet() [data-ajax-prepend]', function () {
+	it('updateSnippet() [data-ajax-prepend]', async function () {
 		const naja = mockNaja();
 		const snippetHandler = new SnippetHandler(naja);
 
@@ -115,12 +115,12 @@ describe('SnippetHandler', function () {
 		document.body.appendChild(el);
 
 		assert.equal(el.innerHTML, 'Foo');
-		snippetHandler.updateSnippet(el, 'prefix-', false, {});
+		await snippetHandler.updateSnippet(el, 'prefix-', false, {});
 		assert.equal(el.innerHTML, 'prefix-Foo');
 		document.body.removeChild(el);
 	});
 
-	it('updateSnippet() [data-ajax-append]', function () {
+	it('updateSnippet() [data-ajax-append]', async function () {
 		const naja = mockNaja();
 		const snippetHandler = new SnippetHandler(naja);
 
@@ -131,12 +131,12 @@ describe('SnippetHandler', function () {
 		document.body.appendChild(el);
 
 		assert.equal(el.innerHTML, 'Foo');
-		snippetHandler.updateSnippet(el, '-suffix', false, {});
+		await snippetHandler.updateSnippet(el, '-suffix', false, {});
 		assert.equal(el.innerHTML, 'Foo-suffix');
 		document.body.removeChild(el);
 	});
 
-	it('updateSnippet() fromCache', function () {
+	it('updateSnippet() fromCache', async function () {
 		const naja = mockNaja();
 		const snippetHandler = new SnippetHandler(naja);
 
@@ -147,12 +147,12 @@ describe('SnippetHandler', function () {
 		document.body.appendChild(el);
 
 		assert.equal(el.innerHTML, 'Foo');
-		snippetHandler.updateSnippet(el, 'new content', true, {});
+		await snippetHandler.updateSnippet(el, 'new content', true, {});
 		assert.equal(el.innerHTML, 'new content');
 		document.body.removeChild(el);
 	});
 
-	it('updateSnippet() events', function () {
+	it('updateSnippet() events', async function () {
 		const naja = mockNaja();
 		const snippetHandler = new SnippetHandler(naja);
 
@@ -165,7 +165,7 @@ describe('SnippetHandler', function () {
 		el.id = 'snippet--foo';
 		el.innerHTML = 'Foo';
 		document.body.appendChild(el);
-		snippetHandler.updateSnippet(el, 'Bar', false, {});
+		await snippetHandler.updateSnippet(el, 'Bar', false, {});
 
 		assert.isTrue(beforeCallback.calledOnce);
 		assert.isTrue(beforeCallback.calledWith(
@@ -193,7 +193,7 @@ describe('SnippetHandler', function () {
 		document.body.removeChild(el);
 	});
 
-	it('updateSnippet() beforeUpdate event can cancel the update', function () {
+	it('updateSnippet() beforeUpdate event can cancel the update', async function () {
 		const naja = mockNaja();
 		const snippetHandler = new SnippetHandler(naja);
 
@@ -206,7 +206,7 @@ describe('SnippetHandler', function () {
 		el.id = 'snippet--foo';
 		el.innerHTML = 'Foo';
 		document.body.appendChild(el);
-		snippetHandler.updateSnippet(el, 'Bar', true, {});
+		await snippetHandler.updateSnippet(el, 'Bar', true, {});
 
 		assert.isTrue(beforeCallback.calledOnce);
 		assert.isTrue(beforeCallback.calledWith(
@@ -225,7 +225,7 @@ describe('SnippetHandler', function () {
 		document.body.removeChild(el);
 	});
 
-	it('updateSnippet() beforeUpdate event can change the operation', function () {
+	it('updateSnippet() beforeUpdate event can change the operation', async function () {
 		const naja = mockNaja();
 		const snippetHandler = new SnippetHandler(naja);
 
@@ -236,7 +236,7 @@ describe('SnippetHandler', function () {
 		el.id = 'snippet--foo';
 		el.innerHTML = 'Foo';
 		document.body.appendChild(el);
-		snippetHandler.updateSnippet(el, 'Bar', false, {});
+		await snippetHandler.updateSnippet(el, 'Bar', false, {});
 
 		assert.isTrue(operation.calledOnce);
 		assert.isTrue(operation.calledWith(el, 'Bar'));
