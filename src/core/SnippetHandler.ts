@@ -8,8 +8,8 @@ declare module '../Naja' {
 }
 
 type SnippetUpdateOperation =
-	((snippet: Element, content: string) => void) | {
-		updateElement(snippet: Element, content: string): void;
+	((snippet: Element, content: string) => void | Promise<void>) | {
+		updateElement(snippet: Element, content: string): void | Promise<void>;
 		updateIndex(currentContent: string, newContent: string): string;
 	};
 
@@ -67,16 +67,16 @@ export class SnippetHandler extends EventTarget {
 		return result;
 	}
 
-	public updateSnippets(snippets: Record<string, string>, fromCache = false, options: Options = {}): void {
-		Object.keys(snippets).forEach((id) => {
+	public async updateSnippets(snippets: Record<string, string>, fromCache = false, options: Options = {}): Promise<void> {
+		await Promise.all(Object.keys(snippets).map(async (id) => {
 			const snippet = document.getElementById(id);
 			if (snippet) {
-				this.updateSnippet(snippet, snippets[id], fromCache, options);
+				await this.updateSnippet(snippet, snippets[id], fromCache, options);
 			}
-		});
+		}));
 	}
 
-	public updateSnippet(snippet: Element, content: string, fromCache: boolean, options: Options): void {
+	public async updateSnippet(snippet: Element, content: string, fromCache: boolean, options: Options): Promise<void> {
 		let operation = this.op.replace;
 		if ((snippet.hasAttribute('data-naja-snippet-prepend') || snippet.hasAttribute('data-ajax-prepend')) && ! fromCache) {
 			operation = this.op.prepend;
@@ -103,7 +103,7 @@ export class SnippetHandler extends EventTarget {
 		}
 
 		const updateElement = typeof operation === 'function' ? operation : operation.updateElement;
-		updateElement(snippet, content);
+		await updateElement(snippet, content);
 
 		this.dispatchEvent(new CustomEvent('afterUpdate', {
 			cancelable: true,

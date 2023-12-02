@@ -51,7 +51,7 @@ describe('FormsHandler', function () {
 		document.body.removeChild(form2);
 	});
 
-	it('initializes on snippet update', function () {
+	it('initializes on snippet update', async function () {
 		sinon.spy(window.Nette, 'initForm');
 
 		const snippetDiv = document.createElement('div');
@@ -65,7 +65,7 @@ describe('FormsHandler', function () {
 		});
 		naja.initialize();
 
-		naja.snippetHandler.updateSnippets({
+		await naja.snippetHandler.updateSnippets({
 			'snippet-formsHandler-snippet-init': '<form><input type="hidden" name="test"></form>',
 		});
 
