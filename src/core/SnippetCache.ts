@@ -116,7 +116,6 @@ export class SnippetCache extends EventTarget {
 		}
 
 		this.naja.snippetHandler.updateSnippets(snippets, true, options);
-		this.naja.scriptLoader.loadScripts(snippets);
 	}
 
 	declare public addEventListener: <K extends keyof SnippetCacheEventMap | string>(type: K, listener: TypedEventListener<SnippetHandler, K extends keyof SnippetCacheEventMap ? SnippetCacheEventMap[K] : CustomEvent>, options?: boolean | AddEventListenerOptions) => void;
