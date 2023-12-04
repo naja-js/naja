@@ -10,6 +10,9 @@ export default {
 	port: 9876,
 	nodeResolve: true,
 	coverage: true,
+	coverageConfig: {
+		include: ['src/**/*'],
+	},
 	files: ['tests/*.js'],
 	browsers: [
 		playwrightLauncher({product: 'chromium'}),
