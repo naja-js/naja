@@ -102,7 +102,7 @@ export class SnippetHandler extends EventTarget {
 			return;
 		}
 
-		this.dispatchEvent(new CustomEvent('update', {
+		this.dispatchEvent(new CustomEvent('pendingUpdate', {
 			detail: {
 				snippet,
 				content,
@@ -132,11 +132,11 @@ export class SnippetHandler extends EventTarget {
 }
 
 export type BeforeUpdateEvent = CustomEvent<{snippet: Element, content: string, fromCache: boolean, operation: SnippetUpdateOperation, changeOperation: (value: SnippetUpdateOperation) => void, options: Options}>;
-export type UpdateEvent = CustomEvent<{snippet: Element, content: string, fromCache: boolean, operation: SnippetUpdateOperation, options: Options}>;
+export type PendingUpdateEvent = CustomEvent<{snippet: Element, content: string, fromCache: boolean, operation: SnippetUpdateOperation, options: Options}>;
 export type AfterUpdateEvent = CustomEvent<{snippet: Element, content: string, fromCache: boolean, operation: SnippetUpdateOperation, options: Options}>;
 
 interface SnippetHandlerEventMap {
 	beforeUpdate: BeforeUpdateEvent;
-	update: UpdateEvent;
+	pendingUpdate: PendingUpdateEvent;
 	afterUpdate: AfterUpdateEvent;
 }
