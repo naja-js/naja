@@ -15,7 +15,7 @@ export interface Options extends Record<string, any> {
 export interface Payload extends Record<string, any> {}
 
 export class Naja extends EventTarget {
-	public readonly VERSION: number = 2;
+	public readonly VERSION: number = 3;
 
 	private initialized: boolean = false;
 
