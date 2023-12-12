@@ -184,8 +184,8 @@ The event's `detail` has the following properties:
 - `snippet: Element`, the snippet element,
 - `content: string`, the new content from response payload,
 - `fromCache: boolean`, a flag telling whether the snippet is being updated from cache after user navigation through history, or as a result of a request to the server,
-- `operation: (snippet: Element, content: string) => void`, the operation that is going to be done with the snippet and its new content,
-- `changeOperation: (operation: (snippet: Element, content: string) => void) => void`, a method that can be called to override the snippet update `operation`,
+- `operation: SnippetUpdateOperation`, the operation that is going to be done with the snippet and its new content,
+- `changeOperation: (operation: SnippetUpdateOperation) => | void`, a method that can be called to override the snippet update `operation`,
 - `options: Object`.
 
 ### pendingUpdate
@@ -197,7 +197,7 @@ The event's `detail` has the following properties:
 - `snippet: Element`, the snippet element,
 - `content: string`, the new content from response payload,
 - `fromCache: boolean`, a flag telling whether the snippet is being updated from cache after user navigation through history, or as a result of a request to the server,
-- `operation: (snippet: Element, content: string) => void`, the operation that has been done with the snippet and its new content,
+- `operation: SnippetUpdateOperation`, the operation that will be done with the snippet and its new content,
 - `options: Object`.
 
 ?> The `pendingUpdate` event has been added in Naja 3.0.0.
@@ -211,7 +211,7 @@ The event's `detail` has the following properties:
 - `snippet: Element`, the snippet element,
 - `content: string`, the new content from response payload,
 - `fromCache: boolean`, a flag telling whether the snippet is being updated from cache after user navigation through history, or as a result of a request to the server,
-- `operation: (snippet: Element, content: string) => void`, the operation that has been done with the snippet and its new content, 
+- `operation: SnippetUpdateOperation`, the operation that has been done with the snippet and its new content, 
 - `options: Object`.
 
 See the [snippet handling docs](snippets.md#snippet-update-events) for usage examples.
