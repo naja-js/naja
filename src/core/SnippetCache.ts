@@ -35,7 +35,7 @@ export class SnippetCache extends EventTarget {
 		};
 
 		naja.addEventListener('init', this.initializeIndex.bind(this));
-		naja.snippetHandler.addEventListener('update', this.updateIndex.bind(this));
+		naja.snippetHandler.addEventListener('pendingUpdate', this.updateIndex.bind(this));
 
 		naja.uiHandler.addEventListener('interaction', this.configureCache.bind(this));
 		naja.historyHandler.addEventListener('buildState', this.buildHistoryState.bind(this));
