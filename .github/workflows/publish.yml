@@ -22,7 +22,7 @@ jobs:
       - run: |
           gpg --local-user B352BC4C --armor --detach-sig dist/Naja.js
           gpg --local-user B352BC4C --armor --detach-sig dist/Naja.min.js
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: dist-files
           path: dist/
@@ -32,7 +32,7 @@ jobs:
     needs: [build]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: dist-files
           path: dist/
@@ -55,7 +55,7 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: dist-files
           path: dist/
