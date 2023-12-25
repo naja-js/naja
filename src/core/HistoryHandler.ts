@@ -22,8 +22,8 @@ export interface HistoryState extends Record<string, any> {
 }
 
 export interface HistoryAdapter {
-	replaceState(state: HistoryState, title: string, url: string): void;
-	pushState(state: HistoryState, title: string, url: string): void;
+	replaceState(state: HistoryState, url: string): void;
+	pushState(state: HistoryState, url: string): void;
 }
 
 export type HistoryMode = boolean | 'replace';
@@ -48,8 +48,8 @@ export class HistoryHandler extends EventTarget {
 		naja.uiHandler.addEventListener('interaction', this.configureMode.bind(this));
 
 		this.historyAdapter = {
-			replaceState: (state, title, url) => window.history.replaceState(state, title, url),
-			pushState: (state, title, url) => window.history.pushState(state, title, url),
+			replaceState: (state, url) => window.history.replaceState(state, '', url),
+			pushState: (state, url) => window.history.pushState(state, '', url),
 		};
 	}
 
@@ -91,7 +91,6 @@ export class HistoryHandler extends EventTarget {
 		if (mode !== false && ! this.initialized) {
 			onDomReady(() => this.historyAdapter.replaceState(
 				this.buildState(window.location.href, 'replace', this.cursor, options),
-				window.document.title,
 				window.location.href,
 			));
 
@@ -140,7 +139,6 @@ export class HistoryHandler extends EventTarget {
 
 		this.historyAdapter[method](
 			this.buildState(options.href!, mode, cursor, options),
-			window.document.title,
 			options.href!,
 		);
 	}
