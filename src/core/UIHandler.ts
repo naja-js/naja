@@ -36,9 +36,7 @@ export class UIHandler extends EventTarget {
 		};
 
 		const elements = element.querySelectorAll(selectors);
-		for (let i = 0; i < elements.length; i++) {
-			bindElement(elements.item(i));
-		}
+		elements.forEach((element) => bindElement(element));
 
 		if (element.matches(selectors)) {
 			bindElement(element);
@@ -54,12 +52,10 @@ export class UIHandler extends EventTarget {
 		}
 
 		const forms = element.querySelectorAll(`form${this.selector}`);
-		for (let i = 0; i < forms.length; i++) {
-			bindForm(forms.item(i) as HTMLFormElement);
-		}
+		forms.forEach((form) => bindForm(form as HTMLFormElement));
 	}
 
-	private handleUI(event: Event | MouseEvent): void {
+	private handleUI(event: Event | MouseEvent | SubmitEvent): void {
 		const mouseEvent = event as MouseEvent;
 		if (mouseEvent.altKey || mouseEvent.ctrlKey || mouseEvent.shiftKey || mouseEvent.metaKey || mouseEvent.button) {
 			return;
