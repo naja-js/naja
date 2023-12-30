@@ -157,8 +157,10 @@ describe('SnippetHandler', function () {
 		const snippetHandler = new SnippetHandler(naja);
 
 		const beforeCallback = sinon.spy();
+		const pendingCallback = sinon.spy();
 		const afterCallback = sinon.spy();
 		snippetHandler.addEventListener('beforeUpdate', beforeCallback);
+		snippetHandler.addEventListener('pendingUpdate', pendingCallback);
 		snippetHandler.addEventListener('afterUpdate', afterCallback);
 
 		const el = document.createElement('div');
@@ -174,18 +176,33 @@ describe('SnippetHandler', function () {
 				.and(sinon.match.has('snippet', el))
 				.and(sinon.match.has('content', sinon.match.string))
 				.and(sinon.match.has('fromCache', false))
+				.and(sinon.match.has('operation', snippetHandler.op.replace))
 				.and(sinon.match.has('options', {}))
 			))
 		));
 
-		assert.isTrue(afterCallback.calledOnce);
-		assert.isTrue(afterCallback.calledAfter(beforeCallback));
-		assert.isTrue(beforeCallback.calledWith(
+		assert.isTrue(pendingCallback.calledOnce);
+		assert.isTrue(pendingCallback.calledAfter(beforeCallback));
+		assert.isTrue(pendingCallback.calledWith(
 			sinon.match((event) => event.constructor.name === 'CustomEvent')
 			.and(sinon.match.has('detail', sinon.match.object
 				.and(sinon.match.has('snippet', el))
 				.and(sinon.match.has('content', sinon.match.string))
 				.and(sinon.match.has('fromCache', false))
+				.and(sinon.match.has('operation', snippetHandler.op.replace))
+				.and(sinon.match.has('options', {}))
+			))
+		));
+
+		assert.isTrue(afterCallback.calledOnce);
+		assert.isTrue(afterCallback.calledAfter(pendingCallback));
+		assert.isTrue(afterCallback.calledWith(
+			sinon.match((event) => event.constructor.name === 'CustomEvent')
+			.and(sinon.match.has('detail', sinon.match.object
+				.and(sinon.match.has('snippet', el))
+				.and(sinon.match.has('content', sinon.match.string))
+				.and(sinon.match.has('fromCache', false))
+				.and(sinon.match.has('operation', snippetHandler.op.replace))
 				.and(sinon.match.has('options', {}))
 			))
 		));
@@ -198,8 +215,10 @@ describe('SnippetHandler', function () {
 		const snippetHandler = new SnippetHandler(naja);
 
 		const beforeCallback = sinon.spy((evt) => evt.preventDefault());
+		const pendingCallback = sinon.spy();
 		const afterCallback = sinon.spy();
 		snippetHandler.addEventListener('beforeUpdate', beforeCallback);
+		snippetHandler.addEventListener('pendingUpdate', pendingCallback);
 		snippetHandler.addEventListener('afterUpdate', afterCallback);
 
 		const el = document.createElement('div');
@@ -219,6 +238,7 @@ describe('SnippetHandler', function () {
 			))
 		));
 
+		assert.isFalse(pendingCallback.called);
 		assert.isFalse(afterCallback.called);
 
 		assert.equal(el.innerHTML, 'Foo');
