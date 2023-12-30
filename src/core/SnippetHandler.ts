@@ -7,7 +7,7 @@ declare module '../Naja' {
 	}
 }
 
-type SnippetUpdateOperation =
+export type SnippetUpdateOperation =
 	((snippet: Element, content: string) => void | Promise<void>) | {
 		updateElement(snippet: Element, content: string): void | Promise<void>;
 		updateIndex(currentContent: string, newContent: string): string;
