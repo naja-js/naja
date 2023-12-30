@@ -23,10 +23,6 @@ export class RedirectHandler extends EventTarget {
 
 		naja.uiHandler.addEventListener('interaction', (event) => {
 			const {element, options} = event.detail;
-			if ( ! element) {
-				return;
-			}
-
 			if (element.hasAttribute('data-naja-force-redirect') || (element as HTMLInputElement).form?.hasAttribute('data-naja-force-redirect')) {
 				const value = element.getAttribute('data-naja-force-redirect') ?? (element as HTMLInputElement).form?.getAttribute('data-naja-force-redirect');
 				options.forceRedirect = value !== 'off';
@@ -35,10 +31,12 @@ export class RedirectHandler extends EventTarget {
 
 		naja.addEventListener('success', (event) => {
 			const {payload, options} = event.detail;
-			if (payload.redirect) {
-				this.makeRedirect(payload.redirect, options.forceRedirect ?? false, options);
-				event.stopImmediatePropagation();
+			if ( ! payload.redirect) {
+				return;
 			}
+
+			this.makeRedirect(payload.redirect, options.forceRedirect ?? false, options);
+			event.stopImmediatePropagation();
 		});
 
 		this.locationAdapter = {

@@ -100,12 +100,6 @@ export class HistoryHandler extends EventTarget {
 
 	private configureMode(event: InteractionEvent): void {
 		const {element, options} = event.detail;
-
-		// propagate mode to options
-		if ( ! element) {
-			return;
-		}
-
 		if (element.hasAttribute('data-naja-history') || (element as HTMLInputElement).form?.hasAttribute('data-naja-history')) {
 			const value = element.getAttribute('data-naja-history') ?? (element as HTMLInputElement).form?.getAttribute('data-naja-history');
 			options.history = HistoryHandler.normalizeMode(value);

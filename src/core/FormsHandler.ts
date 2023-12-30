@@ -20,16 +20,17 @@ export class FormsHandler {
 
 	private initForms(element: Element): void {
 		const netteForms = this.netteForms || (window as any).Nette;
-		if (netteForms) {
-			if (element.tagName === 'form') {
-				netteForms.initForm(element);
-			}
-
-			const forms = element.querySelectorAll('form');
-			for (let i = 0; i < forms.length; i++) {
-				netteForms.initForm(forms.item(i));
-			}
+		if ( ! netteForms) {
+			return;
 		}
+
+		if (element.tagName === 'form') {
+			netteForms.initForm(element);
+			return;
+		}
+
+		const forms = element.querySelectorAll('form');
+		forms.forEach((form) => netteForms.initForm(form));
 	}
 
 	private processForm(event: InteractionEvent): void {
@@ -42,11 +43,8 @@ export class FormsHandler {
 
 		const netteForms = this.netteForms || (window as any).Nette;
 		if ((element.tagName === 'FORM' || (element as HTMLInputElement).form) && netteForms && ! netteForms.validateForm(element)) {
-			if (originalEvent) {
-				originalEvent.stopImmediatePropagation();
-				originalEvent.preventDefault();
-			}
-
+			originalEvent?.stopImmediatePropagation();
+			originalEvent?.preventDefault();
 			event.preventDefault();
 		}
 	}

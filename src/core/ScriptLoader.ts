@@ -6,21 +6,23 @@ export class ScriptLoader {
 
 	private static parser = new DOMParser();
 
-	public constructor(naja: Naja) {
-		naja.addEventListener('init', () => {
-			onDomReady(() => {
-				document.querySelectorAll('script[data-naja-script-id]').forEach((script) => {
-					const scriptId = script.getAttribute('data-naja-script-id');
-					if (scriptId !== null && scriptId !== '') {
-						this.loadedScripts.add(scriptId);
-					}
-				});
-			});
+	public constructor(private readonly naja: Naja) {
+		naja.addEventListener('init', this.initialize.bind(this));
+	}
 
-			naja.snippetHandler.addEventListener('afterUpdate', (event) => {
-				const {content} = event.detail;
-				this.loadScripts(content);
+	private initialize(): void {
+		onDomReady(() => {
+			document.querySelectorAll('script[data-naja-script-id]').forEach((script) => {
+				const scriptId = script.getAttribute('data-naja-script-id');
+				if (scriptId !== null && scriptId !== '') {
+					this.loadedScripts.add(scriptId);
+				}
 			});
+		});
+
+		this.naja.snippetHandler.addEventListener('afterUpdate', (event) => {
+			const {content} = event.detail;
+			this.loadScripts(content);
 		});
 	}
 
@@ -46,22 +48,18 @@ export class ScriptLoader {
 		const snippetContent = ScriptLoader.parser.parseFromString(content, 'text/html');
 		const scripts = snippetContent.querySelectorAll('script');
 
-		const scripts = el.querySelectorAll('script');
-		for (let i = 0; i < scripts.length; i++) {
-			const script = scripts.item(i);
+		scripts.forEach((script) => {
 			const scriptId = script.getAttribute('data-naja-script-id');
 			if (scriptId !== null && scriptId !== '' && this.loadedScripts.has(scriptId)) {
-				continue;
+				return;
 			}
 
 			const scriptEl = window.document.createElement('script');
 			scriptEl.innerHTML = script.innerHTML;
 
 			if (script.hasAttributes()) {
-				const attrs = script.attributes;
-				for (let j = 0; j < attrs.length; j++) {
-					const attrName = attrs[j].name;
-					scriptEl.setAttribute(attrName, attrs[j].value);
+				for (const attribute of script.attributes) {
+					scriptEl.setAttribute(attribute.name, attribute.value);
 				}
 			}
 
@@ -71,6 +69,6 @@ export class ScriptLoader {
 			if (scriptId !== null && scriptId !== '') {
 				this.loadedScripts.add(scriptId);
 			}
-		}
+		});
 	}
 }

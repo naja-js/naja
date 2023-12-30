@@ -41,13 +41,15 @@ export class SnippetHandler extends EventTarget {
 		},
 	};
 
-	public constructor(private readonly naja: Naja) {
+	public constructor(naja: Naja) {
 		super();
 		naja.addEventListener('success', (event) => {
 			const {options, payload} = event.detail;
-			if (payload.snippets) {
-				this.updateSnippets(payload.snippets, false, options);
+			if ( ! payload.snippets) {
+				return;
 			}
+
+			this.updateSnippets(payload.snippets, false, options);
 		});
 	}
 
@@ -57,12 +59,11 @@ export class SnippetHandler extends EventTarget {
 	): Record<string, string> {
 		const result: Record<string, string> = {};
 		const snippets = document.querySelectorAll('[id^="snippet-"]');
-		for (let i = 0; i < snippets.length; i++) {
-			const snippet = snippets.item(i);
+		snippets.forEach((snippet) => {
 			if (predicate?.(snippet) ?? true) {
 				result[snippet.id] = snippet.innerHTML;
 			}
-		}
+		});
 
 		return result;
 	}
