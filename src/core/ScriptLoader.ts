@@ -4,6 +4,8 @@ import {onDomReady} from '../utils';
 export class ScriptLoader {
 	private loadedScripts = new Set<string>();
 
+	private static parser = new DOMParser();
+
 	public constructor(naja: Naja) {
 		naja.addEventListener('init', () => {
 			onDomReady(() => {
@@ -41,8 +43,8 @@ export class ScriptLoader {
 			return;
 		}
 
-		const el = window.document.createElement('div');
-		el.innerHTML = content;
+		const snippetContent = ScriptLoader.parser.parseFromString(content, 'text/html');
+		const scripts = snippetContent.querySelectorAll('script');
 
 		const scripts = el.querySelectorAll('script');
 		for (let i = 0; i < scripts.length; i++) {
