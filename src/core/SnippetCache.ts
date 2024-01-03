@@ -1,7 +1,7 @@
 import {Naja, Options} from '../Naja';
 import {InteractionEvent} from './UIHandler';
 import {BuildStateEvent, HistoryState, RestoreStateEvent} from './HistoryHandler';
-import {AfterUpdateEvent, SnippetHandler} from './SnippetHandler';
+import {PendingUpdateEvent, SnippetHandler} from './SnippetHandler';
 import {onDomReady, TypedEventListener} from '../utils';
 
 declare module '../Naja' {
@@ -69,7 +69,7 @@ export class SnippetCache extends EventTarget {
 		});
 	}
 
-	private updateIndex(event: AfterUpdateEvent): void {
+	private updateIndex(event: PendingUpdateEvent): void {
 		const {snippet, content, operation} = event.detail;
 		if ( ! SnippetCache.shouldCacheSnippet(snippet)) {
 			return;
