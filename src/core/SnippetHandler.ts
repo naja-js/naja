@@ -117,7 +117,6 @@ export class SnippetHandler extends EventTarget {
 		await updateElement(snippet, content);
 
 		this.dispatchEvent(new CustomEvent('afterUpdate', {
-			cancelable: true,
 			detail: {
 				snippet,
 				content,
