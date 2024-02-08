@@ -31,8 +31,6 @@
   - [Writing extensions](extensions-custom.md)
   - [Integrating with third-party services](extensions-integration.md)
 
-- [Supported releases](support.md)
-
 ---
 
 - [Upgrading from 1.x](upgrade-from-1.md)
