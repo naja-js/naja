@@ -54,11 +54,24 @@ naja.snippetHandler.addEventListener('beforeUpdate', (event) => {
 });
 ```
 
-Or you can also write your own implementation that accepts the updated `snippet: Element`, and the new `content: string`:
+Or you can also write your own implementation. A snippet update operation needs to implement a pair of methods:
+
+- `updateElement(snippet: Element, content: string): void | Promise<void>`
+
+  This method should update the `snippet` element with the `content` received from the server.
+
+- `updateIndex(currentContent: string, newContent: string): string`
+
+  This method should apply the `newContent` received from the server onto the snippet's [cached](snippet-cache.md) `currentContent`, and return the result.
+
+Example:
 
 ```js
 naja.snippetHandler.addEventListener('beforeUpdate', (event) => {
-    event.detail.changeOperation((snippet, content) => { /* do some super clever Virtual DOM magic here */ });
+    event.detail.changeOperation({
+        updateElement(snippet, content) { /* do some super clever DOM diff magic here */ },
+        updateIndex: (_, newContent) => newContent,
+    });
 });
 ```
 
