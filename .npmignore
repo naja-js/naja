@@ -10,5 +10,6 @@ tests/
 .npmignore
 .yarnrc.yml
 rollup.config.mjs
+tsconfig.json
 web-test-runner.config.mjs
 yarn.lock
