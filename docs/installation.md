@@ -23,7 +23,7 @@ import naja from 'naja';
 Alternatively, you can load Naja directly into your site from a CDN such as UNPKG, or a self-hosted bundled version of Naja which you can download from the [releases archive](https://github.com/naja-js/naja/releases) on Github:
 
 ```html
-<script src="https://unpkg.com/naja@2/dist/Naja.min.js"></script>
+<script src="https://unpkg.com/naja@3/dist/Naja.min.js"></script>
 ```
 
 Naja is then exposed via the `naja` variable in the global context.
