@@ -15,7 +15,7 @@ import naja from 'naja';
 If you're not friends with package managers, you can load a bundled version of Naja directly into your site, e.g. from a CDN, or downloaded from the [releases archive](https://github.com/naja-js/naja/releases):
 
 ```html
-<script src="https://unpkg.com/naja@2/dist/Naja.min.js"></script>
+<script src="https://unpkg.com/naja@3/dist/Naja.min.js"></script>
 ```
 
 Naja is then exposed via the `naja` variable in the global context.
