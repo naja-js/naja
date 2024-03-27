@@ -13,7 +13,7 @@ jobs:
         with:
           gpg_private_key: ${{ secrets.GPG_SIGNING_KEY }}
           passphrase: ${{ secrets.GPG_SIGNING_KEY_PASSPHRASE }}
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: lts/*
           cache: yarn
@@ -37,7 +37,7 @@ jobs:
           name: dist-files
           path: dist/
 
-      - uses: softprops/action-gh-release@v1
+      - uses: softprops/action-gh-release@v2
         with:
           draft: true
           files: |
