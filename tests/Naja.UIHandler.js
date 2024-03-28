@@ -599,4 +599,56 @@ describe('UIHandler', function () {
 			mock.verify();
 		});
 	});
+
+	describe('processInteraction()', function () {
+		it('dispatches request', function () {
+			const naja = mockNaja();
+			const mock = sinon.mock(naja);
+
+			const expectedResult = {answer: 42};
+
+			mock.expects('makeRequest')
+				.withExactArgs('GET', '/UIHandler/processInteraction', null, {})
+				.once()
+				.returns(Promise.resolve(expectedResult));
+
+			const button = document.createElement('button');
+
+			const handler = new UIHandler(naja);
+			return handler.processInteraction(button, 'GET', '/UIHandler/processInteraction')
+				.then((result) => {
+					assert.deepEqual(result, expectedResult);
+					mock.verify();
+				});
+		});
+
+		it('triggers interaction event', function () {
+			const naja = mockNaja();
+			const mock = sinon.mock(naja);
+
+			mock.expects('makeRequest')
+				.withExactArgs('GET', '/UIHandler/processInteraction', null, {})
+				.once();
+
+			const button = document.createElement('button');
+
+			const listener = sinon.spy();
+			const handler = new UIHandler(naja);
+			handler.addEventListener('interaction', listener);
+
+			const event = new MouseEvent('click');
+
+			handler.processInteraction(button, 'GET', '/UIHandler/processInteraction', null, {}, event);
+
+			assert.isTrue(listener.calledWith(
+				sinon.match((event) => event.constructor.name === 'CustomEvent')
+					.and(sinon.match.has('detail', sinon.match.object
+						.and(sinon.match.has('element', button))
+						.and(sinon.match.has('originalEvent', event))
+					))
+			));
+
+			mock.verify();
+		});
+	});
 });
