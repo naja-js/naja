@@ -40,6 +40,26 @@ describe('UIHandler', function () {
 		this.image.classList.add('ajax');
 		this.form3.appendChild(this.image);
 		document.body.appendChild(this.form3);
+
+		// form button.ajax
+		this.form4 = document.createElement('form');
+		this.form4.action = '/UIHandler/defaultSubmit';
+		this.submitButton = document.createElement('button');
+		this.submitButton.name = 'defaultSubmit';
+		this.submitButton.classList.add('ajax');
+		this.form4.appendChild(this.submitButton);
+		document.body.appendChild(this.form4);
+
+		// button[form].ajax
+		this.form5 = document.createElement('form');
+		this.form5.action = '/UIHandler/externalSubmit';
+		this.form5.id = 'externalForm';
+		this.externalButton = document.createElement('button');
+		this.externalButton.setAttribute('form', 'externalForm');
+		this.externalButton.name = 'externalSubmit';
+		this.externalButton.classList.add('ajax');
+		document.body.appendChild(this.form5);
+		document.body.appendChild(this.externalButton);
 	});
 
 	afterEach(function () {
@@ -47,6 +67,9 @@ describe('UIHandler', function () {
 		document.body.removeChild(this.form);
 		document.body.removeChild(this.form2);
 		document.body.removeChild(this.form3);
+		document.body.removeChild(this.form4);
+		document.body.removeChild(this.form5);
+		document.body.removeChild(this.externalButton);
 	});
 
 	it('constructor()', function () {
@@ -86,8 +109,11 @@ describe('UIHandler', function () {
 			this.a.dispatchEvent(createEvent('click'));
 			this.form.dispatchEvent(createEvent('submit'));
 			this.input.dispatchEvent(createEvent('click'));
+			this.image.dispatchEvent(createEvent('click'));
+			this.submitButton.dispatchEvent(createEvent('click'));
+			this.externalButton.dispatchEvent(createEvent('click'));
 
-			assert.isTrue(naja.uiHandler.handler.calledThrice);
+			assert.equal(naja.uiHandler.handler.callCount, 6);
 		});
 
 		it('binds to elements specified by custom selector', function () {
@@ -485,6 +511,52 @@ describe('UIHandler', function () {
 			const evt = {
 				type: 'click',
 				currentTarget: this.image,
+				preventDefault,
+			};
+			handler.handleUI(evt);
+
+			assert.isTrue(preventDefault.called);
+			mock.verify();
+		});
+
+		it('form button.ajax', function () {
+			const naja = mockNaja();
+			const mock = sinon.mock(naja);
+			const containsSubmit = sinon.match((value) => value.has('defaultSubmit'));
+
+			mock.expects('makeRequest')
+				.withExactArgs('GET', '/UIHandler/defaultSubmit', sinon.match.instanceOf(FormData).and(containsSubmit), {fetch: {}})
+				.once();
+
+			const handler = new UIHandler(naja);
+
+			const preventDefault = sinon.spy();
+			const evt = {
+				type: 'click',
+				currentTarget: this.submitButton,
+				preventDefault,
+			};
+			handler.handleUI(evt);
+
+			assert.isTrue(preventDefault.called);
+			mock.verify();
+		});
+
+		it('button[form].ajax', function () {
+			const naja = mockNaja();
+			const mock = sinon.mock(naja);
+			const containsSubmit = sinon.match((value) => value.has('externalSubmit'));
+
+			mock.expects('makeRequest')
+				.withExactArgs('GET', '/UIHandler/externalSubmit', sinon.match.instanceOf(FormData).and(containsSubmit), {fetch: {}})
+				.once();
+
+			const handler = new UIHandler(naja);
+
+			const preventDefault = sinon.spy();
+			const evt = {
+				type: 'click',
+				currentTarget: this.externalButton,
 				preventDefault,
 			};
 			handler.handleUI(evt);

@@ -25,9 +25,12 @@ export class UIHandler extends EventTarget {
 			`input[type="submit"]${this.selector}`,
 			`input[type="image"]${this.selector}`,
 			`button[type="submit"]${this.selector}`,
+			`button[form]:not([type])${this.selector}`,
+			`form button:not([type])${this.selector}`,
 			`form${this.selector} input[type="submit"]`,
 			`form${this.selector} input[type="image"]`,
 			`form${this.selector} button[type="submit"]`,
+			`form${this.selector} button:not([type])`,
 		].join(', ');
 
 		const bindElement = (element: Element) => {
