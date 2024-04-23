@@ -56,6 +56,8 @@ describe('UIHandler', function () {
 		this.form5.id = 'externalForm';
 		this.externalButton = document.createElement('button');
 		this.externalButton.setAttribute('form', 'externalForm');
+		this.externalButton.formAction = '/UIHandler/externalSubmitOverride';
+		this.externalButton.formMethod = 'POST';
 		this.externalButton.name = 'externalSubmit';
 		this.externalButton.classList.add('ajax');
 		document.body.appendChild(this.form5);
@@ -548,7 +550,7 @@ describe('UIHandler', function () {
 			const containsSubmit = sinon.match((value) => value.has('externalSubmit'));
 
 			mock.expects('makeRequest')
-				.withExactArgs('GET', '/UIHandler/externalSubmit', sinon.match.instanceOf(FormData).and(containsSubmit), {fetch: {}})
+				.withExactArgs('POST', '/UIHandler/externalSubmitOverride', sinon.match.instanceOf(FormData).and(containsSubmit), {fetch: {}})
 				.once();
 
 			const handler = new UIHandler(naja);
