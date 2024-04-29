@@ -1,10 +1,11 @@
 import {Naja, Options, Payload} from '../Naja';
-import {assert, onDomReady, TypedEventListener} from '../utils';
+import {assert, TypedEventListener} from '../utils';
 
 export class UIHandler extends EventTarget {
 	public selector: string = '.ajax';
 	public allowedOrigins: (string | URL)[] = [window.location.origin];
-	private handler = this.handleUI.bind(this);
+	private clickSelector: string = '';
+	private formSelector: string = '';
 
 	public constructor(private readonly naja: Naja) {
 		super();
@@ -12,15 +13,7 @@ export class UIHandler extends EventTarget {
 	}
 
 	private initialize(): void {
-		onDomReady(() => this.bindUI(window.document.body));
-		this.naja.snippetHandler.addEventListener('afterUpdate', (event) => {
-			const {snippet} = event.detail;
-			this.bindUI(snippet);
-		});
-	}
-
-	public bindUI(element: Element): void {
-		const selectors = [
+		this.clickSelector = [
 			`a${this.selector}`,
 			`input[type="submit"]${this.selector}`,
 			`input[type="image"]${this.selector}`,
@@ -33,38 +26,19 @@ export class UIHandler extends EventTarget {
 			`form${this.selector} button:not([type])`,
 		].join(', ');
 
-		const bindElement = (element: Element) => {
-			element.removeEventListener('click', this.handler);
-			element.addEventListener('click', this.handler);
-		};
+		this.formSelector = `form${this.selector}`;
 
-		const elements = element.querySelectorAll(selectors);
-		elements.forEach((element) => bindElement(element));
-
-		if (element.matches(selectors)) {
-			bindElement(element);
-		}
-
-		const bindForm = (form: HTMLFormElement) => {
-			form.removeEventListener('submit', this.handler);
-			form.addEventListener('submit', this.handler);
-		};
-
-		if (element.matches(`form${this.selector}`)) {
-			bindForm(element as HTMLFormElement);
-		}
-
-		const forms = element.querySelectorAll(`form${this.selector}`);
-		forms.forEach((form) => bindForm(form as HTMLFormElement));
+		addEventListener('click', this, false);
+		document.addEventListener('submit', this, false);
 	}
 
-	private handleUI(event: Event | MouseEvent | SubmitEvent): void {
+	public handleEvent(event: Event | MouseEvent | SubmitEvent): void {
 		const mouseEvent = event as MouseEvent;
 		if (mouseEvent.altKey || mouseEvent.ctrlKey || mouseEvent.shiftKey || mouseEvent.metaKey || mouseEvent.button) {
 			return;
 		}
 
-		const element = event.currentTarget;
+		const element = event.target;
 		const options = this.naja.prepareOptions();
 
 		const ignoreErrors = () => {
@@ -73,10 +47,14 @@ export class UIHandler extends EventTarget {
 		};
 
 		if (event.type === 'submit') {
-			this.submitForm(element as HTMLFormElement, options, event).catch(ignoreErrors);
-
+			if ((element as HTMLFormElement).matches(this.formSelector)) {
+				this.submitForm(element as HTMLFormElement, options, event).catch(ignoreErrors);
+			}
 		} else if (event.type === 'click') {
-			this.clickElement(element as HTMLElement, options, mouseEvent).catch(ignoreErrors);
+			const matchedElement = (element as HTMLElement).closest(this.clickSelector);
+			if (matchedElement) {
+				this.clickElement(matchedElement as HTMLElement, options, mouseEvent).catch(ignoreErrors);
+			}
 		}
 	}
 

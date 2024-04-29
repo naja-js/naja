@@ -3,7 +3,6 @@ import {assert} from 'chai';
 import sinon from 'sinon';
 
 import {UIHandler} from '../src/core/UIHandler';
-import {SnippetHandler} from '../src/core/SnippetHandler';
 
 
 describe('UIHandler', function () {
@@ -85,83 +84,7 @@ describe('UIHandler', function () {
 		mock.verify();
 	});
 
-	describe('bindUI()', function () {
-		const createEvent = (type) => {
-			if (typeof(Event) === 'function') {
-				return new Event(type, {
-					bubbles: true,
-					cancelable: true,
-				});
-
-			} else {
-				const event = document.createEvent('Event');
-				event.initEvent(type, true, true);
-				return event;
-			}
-		};
-
-		it('binds to .ajax elements by default', function () {
-			const naja = mockNaja({
-				snippetHandler: SnippetHandler,
-				uiHandler: UIHandler,
-			});
-			naja.uiHandler.handler = sinon.spy((evt) => evt.preventDefault());
-			naja.initialize();
-
-			this.a.dispatchEvent(createEvent('click'));
-			this.form.dispatchEvent(createEvent('submit'));
-			this.input.dispatchEvent(createEvent('click'));
-			this.image.dispatchEvent(createEvent('click'));
-			this.submitButton.dispatchEvent(createEvent('click'));
-			this.externalButton.dispatchEvent(createEvent('click'));
-
-			assert.equal(naja.uiHandler.handler.callCount, 6);
-		});
-
-		it('binds to elements specified by custom selector', function () {
-			const customSelectorLink = document.createElement('a');
-			customSelectorLink.href = '/UIHandler/customSelector';
-			customSelectorLink.setAttribute('data-naja', true);
-			document.body.appendChild(customSelectorLink);
-
-			const naja = mockNaja({
-				snippetHandler: SnippetHandler,
-				uiHandler: UIHandler,
-			});
-			naja.uiHandler.selector = '[data-naja]';
-			naja.uiHandler.handler = sinon.spy((evt) => evt.preventDefault());
-			naja.initialize();
-
-			customSelectorLink.dispatchEvent(createEvent('click'));
-			assert.isTrue(naja.uiHandler.handler.called);
-			document.body.removeChild(customSelectorLink);
-		});
-
-		it('binds after snippet update', async function () {
-			const snippetDiv = document.createElement('div');
-			snippetDiv.id = 'snippet-uiHandler-snippet-bind';
-			document.body.appendChild(snippetDiv);
-
-			const naja = mockNaja({
-				snippetHandler: SnippetHandler,
-				uiHandler: UIHandler,
-			});
-			naja.uiHandler.handler = sinon.spy((evt) => evt.preventDefault());
-			naja.initialize();
-
-			await naja.snippetHandler.updateSnippets({
-				'snippet-uiHandler-snippet-bind': '<a href="/UIHandler/snippetBind" class="ajax" id="uiHandler-snippet-bind">test</a>',
-			});
-
-			const a = document.getElementById('uiHandler-snippet-bind');
-			a.dispatchEvent(createEvent('click'));
-
-			assert.isTrue(naja.uiHandler.handler.called);
-			document.body.removeChild(snippetDiv);
-		});
-	});
-
-	describe('handleUI()', function () {
+	describe('handleEvent()', function () {
 		it('modifier keys should abort request', function () {
 			const naja = mockNaja();
 			const mock = sinon.mock(naja);
@@ -169,20 +92,21 @@ describe('UIHandler', function () {
 				.never();
 
 			const handler = new UIHandler(naja);
+			handler.initialize();
 
 			const evt = {
 				type: 'click',
-				currentTarget: this.a,
+				target: this.a,
 				button: 2,
 			};
-			handler.handleUI(evt);
+			handler.handleEvent(evt);
 
 			const evt2 = {
 				type: 'click',
-				currentTarget: this.a,
+				target: this.a,
 				ctrlKey: true,
 			};
-			handler.handleUI(evt2);
+			handler.handleEvent(evt2);
 
 			mock.verify();
 		});
@@ -194,6 +118,7 @@ describe('UIHandler', function () {
 				.never();
 
 			const handler = new UIHandler(naja);
+			handler.initialize();
 
 			const voidLink = document.createElement('a');
 			voidLink.href = 'javascript:void(0)';
@@ -202,9 +127,9 @@ describe('UIHandler', function () {
 
 			const evt = {
 				type: 'click',
-				currentTarget: voidLink,
+				target: voidLink,
 			};
-			handler.handleUI(evt);
+			handler.handleEvent(evt);
 
 			mock.verify();
 			document.body.removeChild(voidLink);
@@ -218,6 +143,7 @@ describe('UIHandler', function () {
 				.once();
 
 			const handler = new UIHandler(naja);
+			handler.initialize();
 
 			const externalLink = document.createElement('a');
 			externalLink.href = '/UIHandler/relative';
@@ -227,10 +153,10 @@ describe('UIHandler', function () {
 			const preventDefault = sinon.spy();
 			const evt = {
 				type: 'click',
-				currentTarget: externalLink,
+				target: externalLink,
 				preventDefault,
 			};
-			handler.handleUI(evt);
+			handler.handleEvent(evt);
 
 			mock.verify();
 			assert.isTrue(preventDefault.called);
@@ -245,6 +171,7 @@ describe('UIHandler', function () {
 				.once();
 
 			const handler = new UIHandler(naja);
+			handler.initialize();
 
 			const externalLink = document.createElement('a');
 			externalLink.href = 'http://localhost:9876/UIHandler/sameOrigin';
@@ -254,10 +181,10 @@ describe('UIHandler', function () {
 			const preventDefault = sinon.spy();
 			const evt = {
 				type: 'click',
-				currentTarget: externalLink,
+				target: externalLink,
 				preventDefault,
 			};
-			handler.handleUI(evt);
+			handler.handleEvent(evt);
 
 			mock.verify();
 			assert.isTrue(preventDefault.called);
@@ -273,6 +200,7 @@ describe('UIHandler', function () {
 
 			const handler = new UIHandler(naja);
 			handler.allowedOrigins.push('http://another-site.com');
+			handler.initialize();
 
 			const externalLink = document.createElement('a');
 			externalLink.href = 'http://another-site.com/foo';
@@ -282,10 +210,10 @@ describe('UIHandler', function () {
 			const preventDefault = sinon.spy();
 			const evt = {
 				type: 'click',
-				currentTarget: externalLink,
+				target: externalLink,
 				preventDefault,
 			};
-			handler.handleUI(evt);
+			handler.handleEvent(evt);
 
 			mock.verify();
 			assert.isTrue(preventDefault.called);
@@ -301,6 +229,7 @@ describe('UIHandler', function () {
 
 			const handler = new UIHandler(naja);
 			handler.allowedOrigins.push('http://another-site.com');
+			handler.initialize();
 
 			const externalLink = document.createElement('a');
 			externalLink.href = '//another-site.com/foo';
@@ -310,10 +239,10 @@ describe('UIHandler', function () {
 			const preventDefault = sinon.spy();
 			const evt = {
 				type: 'click',
-				currentTarget: externalLink,
+				target: externalLink,
 				preventDefault,
 			};
-			handler.handleUI(evt);
+			handler.handleEvent(evt);
 
 			mock.verify();
 			assert.isTrue(preventDefault.called);
@@ -327,6 +256,7 @@ describe('UIHandler', function () {
 				.never();
 
 			const handler = new UIHandler(naja);
+			handler.initialize();
 
 			const externalLink = document.createElement('a');
 			externalLink.href = 'https://google.com';
@@ -335,9 +265,9 @@ describe('UIHandler', function () {
 
 			const evt = {
 				type: 'click',
-				currentTarget: externalLink,
+				target: externalLink,
 			};
-			handler.handleUI(evt);
+			handler.handleEvent(evt);
 
 			mock.verify();
 			document.body.removeChild(externalLink);
@@ -352,14 +282,15 @@ describe('UIHandler', function () {
 
 			const listener = sinon.spy();
 			const handler = new UIHandler(naja);
+			handler.initialize();
 			handler.addEventListener('interaction', listener);
 
 			const evt = {
 				type: 'click',
-				currentTarget: this.a,
+				target: this.a,
 				preventDefault: () => true,
 			};
-			handler.handleUI(evt);
+			handler.handleEvent(evt);
 
 			assert.isTrue(listener.calledWith(
 				sinon.match((event) => event.constructor.name === 'CustomEvent')
@@ -379,14 +310,15 @@ describe('UIHandler', function () {
 				.never();
 
 			const handler = new UIHandler(naja);
+			handler.initialize();
 			handler.addEventListener('interaction', (evt) => evt.preventDefault());
 
 			const evt = {
 				type: 'click',
-				currentTarget: this.a,
+				target: this.a,
 				preventDefault: () => undefined,
 			};
-			handler.handleUI(evt);
+			handler.handleEvent(evt);
 
 			mock.verify();
 		});
@@ -399,16 +331,17 @@ describe('UIHandler', function () {
 				.once();
 
 			const handler = new UIHandler(naja);
+			handler.initialize();
 			handler.addEventListener('interaction', (event) => {
 				event.detail.options.foo = 42;
 			});
 
 			const evt = {
 				type: 'click',
-				currentTarget: this.a,
+				target: this.a,
 				preventDefault: () => true,
 			};
-			handler.handleUI(evt);
+			handler.handleEvent(evt);
 
 			mock.verify();
 		});
@@ -422,13 +355,14 @@ describe('UIHandler', function () {
 				.returns(Promise.reject(new Error()));
 
 			const handler = new UIHandler(naja);
+			handler.initialize();
 
 			const evt = {
 				type: 'click',
-				currentTarget: this.a,
+				target: this.a,
 				preventDefault: () => undefined,
 			};
-			handler.handleUI(evt);
+			handler.handleEvent(evt);
 
 			mock.verify();
 		});
@@ -441,14 +375,15 @@ describe('UIHandler', function () {
 				.once();
 
 			const handler = new UIHandler(naja);
+			handler.initialize();
 
 			const preventDefault = sinon.spy();
 			const evt = {
 				type: 'click',
-				currentTarget: this.a,
+				target: this.a,
 				preventDefault,
 			};
-			handler.handleUI(evt);
+			handler.handleEvent(evt);
 
 			assert.isTrue(preventDefault.called);
 			mock.verify();
@@ -462,14 +397,15 @@ describe('UIHandler', function () {
 				.once();
 
 			const handler = new UIHandler(naja);
+			handler.initialize();
 
 			const preventDefault = sinon.spy();
 			const evt = {
 				type: 'submit',
-				currentTarget: this.form,
+				target: this.form,
 				preventDefault,
 			};
-			handler.handleUI(evt);
+			handler.handleEvent(evt);
 
 			assert.isTrue(preventDefault.called);
 			mock.verify();
@@ -485,14 +421,15 @@ describe('UIHandler', function () {
 				.once();
 
 			const handler = new UIHandler(naja);
+			handler.initialize();
 
 			const preventDefault = sinon.spy();
 			const evt = {
 				type: 'click',
-				currentTarget: this.input,
+				target: this.input,
 				preventDefault,
 			};
-			handler.handleUI(evt);
+			handler.handleEvent(evt);
 
 			assert.isTrue(preventDefault.called);
 			mock.verify();
@@ -508,14 +445,15 @@ describe('UIHandler', function () {
 				.once();
 
 			const handler = new UIHandler(naja);
+			handler.initialize();
 
 			const preventDefault = sinon.spy();
 			const evt = {
 				type: 'click',
-				currentTarget: this.image,
+				target: this.image,
 				preventDefault,
 			};
-			handler.handleUI(evt);
+			handler.handleEvent(evt);
 
 			assert.isTrue(preventDefault.called);
 			mock.verify();
@@ -531,14 +469,15 @@ describe('UIHandler', function () {
 				.once();
 
 			const handler = new UIHandler(naja);
+			handler.initialize();
 
 			const preventDefault = sinon.spy();
 			const evt = {
 				type: 'click',
-				currentTarget: this.submitButton,
+				target: this.submitButton,
 				preventDefault,
 			};
-			handler.handleUI(evt);
+			handler.handleEvent(evt);
 
 			assert.isTrue(preventDefault.called);
 			mock.verify();
@@ -554,14 +493,15 @@ describe('UIHandler', function () {
 				.once();
 
 			const handler = new UIHandler(naja);
+			handler.initialize();
 
 			const preventDefault = sinon.spy();
 			const evt = {
 				type: 'click',
-				currentTarget: this.externalButton,
+				target: this.externalButton,
 				preventDefault,
 			};
-			handler.handleUI(evt);
+			handler.handleEvent(evt);
 
 			assert.isTrue(preventDefault.called);
 			mock.verify();
