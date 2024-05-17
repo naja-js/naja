@@ -82,7 +82,7 @@ export class UIHandler extends EventTarget {
 		const url = submitter?.getAttribute('formaction') ?? form.getAttribute('action') ?? window.location.pathname + window.location.search;
 		const data = new FormData(form, submitter);
 
-		return this.processInteraction(form, method, url, data, options, event);
+		return this.processInteraction(submitter || form, method, url, data, options, event);
 	}
 
 	public async processInteraction(
