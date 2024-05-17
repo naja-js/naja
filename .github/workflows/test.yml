@@ -1,7 +1,7 @@
 name: Test
 on:
   push:
-    branches: [main]
+    branches: [main, naja-formdata-submitter]
   pull_request:
     branches: [main]
 

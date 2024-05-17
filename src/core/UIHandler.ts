@@ -1,5 +1,5 @@
 import {Naja, Options, Payload} from '../Naja';
-import {assert, onDomReady, TypedEventListener} from '../utils';
+import {onDomReady, TypedEventListener} from '../utils';
 
 export class UIHandler extends EventTarget {
 	public selector: string = '.ajax';
@@ -20,29 +20,18 @@ export class UIHandler extends EventTarget {
 	}
 
 	public bindUI(element: Element): void {
-		const selectors = [
-			`a${this.selector}`,
-			`input[type="submit"]${this.selector}`,
-			`input[type="image"]${this.selector}`,
-			`button[type="submit"]${this.selector}`,
-			`button[form]:not([type])${this.selector}`,
-			`form button:not([type])${this.selector}`,
-			`form${this.selector} input[type="submit"]`,
-			`form${this.selector} input[type="image"]`,
-			`form${this.selector} button[type="submit"]`,
-			`form${this.selector} button:not([type])`,
-		].join(', ');
+		const selector = `a${this.selector}`;
 
-		const bindElement = (element: Element) => {
+		const bindElement = (element: HTMLAnchorElement) => {
 			element.removeEventListener('click', this.handler);
 			element.addEventListener('click', this.handler);
 		};
 
-		const elements = element.querySelectorAll(selectors);
-		elements.forEach((element) => bindElement(element));
+		const elements = element.querySelectorAll(selector);
+		elements.forEach((element) => bindElement(element as HTMLAnchorElement));
 
-		if (element.matches(selectors)) {
-			bindElement(element);
+		if (element.matches(selector)) {
+			bindElement(element as HTMLAnchorElement);
 		}
 
 		const bindForm = (form: HTMLFormElement) => {
@@ -50,11 +39,11 @@ export class UIHandler extends EventTarget {
 			form.addEventListener('submit', this.handler);
 		};
 
-		if (element.matches(`form${this.selector}`)) {
+		if (element.tagName === 'FORM') {
 			bindForm(element as HTMLFormElement);
 		}
 
-		const forms = element.querySelectorAll(`form${this.selector}`);
+		const forms = element.querySelectorAll('form');
 		forms.forEach((form) => bindForm(form as HTMLFormElement));
 	}
 
@@ -73,50 +62,25 @@ export class UIHandler extends EventTarget {
 		};
 
 		if (event.type === 'submit') {
-			this.submitForm(element as HTMLFormElement, options, event).catch(ignoreErrors);
+			const {submitter} = (event as SubmitEvent);
+			if ((element as HTMLFormElement).matches(this.selector) || submitter?.matches(this.selector)) {
+				this.submitForm(element as HTMLFormElement, options, event as SubmitEvent).catch(ignoreErrors);
+			}
 
 		} else if (event.type === 'click') {
-			this.clickElement(element as HTMLElement, options, mouseEvent).catch(ignoreErrors);
+			this.clickElement(element as HTMLAnchorElement, options, mouseEvent).catch(ignoreErrors);
 		}
 	}
 
-	public async clickElement(element: HTMLElement, options: Options = {}, event?: MouseEvent): Promise<Payload> {
-		let method: string = 'GET', url: string = '', data: any;
-
-		if (element.tagName === 'A') {
-			assert(element instanceof HTMLAnchorElement);
-
-			method = 'GET';
-			url = element.href;
-			data = null;
-
-		} else if (element.tagName === 'INPUT' || element.tagName === 'BUTTON') {
-			assert(element instanceof HTMLInputElement || element instanceof HTMLButtonElement);
-
-			const {form} = element;
-			// eslint-disable-next-line no-nested-ternary,no-extra-parens
-			method = element.getAttribute('formmethod')?.toUpperCase() ?? form?.getAttribute('method')?.toUpperCase() ?? 'GET';
-			url = element.getAttribute('formaction') ?? form?.getAttribute('action') ?? window.location.pathname + window.location.search;
-			data = new FormData(form ?? undefined);
-
-			if (element.type === 'submit' && element.name !== '') {
-				data.append(element.name, element.value || '');
-
-			} else if (element.type === 'image') {
-				const coords = element.getBoundingClientRect();
-				const prefix = element.name !== '' ? `${element.name}.` : '';
-				data.append(`${prefix}x`, Math.max(0, Math.floor(event !== undefined ? event.pageX - coords.left : 0)));
-				data.append(`${prefix}y`, Math.max(0, Math.floor(event !== undefined ? event.pageY - coords.top : 0)));
-			}
-		}
-
-		return this.processInteraction(element, method, url, data, options, event);
+	public async clickElement(element: HTMLAnchorElement, options: Options = {}, event?: MouseEvent): Promise<Payload> {
+		return this.processInteraction(element, 'GET', element.href, null, options, event);
 	}
 
-	public async submitForm(form: HTMLFormElement, options: Options = {}, event?: Event): Promise<Payload> {
-		const method = form.getAttribute('method')?.toUpperCase() ?? 'GET';
-		const url = form.getAttribute('action') ?? window.location.pathname + window.location.search;
-		const data = new FormData(form);
+	public async submitForm(form: HTMLFormElement, options: Options = {}, event?: SubmitEvent): Promise<Payload> {
+		const submitter = event?.submitter;
+		const method = (submitter?.getAttribute('formmethod') || form.getAttribute('method') || 'GET').toUpperCase();
+		const url = submitter?.getAttribute('formaction') ?? form.getAttribute('action') ?? window.location.pathname + window.location.search;
+		const data = new FormData(form, submitter);
 
 		return this.processInteraction(form, method, url, data, options, event);
 	}

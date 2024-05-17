@@ -110,12 +110,8 @@ describe('UIHandler', function () {
 
 			this.a.dispatchEvent(createEvent('click'));
 			this.form.dispatchEvent(createEvent('submit'));
-			this.input.dispatchEvent(createEvent('click'));
-			this.image.dispatchEvent(createEvent('click'));
-			this.submitButton.dispatchEvent(createEvent('click'));
-			this.externalButton.dispatchEvent(createEvent('click'));
 
-			assert.equal(naja.uiHandler.handler.callCount, 6);
+			assert.equal(naja.uiHandler.handler.callCount, 2);
 		});
 
 		it('binds to elements specified by custom selector', function () {
@@ -488,8 +484,9 @@ describe('UIHandler', function () {
 
 			const preventDefault = sinon.spy();
 			const evt = {
-				type: 'click',
-				currentTarget: this.input,
+				type: 'submit',
+				currentTarget: this.form2,
+				submitter: this.input,
 				preventDefault,
 			};
 			handler.handleUI(evt);
@@ -511,8 +508,9 @@ describe('UIHandler', function () {
 
 			const preventDefault = sinon.spy();
 			const evt = {
-				type: 'click',
-				currentTarget: this.image,
+				type: 'submit',
+				currentTarget: this.form3,
+				submitter: this.image,
 				preventDefault,
 			};
 			handler.handleUI(evt);
@@ -534,8 +532,9 @@ describe('UIHandler', function () {
 
 			const preventDefault = sinon.spy();
 			const evt = {
-				type: 'click',
-				currentTarget: this.submitButton,
+				type: 'submit',
+				currentTarget: this.form4,
+				submitter: this.submitButton,
 				preventDefault,
 			};
 			handler.handleUI(evt);
@@ -557,8 +556,9 @@ describe('UIHandler', function () {
 
 			const preventDefault = sinon.spy();
 			const evt = {
-				type: 'click',
-				currentTarget: this.externalButton,
+				type: 'submit',
+				currentTarget: this.form5,
+				submitter: this.externalButton,
 				preventDefault,
 			};
 			handler.handleUI(evt);
