@@ -68,12 +68,24 @@ export class UIHandler extends EventTarget {
 			}
 
 		} else if (event.type === 'click') {
-			this.clickElement(element as HTMLAnchorElement, options, mouseEvent).catch(ignoreErrors);
+			this.processInteraction(element as HTMLAnchorElement, 'GET', (element as HTMLAnchorElement).href, null, options, mouseEvent).catch(ignoreErrors);
+
 		}
 	}
 
-	public async clickElement(element: HTMLAnchorElement, options: Options = {}, event?: MouseEvent): Promise<Payload> {
-		return this.processInteraction(element, 'GET', element.href, null, options, event);
+	public async clickElement(element: HTMLElement, options: Options = {}, event?: MouseEvent): Promise<Payload> {
+		if (element.tagName === 'A') {
+			return this.processInteraction(element, 'GET', (element as HTMLAnchorElement).href, null, options, event);
+
+		} else if (element.tagName === 'INPUT' || element.tagName === 'BUTTON') {
+			const {form} = element as HTMLButtonElement | HTMLInputElement;
+			if (form) {
+				return this.submitForm(form, options, event);
+			}
+
+		}
+
+		return {};
 	}
 
 	public async submitForm(form: HTMLFormElement, options: Options = {}, event?: Event): Promise<Payload> {
