@@ -591,6 +591,29 @@ describe('UIHandler', function () {
 				});
 		});
 
+		it('dispatches request on button[form]|input[form]', function () {
+			const naja = mockNaja();
+			const mock = sinon.mock(naja);
+			const expectedResult = {answer: 42};
+
+			mock.expects('makeRequest')
+				.withExactArgs('POST', '/UIHandler/submitForm', sinon.match.instanceOf(FormData), {})
+				.once()
+				.returns(Promise.resolve(expectedResult));
+
+			const form = document.createElement('form');
+			form.method = 'POST';
+			form.action = '/UIHandler/submitForm';
+			const input = document.createElement('input');
+			input.type = 'submit';
+			form.appendChild(input);
+
+			const handler = new UIHandler(naja);
+			handler.clickElement(input);
+
+			mock.verify();
+		});
+
 		it('triggers interaction event', function () {
 			const naja = mockNaja();
 			const mock = sinon.mock(naja);
@@ -617,6 +640,20 @@ describe('UIHandler', function () {
 			));
 
 			mock.verify();
+		});
+
+		it('does not trigger interaction event on non-hyperlink|:not([form]) elements', function () {
+			const naja = mockNaja();
+
+			const btn = document.createElement('button');
+
+			const listener = sinon.spy();
+			const handler = new UIHandler(naja);
+			handler.addEventListener('interaction', listener);
+
+			handler.clickElement(btn);
+
+			assert.isFalse(listener.called);
 		});
 	});
 
