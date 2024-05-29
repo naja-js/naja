@@ -27,12 +27,12 @@ export class UIHandler extends EventTarget {
 			element.addEventListener('click', this.handler);
 		};
 
+		if (element.matches(selector)) {
+			return bindElement(element as HTMLAnchorElement);
+		}
+
 		const elements = element.querySelectorAll(selector);
 		elements.forEach((element) => bindElement(element as HTMLAnchorElement));
-
-		if (element.matches(selector)) {
-			bindElement(element as HTMLAnchorElement);
-		}
 
 		const bindForm = (form: HTMLFormElement) => {
 			form.removeEventListener('submit', this.handler);
@@ -40,7 +40,7 @@ export class UIHandler extends EventTarget {
 		};
 
 		if (element.tagName === 'FORM') {
-			bindForm(element as HTMLFormElement);
+			return bindForm(element as HTMLFormElement);
 		}
 
 		const forms = element.querySelectorAll('form');
