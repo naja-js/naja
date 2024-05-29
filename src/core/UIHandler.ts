@@ -78,11 +78,11 @@ export class UIHandler extends EventTarget {
 
 	public async submitForm(form: HTMLFormElement, options: Options = {}, event?: SubmitEvent): Promise<Payload> {
 		const submitter = event?.submitter;
-		const method = (submitter?.getAttribute('formmethod') || form.getAttribute('method') || 'GET').toUpperCase();
+		const method = (submitter?.getAttribute('formmethod') ?? form.getAttribute('method') ?? 'GET').toUpperCase();
 		const url = submitter?.getAttribute('formaction') ?? form.getAttribute('action') ?? window.location.pathname + window.location.search;
 		const data = new FormData(form, submitter);
 
-		return this.processInteraction(submitter || form, method, url, data, options, event);
+		return this.processInteraction(submitter ?? form, method, url, data, options, event);
 	}
 
 	public async processInteraction(
