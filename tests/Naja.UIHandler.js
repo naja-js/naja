@@ -709,6 +709,20 @@ describe('UIHandler', function () {
 
 			mock.verify();
 		});
+
+		it('does not trigger interaction event without form element', function () {
+			const naja = mockNaja();
+
+			const btn = document.createElement('button');
+
+			const listener = sinon.spy();
+			const handler = new UIHandler(naja);
+			handler.addEventListener('interaction', listener);
+
+			handler.submitForm(btn);
+
+			assert.isFalse(listener.called);
+		});
 	});
 
 	describe('processInteraction()', function () {
