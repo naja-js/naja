@@ -39,21 +39,16 @@ export class UIHandler extends EventTarget {
 			form.addEventListener('submit', this.handler);
 		};
 
-		if (element.tagName === 'FORM') {
-			return bindForm(element as HTMLFormElement);
+		if (element instanceof HTMLFormElement) {
+			return bindForm(element);
 		}
 
 		const forms = element.querySelectorAll('form');
-		forms.forEach((form) => bindForm(form as HTMLFormElement));
+		forms.forEach((form) => bindForm(form));
 	}
 
-	private handleUI(event: Event | MouseEvent | SubmitEvent): void {
-		const mouseEvent = event as MouseEvent;
-		if (mouseEvent.altKey || mouseEvent.ctrlKey || mouseEvent.shiftKey || mouseEvent.metaKey || mouseEvent.button) {
-			return;
-		}
-
-		const element = event.currentTarget;
+	private handleUI(event: MouseEvent | SubmitEvent): void {
+		const element = event.currentTarget as HTMLElement;
 		const options = this.naja.prepareOptions();
 
 		const ignoreErrors = () => {
@@ -61,50 +56,55 @@ export class UIHandler extends EventTarget {
 			// in this situation; errors should be handled in `naja.addEventListener('error', errorHandler)`
 		};
 
-		if (event.type === 'submit') {
-			const {submitter} = (event as SubmitEvent);
-			if ((element as HTMLFormElement).matches(this.selector) || submitter?.matches(this.selector)) {
-				this.submitForm(element as HTMLFormElement, options, event as SubmitEvent).catch(ignoreErrors);
+		if (event instanceof MouseEvent) {
+			if (event.altKey || event.ctrlKey || event.shiftKey || event.metaKey || event.button) {
+				return;
 			}
 
-		} else if (event.type === 'click') {
-			this.processInteraction(element as HTMLAnchorElement, 'GET', (element as HTMLAnchorElement).href, null, options, mouseEvent).catch(ignoreErrors);
+			this.clickElement(element, options, event).catch(ignoreErrors);
+			return;
+		}
 
+		const {submitter} = event;
+		if (element.matches(this.selector) || submitter?.matches(this.selector)) {
+			this.submitForm(submitter ?? element, options, event).catch(ignoreErrors);
 		}
 	}
 
 	public async clickElement(element: HTMLElement, options: Options = {}, event?: MouseEvent): Promise<Payload> {
-		if (element.tagName === 'A') {
-			return this.processInteraction(element, 'GET', (element as HTMLAnchorElement).href, null, options, event);
+		if (element instanceof HTMLAnchorElement) {
+			return this.processInteraction(element, 'GET', element.href, null, options, event);
+		}
 
-		} else if (element.tagName === 'INPUT' || element.tagName === 'BUTTON' && (element as HTMLButtonElement | HTMLInputElement).form) {
+		if ((element instanceof HTMLInputElement || element instanceof HTMLButtonElement) && element.form) {
 			return this.submitForm(element, options, event);
-
 		}
 
 		return {};
 	}
 
-	public async submitForm(sender: HTMLFormElement|HTMLElement, options: Options = {}, event?: Event): Promise<Payload> {
-		let form: HTMLFormElement|null = sender.tagName === 'FORM' ? sender as HTMLFormElement : null;
-		let submitter: HTMLElement|null|undefined = null;
+	public async submitForm(formOrSubmitter: HTMLFormElement | HTMLElement, options: Options = {}, event?: Event): Promise<Payload> {
+		let form: HTMLFormElement;
+		let submitter: HTMLElement | null = null;
 
-		if (event?.type === 'submit') {
-			submitter = (event as SubmitEvent)?.submitter;
-		} else if (sender.tagName === 'INPUT' || sender.tagName === 'BUTTON') {
-			form = (sender as HTMLButtonElement | HTMLInputElement).form ?? null;
-			submitter = sender;
+		if ((formOrSubmitter instanceof HTMLInputElement || formOrSubmitter instanceof HTMLButtonElement) && formOrSubmitter.form) {
+			// eslint-disable-next-line prefer-destructuring
+			form = formOrSubmitter.form;
+			submitter = formOrSubmitter;
+
+		} else if (formOrSubmitter instanceof HTMLFormElement) {
+			form = formOrSubmitter;
+			submitter = event instanceof SubmitEvent ? event.submitter : null;
+
+		} else {
+			return {};
 		}
 
-		if (form) {
-			const method = (submitter?.getAttribute('formmethod') ?? form.getAttribute('method') ?? 'GET').toUpperCase();
-			const url = submitter?.getAttribute('formaction') ?? form.getAttribute('action') ?? window.location.pathname + window.location.search;
-			const data = new FormData(form, submitter);
+		const method = (submitter?.getAttribute('formmethod') ?? form.getAttribute('method') ?? 'GET').toUpperCase();
+		const url = submitter?.getAttribute('formaction') ?? form.getAttribute('action') ?? window.location.pathname + window.location.search;
+		const data = new FormData(form, submitter);
 
-			return this.processInteraction(submitter ?? form, method, url, data, options, event);
-		}
-
-		return {};
+		return this.processInteraction(submitter ?? form, method, url, data, options, event);
 	}
 
 	public async processInteraction(

@@ -86,20 +86,6 @@ describe('UIHandler', function () {
 	});
 
 	describe('bindUI()', function () {
-		const createEvent = (type) => {
-			if (typeof(Event) === 'function') {
-				return new Event(type, {
-					bubbles: true,
-					cancelable: true,
-				});
-
-			} else {
-				const event = document.createEvent('Event');
-				event.initEvent(type, true, true);
-				return event;
-			}
-		};
-
 		it('binds to .ajax elements by default', function () {
 			const naja = mockNaja({
 				snippetHandler: SnippetHandler,
@@ -108,8 +94,8 @@ describe('UIHandler', function () {
 			naja.uiHandler.handler = sinon.spy((evt) => evt.preventDefault());
 			naja.initialize();
 
-			this.a.dispatchEvent(createEvent('click'));
-			this.form.dispatchEvent(createEvent('submit'));
+			this.a.dispatchEvent(new MouseEvent('click', {cancelable: true}));
+			this.form.dispatchEvent(new SubmitEvent('submit', {cancelable: true}));
 
 			assert.equal(naja.uiHandler.handler.callCount, 2);
 		});
@@ -128,7 +114,7 @@ describe('UIHandler', function () {
 			naja.uiHandler.handler = sinon.spy((evt) => evt.preventDefault());
 			naja.initialize();
 
-			customSelectorLink.dispatchEvent(createEvent('click'));
+			customSelectorLink.dispatchEvent(new MouseEvent('click', {cancelable: true}));
 			assert.isTrue(naja.uiHandler.handler.called);
 			document.body.removeChild(customSelectorLink);
 		});
@@ -150,7 +136,7 @@ describe('UIHandler', function () {
 			});
 
 			const a = document.getElementById('uiHandler-snippet-bind');
-			a.dispatchEvent(createEvent('click'));
+			a.dispatchEvent(new MouseEvent('click', {cancelable: true}));
 
 			assert.isTrue(naja.uiHandler.handler.called);
 			document.body.removeChild(snippetDiv);
@@ -158,6 +144,15 @@ describe('UIHandler', function () {
 	});
 
 	describe('handleUI()', function () {
+		function simulateInteraction(handler, target, event) {
+			target.addEventListener(event.type, (event) => {
+				event.preventDefault();
+				handler.handleUI(event);
+			}, {once: true});
+
+			target.dispatchEvent(event);
+		}
+
 		it('modifier keys should abort request', function () {
 			const naja = mockNaja();
 			const mock = sinon.mock(naja);
@@ -166,19 +161,17 @@ describe('UIHandler', function () {
 
 			const handler = new UIHandler(naja);
 
-			const evt = {
-				type: 'click',
-				currentTarget: this.a,
-				button: 2,
-			};
-			handler.handleUI(evt);
+			simulateInteraction(
+				handler,
+				this.a,
+				new MouseEvent('click', {cancelable: true, button: 2}),
+			);
 
-			const evt2 = {
-				type: 'click',
-				currentTarget: this.a,
-				ctrlKey: true,
-			};
-			handler.handleUI(evt2);
+			simulateInteraction(
+				handler,
+				this.a,
+				new MouseEvent('click', {cancelable: true, ctrlKey: true}),
+			);
 
 			mock.verify();
 		});
@@ -196,11 +189,11 @@ describe('UIHandler', function () {
 			voidLink.classList.add('ajax');
 			document.body.appendChild(voidLink);
 
-			const evt = {
-				type: 'click',
-				currentTarget: voidLink,
-			};
-			handler.handleUI(evt);
+			simulateInteraction(
+				handler,
+				voidLink,
+				new MouseEvent('click', {cancelable: true}),
+			);
 
 			mock.verify();
 			document.body.removeChild(voidLink);
@@ -220,16 +213,11 @@ describe('UIHandler', function () {
 			externalLink.classList.add('ajax');
 			document.body.appendChild(externalLink);
 
-			const preventDefault = sinon.spy();
-			const evt = {
-				type: 'click',
-				currentTarget: externalLink,
-				preventDefault,
-			};
-			handler.handleUI(evt);
+			const event = new MouseEvent('click', {cancelable: true});
+			simulateInteraction(handler, externalLink, event);
 
 			mock.verify();
-			assert.isTrue(preventDefault.called);
+			assert.isTrue(event.defaultPrevented);
 			document.body.removeChild(externalLink);
 		});
 
@@ -247,16 +235,11 @@ describe('UIHandler', function () {
 			externalLink.classList.add('ajax');
 			document.body.appendChild(externalLink);
 
-			const preventDefault = sinon.spy();
-			const evt = {
-				type: 'click',
-				currentTarget: externalLink,
-				preventDefault,
-			};
-			handler.handleUI(evt);
+			const event = new MouseEvent('click', {cancelable: true});
+			simulateInteraction(handler, externalLink, event);
 
 			mock.verify();
-			assert.isTrue(preventDefault.called);
+			assert.isTrue(event.defaultPrevented);
 			document.body.removeChild(externalLink);
 		});
 
@@ -275,16 +258,11 @@ describe('UIHandler', function () {
 			externalLink.classList.add('ajax');
 			document.body.appendChild(externalLink);
 
-			const preventDefault = sinon.spy();
-			const evt = {
-				type: 'click',
-				currentTarget: externalLink,
-				preventDefault,
-			};
-			handler.handleUI(evt);
+			const event = new MouseEvent('click', {cancelable: true});
+			simulateInteraction(handler, externalLink, event);
 
 			mock.verify();
-			assert.isTrue(preventDefault.called);
+			assert.isTrue(event.defaultPrevented);
 			document.body.removeChild(externalLink);
 		});
 
@@ -303,16 +281,11 @@ describe('UIHandler', function () {
 			externalLink.classList.add('ajax');
 			document.body.appendChild(externalLink);
 
-			const preventDefault = sinon.spy();
-			const evt = {
-				type: 'click',
-				currentTarget: externalLink,
-				preventDefault,
-			};
-			handler.handleUI(evt);
+			const event = new MouseEvent('click', {cancelable: true});
+			simulateInteraction(handler, externalLink, event);
 
 			mock.verify();
-			assert.isTrue(preventDefault.called);
+			assert.isTrue(event.defaultPrevented);
 			document.body.removeChild(externalLink);
 		});
 
@@ -329,11 +302,11 @@ describe('UIHandler', function () {
 			externalLink.classList.add('ajax');
 			document.body.appendChild(externalLink);
 
-			const evt = {
-				type: 'click',
-				currentTarget: externalLink,
-			};
-			handler.handleUI(evt);
+			simulateInteraction(
+				handler,
+				externalLink,
+				new MouseEvent('click', {cancelable: true}),
+			);
 
 			mock.verify();
 			document.body.removeChild(externalLink);
@@ -350,19 +323,15 @@ describe('UIHandler', function () {
 			const handler = new UIHandler(naja);
 			handler.addEventListener('interaction', listener);
 
-			const evt = {
-				type: 'click',
-				currentTarget: this.a,
-				preventDefault: () => true,
-			};
-			handler.handleUI(evt);
+			const event = new MouseEvent('click', {cancelable: true});
+			simulateInteraction(handler, this.a, event);
 
 			assert.isTrue(listener.calledWith(
 				sinon.match((event) => event.constructor.name === 'CustomEvent')
-				.and(sinon.match.has('detail', sinon.match.object
-					.and(sinon.match.has('element', this.a))
-					.and(sinon.match.has('originalEvent', evt))
-				))
+					.and(sinon.match.has('detail', sinon.match.object
+						.and(sinon.match.has('element', this.a))
+						.and(sinon.match.has('originalEvent', event))
+					))
 			));
 
 			mock.verify();
@@ -377,12 +346,8 @@ describe('UIHandler', function () {
 			const handler = new UIHandler(naja);
 			handler.addEventListener('interaction', (evt) => evt.preventDefault());
 
-			const evt = {
-				type: 'click',
-				currentTarget: this.a,
-				preventDefault: () => undefined,
-			};
-			handler.handleUI(evt);
+			const event = new MouseEvent('click', {cancelable: true});
+			simulateInteraction(handler, this.a, event);
 
 			mock.verify();
 		});
@@ -399,12 +364,11 @@ describe('UIHandler', function () {
 				event.detail.options.foo = 42;
 			});
 
-			const evt = {
-				type: 'click',
-				currentTarget: this.a,
-				preventDefault: () => true,
-			};
-			handler.handleUI(evt);
+			simulateInteraction(
+				handler,
+				this.a,
+				new MouseEvent('click', {cancelable: true}),
+			);
 
 			mock.verify();
 		});
@@ -419,12 +383,11 @@ describe('UIHandler', function () {
 
 			const handler = new UIHandler(naja);
 
-			const evt = {
-				type: 'click',
-				currentTarget: this.a,
-				preventDefault: () => undefined,
-			};
-			handler.handleUI(evt);
+			simulateInteraction(
+				handler,
+				this.a,
+				new MouseEvent('click', {cancelable: true}),
+			);
 
 			mock.verify();
 		});
@@ -438,15 +401,10 @@ describe('UIHandler', function () {
 
 			const handler = new UIHandler(naja);
 
-			const preventDefault = sinon.spy();
-			const evt = {
-				type: 'click',
-				currentTarget: this.a,
-				preventDefault,
-			};
-			handler.handleUI(evt);
+			const event = new MouseEvent('click', {cancelable: true});
+			simulateInteraction(handler, this.a, event);
 
-			assert.isTrue(preventDefault.called);
+			assert.isTrue(event.defaultPrevented);
 			mock.verify();
 		});
 
@@ -459,15 +417,10 @@ describe('UIHandler', function () {
 
 			const handler = new UIHandler(naja);
 
-			const preventDefault = sinon.spy();
-			const evt = {
-				type: 'submit',
-				currentTarget: this.form,
-				preventDefault,
-			};
-			handler.handleUI(evt);
+			const event = new SubmitEvent('submit', {cancelable: true});
+			simulateInteraction(handler, this.form, event);
 
-			assert.isTrue(preventDefault.called);
+			assert.isTrue(event.defaultPrevented);
 			mock.verify();
 		});
 
@@ -482,16 +435,10 @@ describe('UIHandler', function () {
 
 			const handler = new UIHandler(naja);
 
-			const preventDefault = sinon.spy();
-			const evt = {
-				type: 'submit',
-				currentTarget: this.form2,
-				submitter: this.input,
-				preventDefault,
-			};
-			handler.handleUI(evt);
+			const event = new SubmitEvent('submit', {cancelable: true, submitter: this.input});
+			simulateInteraction(handler, this.form2, event);
 
-			assert.isTrue(preventDefault.called);
+			assert.isTrue(event.defaultPrevented);
 			mock.verify();
 		});
 
@@ -506,16 +453,10 @@ describe('UIHandler', function () {
 
 			const handler = new UIHandler(naja);
 
-			const preventDefault = sinon.spy();
-			const evt = {
-				type: 'submit',
-				currentTarget: this.form3,
-				submitter: this.image,
-				preventDefault,
-			};
-			handler.handleUI(evt);
+			const event = new SubmitEvent('submit', {cancelable: true, submitter: this.image});
+			simulateInteraction(handler, this.form3, event);
 
-			assert.isTrue(preventDefault.called);
+			assert.isTrue(event.defaultPrevented);
 			mock.verify();
 		});
 
@@ -530,16 +471,10 @@ describe('UIHandler', function () {
 
 			const handler = new UIHandler(naja);
 
-			const preventDefault = sinon.spy();
-			const evt = {
-				type: 'submit',
-				currentTarget: this.form4,
-				submitter: this.submitButton,
-				preventDefault,
-			};
-			handler.handleUI(evt);
+			const event = new SubmitEvent('submit', {cancelable: true, submitter: this.submitButton});
+			simulateInteraction(handler, this.form4, event);
 
-			assert.isTrue(preventDefault.called);
+			assert.isTrue(event.defaultPrevented);
 			mock.verify();
 		});
 
@@ -554,16 +489,10 @@ describe('UIHandler', function () {
 
 			const handler = new UIHandler(naja);
 
-			const preventDefault = sinon.spy();
-			const evt = {
-				type: 'submit',
-				currentTarget: this.form5,
-				submitter: this.externalButton,
-				preventDefault,
-			};
-			handler.handleUI(evt);
+			const event = new SubmitEvent('submit', {cancelable: true, submitter: this.externalButton});
+			simulateInteraction(handler, this.form5, event);
 
-			assert.isTrue(preventDefault.called);
+			assert.isTrue(event.defaultPrevented);
 			mock.verify();
 		});
 	});
@@ -633,10 +562,10 @@ describe('UIHandler', function () {
 
 			assert.isTrue(listener.calledWith(
 				sinon.match((event) => event.constructor.name === 'CustomEvent')
-				.and(sinon.match.has('detail', sinon.match.object
-					.and(sinon.match.has('element', a))
-					.and(sinon.match.has('originalEvent', undefined))
-				))
+					.and(sinon.match.has('detail', sinon.match.object
+						.and(sinon.match.has('element', a))
+						.and(sinon.match.has('originalEvent', undefined))
+					))
 			));
 
 			mock.verify();
@@ -681,6 +610,33 @@ describe('UIHandler', function () {
 				});
 		});
 
+		it('dispatches request on button[form]|input[form]', function () {
+			const naja = mockNaja();
+			const mock = sinon.mock(naja);
+
+			const expectedResult = {answer: 42};
+
+			mock.expects('makeRequest')
+				.withExactArgs('POST', '/UIHandler/submitForm', sinon.match.instanceOf(FormData), {})
+				.once()
+				.returns(Promise.resolve(expectedResult));
+
+			const form = document.createElement('form');
+			form.method = 'POST';
+			form.action = '/UIHandler/submitForm';
+
+			const submitter = document.createElement('input');
+			submitter.type = 'submit';
+			form.appendChild(submitter);
+
+			const handler = new UIHandler(naja);
+			return handler.submitForm(submitter)
+				.then((result) => {
+					assert.deepEqual(result, expectedResult);
+					mock.verify();
+				});
+		});
+
 		it('triggers interaction event', function () {
 			const naja = mockNaja();
 			const mock = sinon.mock(naja);
@@ -701,10 +657,10 @@ describe('UIHandler', function () {
 
 			assert.isTrue(listener.calledWith(
 				sinon.match((event) => event.constructor.name === 'CustomEvent')
-				.and(sinon.match.has('detail', sinon.match.object
-					.and(sinon.match.has('element', form))
-					.and(sinon.match.has('originalEvent', undefined))
-				))
+					.and(sinon.match.has('detail', sinon.match.object
+						.and(sinon.match.has('element', form))
+						.and(sinon.match.has('originalEvent', undefined))
+					))
 			));
 
 			mock.verify();
