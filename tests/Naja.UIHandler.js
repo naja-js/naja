@@ -543,6 +543,18 @@ describe('UIHandler', function () {
 			mock.verify();
 		});
 
+		it('rejects clicks on unsupported elements', function () {
+			const naja = mockNaja();
+
+			const btn = document.createElement('button');
+			const handler = new UIHandler(naja);
+
+			return handler.clickElement(btn).catch((error) => {
+				assert.isOk(error); // isOk = truthy
+				assert.equal('Unsupported element in clickElement(): element must be an anchor or a submitter element attached to a form.', error.message);
+			});
+		});
+
 		it('triggers interaction event', function () {
 			const naja = mockNaja();
 			const mock = sinon.mock(naja);
@@ -569,20 +581,6 @@ describe('UIHandler', function () {
 			));
 
 			mock.verify();
-		});
-
-		it('does not trigger interaction event on non-hyperlink|:not([form]) elements', function () {
-			const naja = mockNaja();
-
-			const btn = document.createElement('button');
-
-			const listener = sinon.spy();
-			const handler = new UIHandler(naja);
-			handler.addEventListener('interaction', listener);
-
-			handler.clickElement(btn);
-
-			assert.isFalse(listener.called);
 		});
 	});
 
@@ -637,6 +635,18 @@ describe('UIHandler', function () {
 				});
 		});
 
+		it('rejects submits of unsupported elements', function () {
+			const naja = mockNaja();
+
+			const btn = document.createElement('button');
+			const handler = new UIHandler(naja);
+
+			return handler.submitForm(btn).catch((error) => {
+				assert.isOk(error); // isOk = truthy
+				assert.equal('Unsupported element in submitForm(): formOrSubmitter must be either a form or a submitter element attached to a form.', error.message);
+			});
+		});
+
 		it('triggers interaction event', function () {
 			const naja = mockNaja();
 			const mock = sinon.mock(naja);
@@ -664,20 +674,6 @@ describe('UIHandler', function () {
 			));
 
 			mock.verify();
-		});
-
-		it('does not trigger interaction event without form element', function () {
-			const naja = mockNaja();
-
-			const btn = document.createElement('button');
-
-			const listener = sinon.spy();
-			const handler = new UIHandler(naja);
-			handler.addEventListener('interaction', listener);
-
-			handler.submitForm(btn);
-
-			assert.isFalse(listener.called);
 		});
 	});
 

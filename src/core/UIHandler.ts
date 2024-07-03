@@ -80,7 +80,7 @@ export class UIHandler extends EventTarget {
 			return this.submitForm(element, options, event);
 		}
 
-		return {};
+		throw new Error('Unsupported element in clickElement(): element must be an anchor or a submitter element attached to a form.');
 	}
 
 	public async submitForm(formOrSubmitter: HTMLFormElement | HTMLElement, options: Options = {}, event?: Event): Promise<Payload> {
@@ -97,7 +97,7 @@ export class UIHandler extends EventTarget {
 			submitter = event instanceof SubmitEvent ? event.submitter : null;
 
 		} else {
-			return {};
+			throw new Error('Unsupported element in submitForm(): formOrSubmitter must be either a form or a submitter element attached to a form.');
 		}
 
 		const method = (submitter?.getAttribute('formmethod') ?? form.getAttribute('method') ?? 'GET').toUpperCase();
