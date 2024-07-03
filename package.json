@@ -10,10 +10,13 @@
   "homepage": "https://naja.js.org",
   "author": "Jiří Pudil",
   "license": "MIT",
-  "main": "dist/Naja.js",
-  "unpkg": "dist/Naja.min.js",
-  "module": "dist/Naja.esm.js",
-  "types": "dist/index.esm.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/Naja.esm.js",
+      "types": "./dist/index.esm.d.ts",
+      "default": "./dist/Naja.js"
+    }
+  },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",

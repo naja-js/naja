@@ -17,7 +17,7 @@ export default [
 		input: 'src/index.esm.ts',
 		output: {
 			...output,
-			file: pkg.module,
+			file: pkg.exports['.'].import,
 			format: 'esm',
 		},
 		external: [
@@ -35,7 +35,7 @@ export default [
 		input: 'src/index.esm.ts',
 		output: {
 			...output,
-			dir: path.dirname(pkg.module),
+			dir: path.dirname(pkg.exports['.'].types),
 			format: 'esm',
 		},
 		external: [
@@ -45,7 +45,7 @@ export default [
 		plugins: [
 			typescript({
 				declaration: true,
-				declarationDir: path.dirname(pkg.module),
+				declarationDir: path.dirname(pkg.exports['.'].types),
 				emitDeclarationOnly: true,
 			}),
 		],
@@ -55,7 +55,7 @@ export default [
 		input: 'src/index.ts',
 		output: {
 			...output,
-			file: pkg.unpkg,
+			file: pkg.exports['.'].default.replace(/\.js$/, '.min.js'),
 			format: 'umd',
 			name: 'naja',
 		},
@@ -72,7 +72,7 @@ export default [
 		input: 'src/index.ts',
 		output: {
 			...output,
-			file: pkg.main,
+			file: pkg.exports['.'].default,
 			format: 'umd',
 			name: 'naja',
 		},
