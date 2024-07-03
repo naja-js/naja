@@ -119,6 +119,42 @@ describe('UIHandler', function () {
 			document.body.removeChild(customSelectorLink);
 		});
 
+		it('binds to all elements when selector is empty', function () {
+			const emptySelectorLink = document.createElement('a');
+			emptySelectorLink.href = '/UIHandler/emptySelector';
+			document.body.appendChild(emptySelectorLink);
+
+			const emptySelectorForm = document.createElement('form');
+			emptySelectorForm.action = '/UIHandler/emptySelector';
+			document.body.appendChild(emptySelectorForm);
+
+			const emptySelectorFormWithSubmitter = document.createElement('form');
+			emptySelectorFormWithSubmitter.action = '/UIHandler/emptySelector';
+			document.body.appendChild(emptySelectorFormWithSubmitter);
+
+			const emptySelectorSubmitter = document.createElement('input');
+			emptySelectorSubmitter.type = 'submit';
+			emptySelectorFormWithSubmitter.appendChild(emptySelectorSubmitter);
+
+			const naja = mockNaja({
+				snippetHandler: SnippetHandler,
+				uiHandler: UIHandler,
+			});
+			naja.uiHandler.selector = '';
+			naja.uiHandler.handler = sinon.spy((evt) => evt.preventDefault());
+			naja.initialize();
+
+			emptySelectorLink.dispatchEvent(new MouseEvent('click', {cancelable: true}));
+			emptySelectorForm.dispatchEvent(new SubmitEvent('submit', {cancelable: true}));
+			emptySelectorFormWithSubmitter.dispatchEvent(new SubmitEvent('submit', {submitter: emptySelectorSubmitter, cancelable: true}));
+
+			assert.equal(naja.uiHandler.handler.callCount, 3);
+
+			document.body.removeChild(emptySelectorLink);
+			document.body.removeChild(emptySelectorForm);
+			document.body.removeChild(emptySelectorFormWithSubmitter);
+		});
+
 		it('binds after snippet update', async function () {
 			const snippetDiv = document.createElement('div');
 			snippetDiv.id = 'snippet-uiHandler-snippet-bind';
@@ -415,10 +451,20 @@ describe('UIHandler', function () {
 				.withExactArgs('POST', '/UIHandler/form', sinon.match.instanceOf(FormData), {fetch: {}})
 				.once();
 
+			const listener = sinon.spy();
 			const handler = new UIHandler(naja);
+			handler.addEventListener('interaction', listener);
 
 			const event = new SubmitEvent('submit', {cancelable: true});
 			simulateInteraction(handler, this.form, event);
+
+			assert.isTrue(listener.calledWith(
+				sinon.match((event) => event.constructor.name === 'CustomEvent')
+					.and(sinon.match.has('detail', sinon.match.object
+						.and(sinon.match.has('element', this.form))
+						.and(sinon.match.has('originalEvent', event))
+					))
+			));
 
 			assert.isTrue(event.defaultPrevented);
 			mock.verify();
@@ -433,10 +479,20 @@ describe('UIHandler', function () {
 				.withExactArgs('GET', '/UIHandler/submit', sinon.match.instanceOf(FormData).and(containsSubmit), {fetch: {}})
 				.once();
 
+			const listener = sinon.spy();
 			const handler = new UIHandler(naja);
+			handler.addEventListener('interaction', listener);
 
 			const event = new SubmitEvent('submit', {cancelable: true, submitter: this.input});
 			simulateInteraction(handler, this.form2, event);
+
+			assert.isTrue(listener.calledWith(
+				sinon.match((event) => event.constructor.name === 'CustomEvent')
+					.and(sinon.match.has('detail', sinon.match.object
+						.and(sinon.match.has('element', this.input))
+						.and(sinon.match.has('originalEvent', event))
+					))
+			));
 
 			assert.isTrue(event.defaultPrevented);
 			mock.verify();
@@ -451,10 +507,20 @@ describe('UIHandler', function () {
 				.withExactArgs('GET', '/UIHandler/image', sinon.match.instanceOf(FormData).and(containsImage), {fetch: {}})
 				.once();
 
+			const listener = sinon.spy();
 			const handler = new UIHandler(naja);
+			handler.addEventListener('interaction', listener);
 
 			const event = new SubmitEvent('submit', {cancelable: true, submitter: this.image});
 			simulateInteraction(handler, this.form3, event);
+
+			assert.isTrue(listener.calledWith(
+				sinon.match((event) => event.constructor.name === 'CustomEvent')
+					.and(sinon.match.has('detail', sinon.match.object
+						.and(sinon.match.has('element', this.image))
+						.and(sinon.match.has('originalEvent', event))
+					))
+			));
 
 			assert.isTrue(event.defaultPrevented);
 			mock.verify();
@@ -469,10 +535,20 @@ describe('UIHandler', function () {
 				.withExactArgs('GET', '/UIHandler/defaultSubmit', sinon.match.instanceOf(FormData).and(containsSubmit), {fetch: {}})
 				.once();
 
+			const listener = sinon.spy();
 			const handler = new UIHandler(naja);
+			handler.addEventListener('interaction', listener);
 
 			const event = new SubmitEvent('submit', {cancelable: true, submitter: this.submitButton});
 			simulateInteraction(handler, this.form4, event);
+
+			assert.isTrue(listener.calledWith(
+				sinon.match((event) => event.constructor.name === 'CustomEvent')
+					.and(sinon.match.has('detail', sinon.match.object
+						.and(sinon.match.has('element', this.submitButton))
+						.and(sinon.match.has('originalEvent', event))
+					))
+			));
 
 			assert.isTrue(event.defaultPrevented);
 			mock.verify();
@@ -487,10 +563,20 @@ describe('UIHandler', function () {
 				.withExactArgs('POST', '/UIHandler/externalSubmitOverride', sinon.match.instanceOf(FormData).and(containsSubmit), {fetch: {}})
 				.once();
 
+			const listener = sinon.spy();
 			const handler = new UIHandler(naja);
+			handler.addEventListener('interaction', listener);
 
 			const event = new SubmitEvent('submit', {cancelable: true, submitter: this.externalButton});
 			simulateInteraction(handler, this.form5, event);
+
+			assert.isTrue(listener.calledWith(
+				sinon.match((event) => event.constructor.name === 'CustomEvent')
+					.and(sinon.match.has('detail', sinon.match.object
+						.and(sinon.match.has('element', this.externalButton))
+						.and(sinon.match.has('originalEvent', event))
+					))
+			));
 
 			assert.isTrue(event.defaultPrevented);
 			mock.verify();

@@ -66,7 +66,7 @@ export class UIHandler extends EventTarget {
 		}
 
 		const {submitter} = event;
-		if (element.matches(this.selector) || submitter?.matches(this.selector)) {
+		if (this.selector === '' || element.matches(this.selector) || submitter?.matches(this.selector)) {
 			this.submitForm(submitter ?? element, options, event).catch(ignoreErrors);
 		}
 	}
