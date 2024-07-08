@@ -24,7 +24,7 @@ export class FormsHandler {
 			return;
 		}
 
-		if (element.tagName === 'form') {
+		if (element instanceof HTMLFormElement) {
 			netteForms.initForm(element);
 			return;
 		}
@@ -36,13 +36,15 @@ export class FormsHandler {
 	private processForm(event: InteractionEvent): void {
 		const {element, originalEvent} = event.detail;
 
-		const inputElement = element as HTMLInputElement;
-		if (inputElement.form !== undefined && inputElement.form !== null) {
-			inputElement.form['nette-submittedBy'] = element;
+		const isForm = element instanceof HTMLFormElement;
+		const isSubmitter = (element instanceof HTMLInputElement || element instanceof HTMLButtonElement) && element.form;
+
+		if (isSubmitter) {
+			element.form['nette-submittedBy'] = element;
 		}
 
 		const netteForms = this.netteForms || (window as any).Nette;
-		if ((element.tagName === 'FORM' || (element as HTMLInputElement).form) && netteForms && ! netteForms.validateForm(element)) {
+		if ((isForm || isSubmitter) && netteForms && ! netteForms.validateForm(element)) {
 			originalEvent?.stopImmediatePropagation();
 			originalEvent?.preventDefault();
 			event.preventDefault();
