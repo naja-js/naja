@@ -56,28 +56,51 @@ The `bindUI` method searches the given `element` and its children for elements t
 
 ## Manual dispatch
 
-Naja exposes two helper methods for dispatching UI-bound requests manually, `clickElement(link)` and `submitForm(form)`. The target element **does not** have to be bound to Naja via the configured selector. However, the aforementioned [allowed origin rules](#allowed-origins) still apply.
+Naja exposes two helper methods for dispatching UI-bound requests manually, `clickElement(link)` and `submitForm(formOrSubmitter)`. The target element **does not** have to be bound to Naja via the configured selector. However, the aforementioned [allowed origin rules](#allowed-origins) still apply.
 
-The `submitForm()` method is especially useful if you need to submit a form programmatically — such as when a value of an input changes — because `form.submit()` does not trigger the form's `submit` event which Naja relies on:
-
-```js
-selectBox.addEventListener('change', (event) => {
-	naja.uiHandler.submitForm(event.target.form);
-});
-```
-
-Both of them optionally accept the `options` object that you can use to configure the request:
+Both of these methods optionally accept the `options` object that you can use to configure the request:
 
 ```js
 naja.uiHandler.clickElement(link, { history: false });
 ```
 
-Both of these methods return the promise from the [underlying call to `naja.makeRequest()`](dispatch.md#handling-the-response):
+Both of them return the promise from the [underlying call to `naja.makeRequest()`](dispatch.md#handling-the-response):
 
 ```js
 naja.uiHandler.clickElement(link)
 	.then((payload) => { /* process payload */ });
 ```
+
+### Manual form submission
+
+The `submitForm()` method has been especially useful if you needed to submit a form programmatically — such as when a value of an input changes — because `form.submit()` does not trigger the form's `submit` event which Naja relies on.
+
+However, in modern browsers, you can use the native `form.requestSubmit()` to trigger the form submission in a way that Naja can notice and process:
+
+```js
+selectBox.addEventListener('change', (event) => {
+	event.target.form.requestSubmit();
+});
+```
+
+### Manual interaction with a non-supported element
+
+For all non-standard use cases, there is a `processInteraction()` helper method that allows you to hook Naja onto any custom interaction, and have it dispatch the `interaction` event properly:
+
+```js
+customButton.addEventListener('click', (event) => {
+	naja.uiHandler.processInteraction(
+		customButton, // interaction target
+		'GET', // method
+		customButton.dataset.targetUrl, // url
+		null, // data
+		{history: false}, // options
+		event, // original UI event
+	);
+});
+```
+
+?> The `processInteraction()` helper is available since version 3.1.0.
 
 
 ## Interaction event
