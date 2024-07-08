@@ -96,8 +96,9 @@ describe('UIHandler', function () {
 
 			this.a.dispatchEvent(new MouseEvent('click', {cancelable: true}));
 			this.form.dispatchEvent(new SubmitEvent('submit', {cancelable: true}));
+			this.form.requestSubmit();
 
-			assert.equal(naja.uiHandler.handler.callCount, 2);
+			assert.equal(naja.uiHandler.handler.callCount, 3);
 		});
 
 		it('binds to elements specified by custom selector', function () {
