@@ -3,10 +3,13 @@ import {RedirectEvent} from './RedirectHandler';
 import {InteractionEvent} from './UIHandler';
 import {onDomReady, TypedEventListener} from '../utils';
 
+const originalTitleKey = Symbol();
+
 declare module '../Naja' {
 	interface Options {
 		history?: HistoryMode;
 		href?: string;
+		[originalTitleKey]?: string;
 	}
 
 	interface Payload {
@@ -22,8 +25,8 @@ export interface HistoryState extends Record<string, any> {
 }
 
 export interface HistoryAdapter {
-	replaceState(state: HistoryState, url: string): void;
-	pushState(state: HistoryState, url: string): void;
+	replaceState(state: HistoryState, title: string, url: string): void;
+	pushState(state: HistoryState, title: string, url: string): void;
 }
 
 export type HistoryMode = boolean | 'replace';
@@ -40,6 +43,7 @@ export class HistoryHandler extends EventTarget {
 
 		naja.addEventListener('init', this.initialize.bind(this));
 		naja.addEventListener('before', this.saveUrl.bind(this));
+		naja.addEventListener('before', this.saveOriginalTitle.bind(this));
 		naja.addEventListener('before', this.replaceInitialState.bind(this));
 		naja.addEventListener('success', this.pushNewState.bind(this));
 
@@ -48,8 +52,8 @@ export class HistoryHandler extends EventTarget {
 		naja.uiHandler.addEventListener('interaction', this.configureMode.bind(this));
 
 		this.historyAdapter = {
-			replaceState: (state, url) => window.history.replaceState(state, '', url),
-			pushState: (state, url) => window.history.pushState(state, '', url),
+			replaceState: (state, title, url) => window.history.replaceState(state, title, url),
+			pushState: (state, title, url) => window.history.pushState(state, title, url),
 		};
 	}
 
@@ -75,6 +79,11 @@ export class HistoryHandler extends EventTarget {
 		window.addEventListener('popstate', this.popStateHandler);
 	}
 
+	private saveOriginalTitle(event: BeforeEvent): void {
+		const {options} = event.detail;
+		options[originalTitleKey] = window.document.title;
+	}
+
 	private saveUrl(event: BeforeEvent): void {
 		const {url, options} = event.detail;
 		options.href ??= url;
@@ -91,6 +100,7 @@ export class HistoryHandler extends EventTarget {
 		if (mode !== false && ! this.initialized) {
 			onDomReady(() => this.historyAdapter.replaceState(
 				this.buildState(window.location.href, 'replace', this.cursor, options),
+				window.document.title,
 				window.location.href,
 			));
 
@@ -130,11 +140,20 @@ export class HistoryHandler extends EventTarget {
 
 		const method = mode === 'replace' ? 'replaceState' : 'pushState';
 		const cursor = mode === 'replace' ? this.cursor : ++this.cursor;
+		const state = this.buildState(options.href!, mode, cursor, options);
+
+		// before the state is pushed into history, revert to the original title
+		const newTitle = window.document.title;
+		window.document.title = options[originalTitleKey]!;
 
 		this.historyAdapter[method](
-			this.buildState(options.href!, mode, cursor, options),
+			state,
+			newTitle,
 			options.href!,
 		);
+
+		// after the state is pushed into history, update back to the new title
+		window.document.title = newTitle;
 	}
 
 	private buildState(href: string, mode: HistoryMode, cursor: number, options: Options): HistoryState {
