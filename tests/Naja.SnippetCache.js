@@ -50,7 +50,7 @@ describe('SnippetCache', function () {
 				storage: TEST_STORAGE_TYPE,
 				key: 'key',
 			},
-		}, 'http://localhost:9876/SnippetCache/store').once();
+		}, '', 'http://localhost:9876/SnippetCache/store').once();
 
 		const el = document.createElement('div');
 		el.id = 'snippet-cache-foo';
@@ -133,7 +133,7 @@ describe('SnippetCache', function () {
 				storage: TEST_STORAGE_TYPE,
 				key: 'key',
 			},
-		}, 'http://localhost:9876/SnippetCache/map').once();
+		}, '', 'http://localhost:9876/SnippetCache/map').once();
 
 		const el = document.createElement('div');
 		el.id = 'snippet-cache-map';

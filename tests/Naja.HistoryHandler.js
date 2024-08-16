@@ -48,7 +48,7 @@ describe('HistoryHandler', function () {
 
 		const mock = sinon.mock(historyHandler.historyAdapter);
 		const href = sinon.match.string.and(sinon.match((value) => value.startsWith('http://localhost:9876/?wtr-session-id=')));
-		mock.expects('replaceState').withExactArgs({source: 'naja', cursor: 0, href}, href).once();
+		mock.expects('replaceState').withExactArgs({source: 'naja', cursor: 0, href}, '', href).once();
 
 		historyHandler.replaceInitialState(new CustomEvent('before', {detail: {options: {history: true}}}));
 
@@ -65,7 +65,7 @@ describe('HistoryHandler', function () {
 		naja.historyHandler.initialized = true;
 
 		const mock = sinon.mock(naja.historyHandler.historyAdapter);
-		mock.expects('pushState').withExactArgs({source: 'naja', cursor: 1, href: 'http://localhost:9876/HistoryHandler/pushState'}, 'http://localhost:9876/HistoryHandler/pushState').once();
+		mock.expects('pushState').withExactArgs({source: 'naja', cursor: 1, href: 'http://localhost:9876/HistoryHandler/pushState'}, '', 'http://localhost:9876/HistoryHandler/pushState').once();
 
 		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {});
 		return naja.makeRequest('GET', '/HistoryHandler/pushState').then(() => {
@@ -83,7 +83,7 @@ describe('HistoryHandler', function () {
 		naja.historyHandler.initialized = true;
 
 		const mock = sinon.mock(naja.historyHandler.historyAdapter);
-		mock.expects('replaceState').withExactArgs({source: 'naja', cursor: 0, href: 'http://localhost:9876/HistoryHandler/replaceState'}, 'http://localhost:9876/HistoryHandler/replaceState').once();
+		mock.expects('replaceState').withExactArgs({source: 'naja', cursor: 0, href: 'http://localhost:9876/HistoryHandler/replaceState'}, '', 'http://localhost:9876/HistoryHandler/replaceState').once();
 
 		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {});
 		return naja.makeRequest('GET', '/HistoryHandler/replaceState', null, {history: 'replace'}).then(() => {
@@ -101,7 +101,7 @@ describe('HistoryHandler', function () {
 		naja.historyHandler.initialized = true;
 
 		const mock = sinon.mock(naja.historyHandler.historyAdapter);
-		mock.expects('pushState').withExactArgs({source: 'naja', cursor: 1, href: '/HistoryHandler/postGet/targetUrl'}, '/HistoryHandler/postGet/targetUrl').once();
+		mock.expects('pushState').withExactArgs({source: 'naja', cursor: 1, href: '/HistoryHandler/postGet/targetUrl'}, '', '/HistoryHandler/postGet/targetUrl').once();
 
 		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {url: '/HistoryHandler/postGet/targetUrl', postGet: true});
 		return naja.makeRequest('GET', '/HistoryHandler/postGet').then(() => {
@@ -138,7 +138,7 @@ describe('HistoryHandler', function () {
 		naja.historyHandler.initialized = true;
 
 		const mock = sinon.mock(naja.historyHandler.historyAdapter);
-		mock.expects('pushState').withExactArgs({source: 'naja', cursor: 1, href: '/HistoryHandler/redirect/targetUrl'}, '/HistoryHandler/redirect/targetUrl').once();
+		mock.expects('pushState').withExactArgs({source: 'naja', cursor: 1, href: '/HistoryHandler/redirect/targetUrl'}, '', '/HistoryHandler/redirect/targetUrl').once();
 		mock.expects('replaceState').never();
 
 		this.fetchMock.when((request) => request.url.endsWith('/redirect'))
@@ -153,6 +153,29 @@ describe('HistoryHandler', function () {
 			.then(() => {
 				mock.verify();
 				mock.restore();
+			});
+	});
+
+	it('stores correct title in the history entry', function () {
+		const naja = mockNaja({
+			snippetHandler: SnippetHandler,
+			historyHandler: HistoryHandler,
+		});
+
+		naja.historyHandler.initialized = true;
+
+		const mock = sinon.mock(naja.historyHandler.historyAdapter);
+		mock.expects('pushState').withExactArgs({source: 'naja', cursor: 1, href: 'http://localhost:9876/HistoryHandler/title'}, 'new title', 'http://localhost:9876/HistoryHandler/title').once();
+
+		document.querySelector('title').id = 'snippet--title';
+
+		this.fetchMock.respond(200, {'Content-Type': 'application/json'}, {snippets: {'snippet--title': 'new title'}});
+		return naja.makeRequest('GET', '/HistoryHandler/title')
+			.then(() => {
+				mock.verify();
+				mock.restore();
+
+				document.querySelector('title').id = '';
 			});
 	});
 
