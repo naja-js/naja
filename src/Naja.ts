@@ -11,7 +11,7 @@ export interface Options extends Record<string, any> {
 	fetch?: RequestInit;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface Payload extends Record<string, any> {}
 
 export class Naja extends EventTarget {

@@ -1,8 +1,8 @@
-import {fileURLToPath} from 'node:url';
 import rollupCommonjs from '@rollup/plugin-commonjs';
 import {esbuildPlugin} from '@web/dev-server-esbuild';
 import {fromRollup} from '@web/dev-server-rollup';
-import {playwrightLauncher} from "@web/test-runner-playwright";
+import {playwrightLauncher} from '@web/test-runner-playwright';
+import {fileURLToPath} from 'node:url';
 
 const commonjs = fromRollup(rollupCommonjs);
 
@@ -21,6 +21,7 @@ export default {
 	],
 	plugins: [
 		commonjs({
+			strictRequires: 'auto',
 			include: [
 				'**/node_modules/nette-forms/**/*',
 			],

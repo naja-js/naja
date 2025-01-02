@@ -5,10 +5,10 @@
 coverage/
 node_modules/
 tests/
-.eslintrc
 .gitignore
 .npmignore
 .yarnrc.yml
+eslint.config.mjs
 rollup.config.mjs
 tsconfig.json
 web-test-runner.config.mjs
