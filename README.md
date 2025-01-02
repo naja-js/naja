@@ -4,8 +4,7 @@
 [![Code Coverage](https://img.shields.io/codecov/c/github/naja-js/naja.svg)](https://codecov.io/gh/naja-js/naja)
 [![latest version](https://img.shields.io/npm/v/naja)](https://npmjs.com/package/naja)
 [![license](https://img.shields.io/npm/l/naja)](https://npmjs.com/package/naja)
-[![minified size](https://img.shields.io/bundlephobia/min/naja)](https://npmjs.com/package/naja)
-[![minzipped size](https://img.shields.io/bundlephobia/minzip/naja)](https://npmjs.com/package/naja)
+[![package size](https://deno.bundlejs.com/?q=naja&badge=detailed)](https://bundlejs.com/?q=naja)
 [![monthly downloads](https://img.shields.io/npm/dm/naja.svg)](https://npmjs.com/package/naja)
 [![downloads total](https://img.shields.io/npm/dt/naja.svg)](https://npmjs.com/package/naja)
 
