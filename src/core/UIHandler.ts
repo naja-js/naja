@@ -6,49 +6,35 @@ export class UIHandler extends EventTarget {
 	public allowedOrigins: (string | URL)[] = [window.location.origin];
 	private handler = this.handleUI.bind(this);
 
+	public binding: BindingStrategyType = 'direct';
+	private _bindingStrategy: BindingStrategy|undefined;
+	private readonly bindingStrategies: Record<BindingStrategyType, BindingStrategy>;
+
+	private get bindingStrategy() {
+		this._bindingStrategy ??= this.bindingStrategies[this.binding];
+		return this._bindingStrategy;
+	}
+
 	public constructor(private readonly naja: Naja) {
 		super();
+
+		this.bindingStrategies = {
+			direct: new DirectBindingStrategy(naja),
+			delegated: new DelegatedBindingStrategy(naja),
+		};
+
 		naja.addEventListener('init', this.initialize.bind(this));
 	}
 
 	private initialize(): void {
-		onDomReady(() => this.bindUI(window.document.body));
-		this.naja.snippetHandler.addEventListener('afterUpdate', (event) => {
-			const {snippet} = event.detail;
-			this.bindUI(snippet);
-		});
+		this.bindingStrategy.initialize(this.handler);
 	}
 
 	public bindUI(element: Element): void {
-		const selector = `a${this.selector}`;
-
-		const bindElement = (element: HTMLAnchorElement) => {
-			element.removeEventListener('click', this.handler);
-			element.addEventListener('click', this.handler);
-		};
-
-		if (element.matches(selector)) {
-			return bindElement(element as HTMLAnchorElement);
-		}
-
-		const elements = element.querySelectorAll(selector);
-		elements.forEach((element) => bindElement(element as HTMLAnchorElement));
-
-		const bindForm = (form: HTMLFormElement) => {
-			form.removeEventListener('submit', this.handler);
-			form.addEventListener('submit', this.handler);
-		};
-
-		if (element instanceof HTMLFormElement) {
-			return bindForm(element);
-		}
-
-		const forms = element.querySelectorAll('form');
-		forms.forEach((form) => bindForm(form));
+		this.bindingStrategy.bind(element);
 	}
 
-	private handleUI(event: MouseEvent | SubmitEvent): void {
-		const element = event.currentTarget as HTMLElement;
+	private handleUI(element: HTMLElement, event: MouseEvent | SubmitEvent): void {
 		const options = this.naja.prepareOptions();
 
 		const ignoreErrors = () => {
@@ -147,4 +133,102 @@ export type InteractionEvent = CustomEvent<{element: Element, originalEvent?: Ev
 
 interface UIHandlerEventMap {
 	interaction: InteractionEvent;
+}
+
+type BindingStrategyType = 'direct' | 'delegated';
+
+interface BindingStrategy {
+	readonly type: BindingStrategyType;
+	initialize(handler: (target: HTMLElement, event: MouseEvent | SubmitEvent) => unknown): void;
+	bind(element: Element): void;
+}
+
+class DirectBindingStrategy implements BindingStrategy {
+	public readonly type = 'direct';
+
+	private eventListener: (event: MouseEvent | SubmitEvent) => unknown = () => {
+		throw new Error('UIHandler: binding strategy must be initialized first.');
+	};
+
+	// eslint-disable-next-line no-empty-function
+	public constructor(private readonly naja: Naja) {}
+
+	public initialize(
+		handler: (target: HTMLElement, event: MouseEvent | SubmitEvent) => unknown,
+	): void {
+		this.eventListener = (event: MouseEvent | SubmitEvent) => handler(event.currentTarget as HTMLElement, event);
+
+		onDomReady(() => this.bind(window.document.body));
+		this.naja.snippetHandler.addEventListener('afterUpdate', (event) => {
+			const {snippet} = event.detail;
+			this.bind(snippet);
+		});
+	}
+
+	public bind(element: Element): void {
+		const linkSelector = `a${this.naja.uiHandler.selector}`;
+		if (element.matches(linkSelector)) {
+			(element as HTMLAnchorElement).removeEventListener('click', this.eventListener);
+			(element as HTMLAnchorElement).addEventListener('click', this.eventListener);
+			return;
+		}
+
+		const links = element.querySelectorAll(linkSelector);
+		links.forEach((link) => {
+			(link as HTMLAnchorElement).removeEventListener('click', this.eventListener);
+			(link as HTMLAnchorElement).addEventListener('click', this.eventListener);
+		});
+
+		if (element instanceof HTMLFormElement) {
+			element.removeEventListener('submit', this.eventListener);
+			element.addEventListener('submit', this.eventListener);
+			return;
+		}
+
+		const forms = element.querySelectorAll('form');
+		forms.forEach((form) => {
+			form.removeEventListener('submit', this.eventListener);
+			form.addEventListener('submit', this.eventListener);
+		});
+	}
+}
+
+class DelegatedBindingStrategy implements BindingStrategy {
+	public readonly type = 'delegated';
+
+	private clickEventListener: (event: MouseEvent) => unknown = () => {
+		throw new Error('UIHandler: binding strategy must be initialized first.');
+	};
+
+	private submitEventListener: (event: SubmitEvent) => unknown = () => {
+		throw new Error('UIHandler: binding strategy must be initialized first.');
+	};
+
+	// eslint-disable-next-line no-empty-function
+	public constructor(private readonly naja: Naja) {}
+
+	public initialize(
+		handler: (target: HTMLElement, event: MouseEvent | SubmitEvent) => unknown,
+	): void {
+		this.clickEventListener = (event: MouseEvent) => {
+			const linkSelector = `a${this.naja.uiHandler.selector}`;
+			const target = (event.target as HTMLElement).closest(linkSelector);
+			if (target !== null) {
+				handler(target as HTMLAnchorElement, event);
+			}
+		};
+
+		this.submitEventListener = (event: SubmitEvent) => {
+			handler(event.target as HTMLFormElement, event);
+		};
+
+		onDomReady(() => {
+			window.document.body.addEventListener('click', this.clickEventListener);
+			window.document.body.addEventListener('submit', this.submitEventListener);
+		});
+	}
+
+	public bind(): void {
+		// no-op
+	}
 }
