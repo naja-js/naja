@@ -13,19 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: crazy-max/ghaction-import-gpg@v6
-        with:
-          gpg_private_key: ${{ secrets.GPG_SIGNING_KEY }}
-          passphrase: ${{ secrets.GPG_SIGNING_KEY_PASSPHRASE }}
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
           cache: yarn
       - run: yarn install --immutable
       - run: yarn build
-      - run: |
-          gpg --local-user B352BC4C --armor --detach-sig dist/Naja.js
-          gpg --local-user B352BC4C --armor --detach-sig dist/Naja.min.js
       - uses: actions/upload-artifact@v4
         with:
           name: dist-files
@@ -47,10 +40,8 @@ jobs:
           files: |
             dist/Naja.js
             dist/Naja.js.map
-            dist/Naja.js.asc
             dist/Naja.min.js
             dist/Naja.min.js.map
-            dist/Naja.min.js.asc
 
   publish:
     runs-on: ubuntu-latest
