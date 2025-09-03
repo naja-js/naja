@@ -114,7 +114,10 @@ export class SnippetHandler extends EventTarget {
 		}));
 
 		const updateElement = typeof operation === 'function' ? operation : operation.updateElement;
-		await updateElement(snippet, content);
+		const updateOperation = updateElement(snippet, content);
+		if (updateOperation instanceof Promise) {
+			await updateOperation;
+		}
 
 		this.dispatchEvent(new CustomEvent('afterUpdate', {
 			detail: {
