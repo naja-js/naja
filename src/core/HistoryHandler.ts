@@ -167,6 +167,7 @@ export class HistoryHandler extends EventTarget {
 			detail: {
 				state,
 				operation: mode === 'replace' ? 'replaceState' : 'pushState',
+				isInitial: ! this.initialized,
 				options,
 			},
 		}));
