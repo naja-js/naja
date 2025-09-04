@@ -292,6 +292,7 @@ describe('HistoryHandler', function () {
 						.and(sinon.match.has('detail', sinon.match.object
 							.and(sinon.match.has('state', sinon.match.object))
 							.and(sinon.match.has('operation', 'pushState'))
+							.and(sinon.match.has('isInitial', false))
 							.and(sinon.match.has('options', sinon.match.object))
 						))
 				));
@@ -323,6 +324,7 @@ describe('HistoryHandler', function () {
 						.and(sinon.match.has('detail', sinon.match.object
 							.and(sinon.match.has('state', sinon.match.object))
 							.and(sinon.match.has('operation', 'replaceState'))
+							.and(sinon.match.has('isInitial', false))
 							.and(sinon.match.has('options', sinon.match.object))
 						))
 				));
@@ -330,6 +332,33 @@ describe('HistoryHandler', function () {
 				mock.verify();
 				mock.restore();
 			});
+		});
+
+		it('dispatches event on build initial state', function () {
+			const naja = mockNaja();
+			const historyHandler = new HistoryHandler(naja);
+
+			const mock = sinon.mock(historyHandler.historyAdapter);
+			mock.expects('replaceState').once();
+
+			const buildStateCallback = sinon.spy();
+			historyHandler.addEventListener('buildState', buildStateCallback);
+
+			historyHandler.replaceInitialState(new CustomEvent('before', {detail: {options: {history: true}}}));
+
+			assert.isTrue(buildStateCallback.calledOnce);
+			assert.isTrue(buildStateCallback.calledWith(
+				sinon.match((event) => event.constructor.name === 'CustomEvent')
+					.and(sinon.match.has('detail', sinon.match.object
+						.and(sinon.match.has('state', sinon.match.object))
+						.and(sinon.match.has('operation', 'replaceState'))
+						.and(sinon.match.has('isInitial', true))
+						.and(sinon.match.has('options', sinon.match.object)),
+					)),
+			));
+
+			mock.verify();
+			mock.restore();
 		});
 
 		it('dispatches event on popstate', function () {
