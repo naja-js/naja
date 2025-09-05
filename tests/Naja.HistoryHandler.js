@@ -42,6 +42,23 @@ describe('HistoryHandler', function () {
 		});
 	});
 
+	it('is initialized when popstate to a Naja-produced state is dispatched', function () {
+		const naja = mockNaja({
+			historyHandler: HistoryHandler,
+		});
+
+		naja.historyHandler.initialize();
+
+		assert.isFalse(naja.historyHandler.initialized);
+
+		const state = {source: 'naja', cursor: 1, href: '/HistoryHandler/popState/event'};
+		window.dispatchEvent(createPopstateEvent(state));
+
+		assert.isTrue(naja.historyHandler.initialized);
+
+		cleanPopstateListener(naja.historyHandler);
+	});
+
 	it('saves initial state', function () {
 		const naja = mockNaja();
 		const historyHandler = new HistoryHandler(naja);
@@ -50,10 +67,29 @@ describe('HistoryHandler', function () {
 		const href = sinon.match.string.and(sinon.match((value) => value.startsWith('http://localhost:9876/?wtr-session-id=')));
 		mock.expects('replaceState').withExactArgs({source: 'naja', cursor: 0, href}, '', href).once();
 
-		historyHandler.replaceInitialState(new CustomEvent('before', {detail: {options: {history: true}}}));
+		historyHandler.replaceInitialStateBeforeRequest(new CustomEvent('before', {detail: {options: {history: true}}}));
 
 		mock.verify();
 		mock.restore();
+	});
+
+	it('preserves cursor value after page reload', function () {
+		const naja = mockNaja();
+		const historyHandler = new HistoryHandler(naja);
+
+		historyHandler.historyAdapter = {
+			state: {
+				source: 'naja',
+				cursor: 42,
+				href: '/test',
+			},
+		};
+
+		assert.equal(historyHandler.cursor, 0);
+
+		historyHandler.preserveCursorFromState();
+
+		assert.equal(historyHandler.cursor, 42);
 	});
 
 	it('pushes new state after successful request', function () {
@@ -344,7 +380,7 @@ describe('HistoryHandler', function () {
 			const buildStateCallback = sinon.spy();
 			historyHandler.addEventListener('buildState', buildStateCallback);
 
-			historyHandler.replaceInitialState(new CustomEvent('before', {detail: {options: {history: true}}}));
+			historyHandler.replaceInitialStateBeforeRequest(new CustomEvent('before', {detail: {options: {history: true}}}));
 
 			assert.isTrue(buildStateCallback.calledOnce);
 			assert.isTrue(buildStateCallback.calledWith(

@@ -25,6 +25,7 @@ export interface HistoryState extends Record<string, any> {
 }
 
 export interface HistoryAdapter {
+	state: HistoryState | null;
 	replaceState(state: HistoryState, title: string, url: string): void;
 	pushState(state: HistoryState, title: string, url: string): void;
 }
@@ -42,9 +43,10 @@ export class HistoryHandler extends EventTarget {
 		super();
 
 		naja.addEventListener('init', this.initialize.bind(this));
+		naja.addEventListener('init', this.preserveCursorFromState.bind(this));
 		naja.addEventListener('before', this.saveUrl.bind(this));
 		naja.addEventListener('before', this.saveOriginalTitle.bind(this));
-		naja.addEventListener('before', this.replaceInitialState.bind(this));
+		naja.addEventListener('before', this.replaceInitialStateBeforeRequest.bind(this));
 		naja.addEventListener('success', this.pushNewState.bind(this));
 
 		naja.redirectHandler.addEventListener('redirect', this.saveRedirectedUrl.bind(this));
@@ -52,6 +54,9 @@ export class HistoryHandler extends EventTarget {
 		naja.uiHandler.addEventListener('interaction', this.configureMode.bind(this));
 
 		this.historyAdapter = {
+			get state() {
+				return window.history.state;
+			},
 			replaceState: (state, title, url) => window.history.replaceState(state, title, url),
 			pushState: (state, title, url) => window.history.pushState(state, title, url),
 		};
@@ -68,6 +73,8 @@ export class HistoryHandler extends EventTarget {
 			return;
 		}
 
+		this.replaceInitialState();
+
 		const direction = state.cursor - this.cursor;
 		this.cursor = state.cursor;
 
@@ -77,6 +84,12 @@ export class HistoryHandler extends EventTarget {
 
 	private initialize(): void {
 		window.addEventListener('popstate', this.popStateHandler);
+	}
+
+	private preserveCursorFromState(): void {
+		if (this.historyAdapter.state?.source === 'naja') {
+			this.cursor = this.historyAdapter.state.cursor;
+		}
 	}
 
 	private saveOriginalTitle(event: BeforeEvent): void {
@@ -94,10 +107,16 @@ export class HistoryHandler extends EventTarget {
 		options.href = url;
 	}
 
-	private replaceInitialState(event: BeforeEvent): void {
+	private replaceInitialStateBeforeRequest(event: BeforeEvent): void {
 		const {options} = event.detail;
 		const mode = HistoryHandler.normalizeMode(options.history);
-		if (mode !== false && ! this.initialized) {
+		if (mode !== false) {
+			this.replaceInitialState(options);
+		}
+	}
+
+	private replaceInitialState(options: Options = this.naja.prepareOptions()): void {
+		if ( ! this.initialized) {
 			onDomReady(() => this.historyAdapter.replaceState(
 				this.buildState(window.location.href, 'replace', this.cursor, options),
 				window.document.title,
