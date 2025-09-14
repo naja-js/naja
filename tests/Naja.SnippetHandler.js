@@ -263,4 +263,53 @@ describe('SnippetHandler', function () {
 
 		document.body.removeChild(el);
 	});
+
+	it('updateSnippet() is synchronous when possible', async function () {
+		const naja = mockNaja();
+		const snippetHandler = new SnippetHandler(naja);
+
+		const afterCallback = sinon.spy();
+		snippetHandler.addEventListener('afterUpdate', afterCallback);
+
+		const el1 = document.createElement('div');
+		el1.id = 'snippet--foo';
+		el1.innerHTML = 'Foo';
+		document.body.appendChild(el1);
+
+		const el2 = document.createElement('div');
+		el2.id = 'snippet--bar';
+		el2.innerHTML = 'Bar';
+		document.body.appendChild(el2);
+
+		snippetHandler.addEventListener('beforeUpdate', (event) => {
+			// make el1 update async
+			if (event.detail.snippet === el1) {
+				event.detail.changeOperation((snippet, content) => Promise.resolve(content));
+			}
+		});
+
+		await snippetHandler.updateSnippets({
+			'snippet--foo': 'updated Foo',
+			'snippet--bar': 'updated Bar',
+		});
+
+		assert.isTrue(afterCallback.calledTwice);
+
+		assert.isTrue(afterCallback.firstCall.calledWith(
+			sinon.match((event) => event.constructor.name === 'CustomEvent')
+				.and(sinon.match.has('detail', sinon.match.object.and(
+					sinon.match.has('snippet', el2),
+				))),
+		));
+
+		assert.isTrue(afterCallback.secondCall.calledWith(
+			sinon.match((event) => event.constructor.name === 'CustomEvent')
+				.and(sinon.match.has('detail', sinon.match.object.and(
+					sinon.match.has('snippet', el1),
+				))),
+		));
+
+		document.body.removeChild(el1);
+		document.body.removeChild(el2);
+	});
 });
