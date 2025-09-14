@@ -6,7 +6,7 @@ on:
 
 permissions:
   id-token: write
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -58,4 +58,5 @@ jobs:
         with:
           node-version: lts/*
           registry-url: 'https://registry.npmjs.org'
+      - run: npm install -g npm@latest # ensure latest npm is installed
       - run: npm publish
