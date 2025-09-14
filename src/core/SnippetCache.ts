@@ -185,7 +185,7 @@ interface SnippetCacheStorage {
 
 class OffCacheStorage implements SnippetCacheStorage {
 	public readonly type = 'off';
-	public constructor(private readonly naja: Naja) {} // eslint-disable-line no-empty-function
+	public constructor(private readonly naja: Naja) {}
 
 	public store(): null {
 		return null;
