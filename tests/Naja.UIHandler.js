@@ -85,98 +85,124 @@ describe('UIHandler', function () {
 		mock.verify();
 	});
 
-	describe('bindUI()', function () {
-		it('binds to .ajax elements by default', function () {
-			const naja = mockNaja({
-				snippetHandler: SnippetHandler,
-				uiHandler: UIHandler,
-			});
-			naja.uiHandler.handler = sinon.spy((evt) => evt.preventDefault());
-			naja.initialize();
+	['direct', 'delegated'].forEach((bindingStrategy) => {
+		describe(`UI binding – ${bindingStrategy}`, function () {
+			function cleanUp(naja) {
+				if (bindingStrategy === 'delegated') {
+					document.body.removeEventListener('click', naja.uiHandler.bindingStrategy.clickEventListener);
+					document.body.removeEventListener('submit', naja.uiHandler.bindingStrategy.submitEventListener);
+				}
+			}
 
-			this.a.dispatchEvent(new MouseEvent('click', {cancelable: true}));
-			this.form.dispatchEvent(new SubmitEvent('submit', {cancelable: true}));
-			this.form.requestSubmit();
+			it('binds to .ajax elements by default', function () {
+				const naja = mockNaja({
+					snippetHandler: SnippetHandler,
+					uiHandler: UIHandler,
+				});
+				naja.uiHandler.binding = bindingStrategy;
+				naja.uiHandler.handler = sinon.spy((_, evt) => evt.preventDefault());
+				naja.initialize();
 
-			assert.equal(naja.uiHandler.handler.callCount, 3);
-		});
+				this.a.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true}));
+				this.form.dispatchEvent(new SubmitEvent('submit', {bubbles: true, cancelable: true}));
+				this.form.requestSubmit();
 
-		it('binds to elements specified by custom selector', function () {
-			const customSelectorLink = document.createElement('a');
-			customSelectorLink.href = '/UIHandler/customSelector';
-			customSelectorLink.setAttribute('data-naja', true);
-			document.body.appendChild(customSelectorLink);
+				assert.equal(naja.uiHandler.handler.callCount, 3);
+				assert.isTrue(naja.uiHandler.handler.firstCall.calledWith(this.a));
+				assert.isTrue(naja.uiHandler.handler.secondCall.calledWith(this.form));
 
-			const naja = mockNaja({
-				snippetHandler: SnippetHandler,
-				uiHandler: UIHandler,
-			});
-			naja.uiHandler.selector = '[data-naja]';
-			naja.uiHandler.handler = sinon.spy((evt) => evt.preventDefault());
-			naja.initialize();
-
-			customSelectorLink.dispatchEvent(new MouseEvent('click', {cancelable: true}));
-			assert.isTrue(naja.uiHandler.handler.called);
-			document.body.removeChild(customSelectorLink);
-		});
-
-		it('binds to all elements when selector is empty', function () {
-			const emptySelectorLink = document.createElement('a');
-			emptySelectorLink.href = '/UIHandler/emptySelector';
-			document.body.appendChild(emptySelectorLink);
-
-			const emptySelectorForm = document.createElement('form');
-			emptySelectorForm.action = '/UIHandler/emptySelector';
-			document.body.appendChild(emptySelectorForm);
-
-			const emptySelectorFormWithSubmitter = document.createElement('form');
-			emptySelectorFormWithSubmitter.action = '/UIHandler/emptySelector';
-			document.body.appendChild(emptySelectorFormWithSubmitter);
-
-			const emptySelectorSubmitter = document.createElement('input');
-			emptySelectorSubmitter.type = 'submit';
-			emptySelectorFormWithSubmitter.appendChild(emptySelectorSubmitter);
-
-			const naja = mockNaja({
-				snippetHandler: SnippetHandler,
-				uiHandler: UIHandler,
-			});
-			naja.uiHandler.selector = '';
-			naja.uiHandler.handler = sinon.spy((evt) => evt.preventDefault());
-			naja.initialize();
-
-			emptySelectorLink.dispatchEvent(new MouseEvent('click', {cancelable: true}));
-			emptySelectorForm.dispatchEvent(new SubmitEvent('submit', {cancelable: true}));
-			emptySelectorFormWithSubmitter.dispatchEvent(new SubmitEvent('submit', {submitter: emptySelectorSubmitter, cancelable: true}));
-
-			assert.equal(naja.uiHandler.handler.callCount, 3);
-
-			document.body.removeChild(emptySelectorLink);
-			document.body.removeChild(emptySelectorForm);
-			document.body.removeChild(emptySelectorFormWithSubmitter);
-		});
-
-		it('binds after snippet update', async function () {
-			const snippetDiv = document.createElement('div');
-			snippetDiv.id = 'snippet-uiHandler-snippet-bind';
-			document.body.appendChild(snippetDiv);
-
-			const naja = mockNaja({
-				snippetHandler: SnippetHandler,
-				uiHandler: UIHandler,
-			});
-			naja.uiHandler.handler = sinon.spy((evt) => evt.preventDefault());
-			naja.initialize();
-
-			await naja.snippetHandler.updateSnippets({
-				'snippet-uiHandler-snippet-bind': '<a href="/UIHandler/snippetBind" class="ajax" id="uiHandler-snippet-bind">test</a>',
+				cleanUp(naja);
 			});
 
-			const a = document.getElementById('uiHandler-snippet-bind');
-			a.dispatchEvent(new MouseEvent('click', {cancelable: true}));
+			it('binds to elements specified by custom selector', function () {
+				const customSelectorLink = document.createElement('a');
+				customSelectorLink.href = '/UIHandler/customSelector';
+				customSelectorLink.setAttribute('data-naja', true);
+				document.body.appendChild(customSelectorLink);
 
-			assert.isTrue(naja.uiHandler.handler.called);
-			document.body.removeChild(snippetDiv);
+				const naja = mockNaja({
+					snippetHandler: SnippetHandler,
+					uiHandler: UIHandler,
+				});
+				naja.uiHandler.selector = '[data-naja]';
+				naja.uiHandler.binding = bindingStrategy;
+				naja.uiHandler.handler = sinon.spy((_, evt) => evt.preventDefault());
+				naja.initialize();
+
+				customSelectorLink.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true}));
+				assert.isTrue(naja.uiHandler.handler.called);
+				assert.isTrue(naja.uiHandler.handler.calledWith(customSelectorLink));
+
+				document.body.removeChild(customSelectorLink);
+				cleanUp(naja);
+			});
+
+			it('binds to all elements when selector is empty', function () {
+				const emptySelectorLink = document.createElement('a');
+				emptySelectorLink.href = '/UIHandler/emptySelector';
+				document.body.appendChild(emptySelectorLink);
+
+				const emptySelectorForm = document.createElement('form');
+				emptySelectorForm.action = '/UIHandler/emptySelector';
+				document.body.appendChild(emptySelectorForm);
+
+				const emptySelectorFormWithSubmitter = document.createElement('form');
+				emptySelectorFormWithSubmitter.action = '/UIHandler/emptySelector';
+				document.body.appendChild(emptySelectorFormWithSubmitter);
+
+				const emptySelectorSubmitter = document.createElement('input');
+				emptySelectorSubmitter.type = 'submit';
+				emptySelectorFormWithSubmitter.appendChild(emptySelectorSubmitter);
+
+				const naja = mockNaja({
+					snippetHandler: SnippetHandler,
+					uiHandler: UIHandler,
+				});
+				naja.uiHandler.selector = '';
+				naja.uiHandler.binding = bindingStrategy;
+				naja.uiHandler.handler = sinon.spy((_, evt) => evt.preventDefault());
+				naja.initialize();
+
+				emptySelectorLink.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true}));
+				emptySelectorForm.dispatchEvent(new SubmitEvent('submit', {bubbles: true, cancelable: true}));
+				emptySelectorFormWithSubmitter.dispatchEvent(new SubmitEvent('submit', {submitter: emptySelectorSubmitter, bubbles: true, cancelable: true}));
+
+				assert.equal(naja.uiHandler.handler.callCount, 3);
+				assert.isTrue(naja.uiHandler.handler.firstCall.calledWith(emptySelectorLink));
+				assert.isTrue(naja.uiHandler.handler.secondCall.calledWith(emptySelectorForm));
+				assert.isTrue(naja.uiHandler.handler.thirdCall.calledWith(emptySelectorFormWithSubmitter));
+
+				document.body.removeChild(emptySelectorLink);
+				document.body.removeChild(emptySelectorForm);
+				document.body.removeChild(emptySelectorFormWithSubmitter);
+				cleanUp(naja);
+			});
+
+			it('binds after snippet update', async function () {
+				const snippetDiv = document.createElement('div');
+				snippetDiv.id = 'snippet-uiHandler-snippet-bind';
+				document.body.appendChild(snippetDiv);
+
+				const naja = mockNaja({
+					snippetHandler: SnippetHandler,
+					uiHandler: UIHandler,
+				});
+				naja.uiHandler.binding = bindingStrategy;
+				naja.uiHandler.handler = sinon.spy((_, evt) => evt.preventDefault());
+				naja.initialize();
+
+				await naja.snippetHandler.updateSnippets({
+					'snippet-uiHandler-snippet-bind': '<a href="/UIHandler/snippetBind" class="ajax" id="uiHandler-snippet-bind">test</a>',
+				});
+
+				const a = document.getElementById('uiHandler-snippet-bind');
+				a.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true}));
+
+				assert.isTrue(naja.uiHandler.handler.called);
+				assert.isTrue(naja.uiHandler.handler.calledWith(a));
+				document.body.removeChild(snippetDiv);
+				cleanUp(naja);
+			});
 		});
 	});
 
@@ -184,7 +210,7 @@ describe('UIHandler', function () {
 		function simulateInteraction(handler, target, event) {
 			target.addEventListener(event.type, (event) => {
 				event.preventDefault();
-				handler.handleUI(event);
+				handler.handleUI(target, event);
 			}, {once: true});
 
 			target.dispatchEvent(event);
