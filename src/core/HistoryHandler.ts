@@ -198,7 +198,7 @@ export class HistoryHandler extends EventTarget {
 	declare public removeEventListener: <K extends keyof HistoryHandlerEventMap | string>(type: K, listener: TypedEventListener<HistoryHandler, K extends keyof HistoryHandlerEventMap ? HistoryHandlerEventMap[K] : CustomEvent>, options?: boolean | AddEventListenerOptions) => void;
 }
 
-export type BuildStateEvent = CustomEvent<{state: HistoryState, operation: 'pushState' | 'replaceState', options: Options}>;
+export type BuildStateEvent = CustomEvent<{state: HistoryState, operation: 'pushState' | 'replaceState', isInitial: boolean, options: Options}>;
 export type RestoreStateEvent = CustomEvent<{state: HistoryState, direction: number, options: Options}>;
 
 interface HistoryHandlerEventMap {
