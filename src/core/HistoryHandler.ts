@@ -43,7 +43,6 @@ export class HistoryHandler extends EventTarget {
 		super();
 
 		naja.addEventListener('init', this.initialize.bind(this));
-		naja.addEventListener('init', this.preserveCursorFromState.bind(this));
 		naja.addEventListener('before', this.saveUrl.bind(this));
 		naja.addEventListener('before', this.saveOriginalTitle.bind(this));
 		naja.addEventListener('before', this.replaceInitialStateBeforeRequest.bind(this));
@@ -84,11 +83,10 @@ export class HistoryHandler extends EventTarget {
 
 	private initialize(): void {
 		window.addEventListener('popstate', this.popStateHandler);
-	}
 
-	private preserveCursorFromState(): void {
 		if (this.historyAdapter.state?.source === 'naja') {
 			this.cursor = this.historyAdapter.state.cursor;
+			this.replaceInitialState();
 		}
 	}
 

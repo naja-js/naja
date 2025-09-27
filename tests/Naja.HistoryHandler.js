@@ -42,21 +42,36 @@ describe('HistoryHandler', function () {
 		});
 	});
 
-	it('is initialized when popstate to a Naja-produced state is dispatched', function () {
-		const naja = mockNaja({
-			historyHandler: HistoryHandler,
-		});
+	it('is initialized after page reload with a Naja-produced state', function () {
+		const naja = mockNaja();
+		const historyHandler = new HistoryHandler(naja);
 
-		naja.historyHandler.initialize();
+		historyHandler.historyAdapter = {
+			state: {
+				source: 'naja',
+				cursor: 42,
+				href: '/test',
+			},
+			replaceState() {
+				// no-op
+			},
+		};
 
-		assert.isFalse(naja.historyHandler.initialized);
+		const mock = sinon.mock(historyHandler.historyAdapter);
+		mock.expects('replaceState').once();
 
-		const state = {source: 'naja', cursor: 1, href: '/HistoryHandler/popState/event'};
-		window.dispatchEvent(createPopstateEvent(state));
+		assert.isFalse(historyHandler.initialized);
+		assert.equal(historyHandler.cursor, 0);
 
-		assert.isTrue(naja.historyHandler.initialized);
+		historyHandler.initialize();
 
-		cleanPopstateListener(naja.historyHandler);
+		assert.isTrue(historyHandler.initialized);
+		assert.equal(historyHandler.cursor, 42);
+
+		mock.verify();
+		mock.restore();
+
+		cleanPopstateListener(historyHandler);
 	});
 
 	it('saves initial state', function () {
@@ -71,25 +86,6 @@ describe('HistoryHandler', function () {
 
 		mock.verify();
 		mock.restore();
-	});
-
-	it('preserves cursor value after page reload', function () {
-		const naja = mockNaja();
-		const historyHandler = new HistoryHandler(naja);
-
-		historyHandler.historyAdapter = {
-			state: {
-				source: 'naja',
-				cursor: 42,
-				href: '/test',
-			},
-		};
-
-		assert.equal(historyHandler.cursor, 0);
-
-		historyHandler.preserveCursorFromState();
-
-		assert.equal(historyHandler.cursor, 42);
 	});
 
 	it('pushes new state after successful request', function () {
