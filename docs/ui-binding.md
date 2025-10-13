@@ -127,3 +127,18 @@ naja.uiHandler.addEventListener('interaction', (event) => {
 	}
 });
 ```
+
+
+## Delegated binding
+
+Since version 3.3.0, you can also opt into event delegation for Naja's UI binding. That way, instead of binding directly to `.ajax` elements, Naja binds itself to `body`, listens to all clicks and form submissions, and only then decides whether to act upon them, or let the browser handle them.
+
+This might decrease time to interactive in situations where you have a huge number of `.ajax` elements on a page, because Naja doesn't have to iterate over so many interaction targets. On the other hand, this may introduce unnecessary function calls if you have a lot of non-AJAX interactivity within your application. You are advised to do your own benchmark and decide accordingly.
+
+You can switch to delegated binding this way:
+
+```js
+naja.uiHandler.binding = 'delegated';
+```
+
+This has to be configured before Naja is initialized and cannot be changed later.
