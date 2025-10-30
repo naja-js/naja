@@ -20,6 +20,7 @@ declare module './HistoryHandler' {
 }
 
 export class SnippetCache extends EventTarget {
+	private initialized = false;
 	private readonly storages: Record<SnippetCacheStorageType, SnippetCacheStorage>;
 	private currentSnippets: Map<string, string> = new Map();
 
@@ -63,10 +64,14 @@ export class SnippetCache extends EventTarget {
 	}
 
 	private initializeIndex(): void {
-		onDomReady(() => {
-			const currentSnippets = SnippetHandler.findSnippets(SnippetCache.shouldCacheSnippet);
-			this.currentSnippets = new Map(Object.entries(currentSnippets));
-		});
+		if ( ! this.initialized) {
+			onDomReady(() => {
+				const currentSnippets = SnippetHandler.findSnippets(SnippetCache.shouldCacheSnippet);
+				this.currentSnippets = new Map(Object.entries(currentSnippets));
+			});
+
+			this.initialized = true;
+		}
 	}
 
 	private updateIndex(event: PendingUpdateEvent): void {
@@ -112,11 +117,15 @@ export class SnippetCache extends EventTarget {
 	}
 
 	private buildHistoryState(event: BuildStateEvent): void {
-		const {state, options} = event.detail;
+		const {isInitial, state, options} = event.detail;
 
 		if ('historyUiCache' in options) {
 			console.warn('Naja: options.historyUiCache is deprecated, use options.snippetCache instead.');
 			options.snippetCache = options.historyUiCache;
+		}
+
+		if (isInitial) {
+			this.initializeIndex();
 		}
 
 		const presentSnippetIds = Object.keys(SnippetHandler.findSnippets(SnippetCache.shouldCacheSnippet));
